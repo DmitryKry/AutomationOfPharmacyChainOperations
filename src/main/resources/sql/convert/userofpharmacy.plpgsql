@@ -1,0 +1,30 @@
+-- Table: public.userofpharmacy
+
+-- DROP TABLE IF EXISTS public.userofpharmacy;
+
+CREATE TABLE IF NOT EXISTS public.userofpharmacy
+(
+    data_of_birt date NOT NULL,
+    phone character varying(20) COLLATE pg_catalog."default",
+    login character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    email character varying(100) COLLATE pg_catalog."default",
+    fio character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    password character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    passport character varying(255) COLLATE pg_catalog."default",
+    id numeric NOT NULL,
+    role numeric NOT NULL DEFAULT 1,
+    CONSTRAINT userofpharmacy_pkey PRIMARY KEY (id),
+    CONSTRAINT userofpharmacy_email_key UNIQUE (email),
+    CONSTRAINT userofpharmacy_login_key UNIQUE (login),
+    CONSTRAINT userofpharmacy_passport_key UNIQUE (passport),
+    CONSTRAINT userofpharmacy_phone_key UNIQUE (phone),
+    CONSTRAINT fk_role_user FOREIGN KEY (role)
+        REFERENCES public.role (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.userofpharmacy
+    OWNER to postgres;

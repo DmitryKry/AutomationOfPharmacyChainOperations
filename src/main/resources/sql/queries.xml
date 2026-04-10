@@ -1,0 +1,11 @@
+<queries>
+    <!-- queries.xml -->
+    <queries>
+        <expression name="getAllPharmacies">
+            <script><![CDATA[
+            SELECT * FROM pharmacy_pkg.get_all_pharmacies_table()
+        ]]></script>
+        </expression>
+    </queries>
+
+</queries>

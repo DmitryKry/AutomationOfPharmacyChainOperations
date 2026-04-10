@@ -1,0 +1,23 @@
+-- Table: public.pharmacy
+
+-- DROP TABLE IF EXISTS public.pharmacy;
+
+CREATE TABLE IF NOT EXISTS public.pharmacy
+(
+    id numeric NOT NULL DEFAULT nextval('allobjects'::regclass),
+    name character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    legal_name character varying(200) COLLATE pg_catalog."default",
+    inn character varying(12) COLLATE pg_catalog."default",
+    kpp character varying(9) COLLATE pg_catalog."default",
+    ogrn character varying(13) COLLATE pg_catalog."default",
+    address character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    city character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    region character varying(100) COLLATE pg_catalog."default",
+    postal_code character varying(10) COLLATE pg_catalog."default",
+    CONSTRAINT pharmacy_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.pharmacy
+    OWNER to postgres;

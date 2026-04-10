@@ -1,0 +1,23 @@
+CREATE SCHEMA IF NOT EXISTS pharmacy_pkg;
+
+CREATE OR REPLACE FUNCTION pharmacy_pkg.get_all_pharmacies() RETURNS REFCURSOR AS $$
+DECLARE
+    p_cursor REFCURSOR;
+BEGIN
+    OPEN p_cursor FOR
+        SELECT *
+        FROM pharmacy
+        ORDER BY id;
+	 RETURN p_cursor;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION pharmacy_pkg.get_all_pharmacies_table()
+RETURNS SETOF pharmacy AS $$
+BEGIN
+    RETURN QUERY
+        SELECT *
+        FROM pharmacy p
+        ORDER BY p.id;
+END;
+$$ LANGUAGE plpgsql;
