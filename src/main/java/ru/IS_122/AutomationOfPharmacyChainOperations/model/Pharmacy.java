@@ -2,6 +2,7 @@ package ru.IS_122.AutomationOfPharmacyChainOperations.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -16,7 +17,7 @@ public class Pharmacy {
     @SequenceGenerator(name = "allobjects_seq", sequenceName = "allobjects", allocationSize = 1)
     @Column(name = "id", nullable = false)
     @NonNull
-    private Long id;
+    private BigDecimal id;
     @Column(name = "name", nullable = false, length = 200)
     @NonNull
     private String name;

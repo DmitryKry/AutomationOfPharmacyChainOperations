@@ -21,3 +21,13 @@ BEGIN
         ORDER BY p.id;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE function pharmacy_pkg.SET_NEW_pharmacy(name varchar, legal_name varchar, inn varchar, kpp varchar,
+ogrn varchar, address varchar, city varchar, region varchar, postal_code)
+returns numeric language plpgsql as $$
+begin
+INSERT INTO your_table_name (id, name, legal_name, inn, kpp, ogrn, address, city, region, postal_code)
+VALUES (name, legal_name, inn, kpp, ogrn, address, city, region, postal_code);
+end;
+$$ LANGUAGE plpgsql;
+
