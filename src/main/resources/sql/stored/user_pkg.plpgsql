@@ -1,0 +1,9 @@
+CREATE SCHEMA IF NOT EXISTS user_pkg;
+
+CREATE OR REPLACE FUNCTION user_pkg.get_of_user(p_login varchar, p_password varchar) RETURNS SETOF userofpharmacy AS $$
+BEGIN
+    RETURN QUERY
+    select * from userofpharmacy where login = p_login and password = p_password;
+END;
+$$ LANGUAGE plpgsql;
+

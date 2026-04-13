@@ -7,5 +7,11 @@
         ]]></script>
         </expression>
     </queries>
-
+    <queries>
+        <expression name="getOfUser">
+            <script><![CDATA[
+            SELECT * FROM user_pkg.get_of_user(:login, :password);
+        ]]></script>
+        </expression>
+    </queries>
 </queries>

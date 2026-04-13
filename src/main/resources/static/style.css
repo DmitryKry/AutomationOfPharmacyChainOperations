@@ -1,0 +1,56 @@
+#Entrace {
+    position: fixed;
+    /* Устанавливаем точку начала в центр */
+    left: 50%;
+    top: 50%;
+    /* Сдвигаем блок назад на половину его собственной ширины и высоты */
+    transform: translate(-50%, -50%);
+
+    /* Вместо огромного padding используйте небольшие значения для красоты */
+    padding: 5%;
+    background: white; /* Чтобы видеть границы блока */
+    border-radius: 25px;
+    border: 3px solid black;
+
+    /* Чтобы инпуты были друг под другом */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    /* Чтобы группа не сжималась в точку, задаем ширину */
+    width: 100%;
+}
+
+/* Убираем ваши left, они тут не работают */
+.form-group > label {
+    margin-bottom: 5px;
+    /* Если нужно текст лабела по центру: */
+    text-align: center;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 8px;
+    width: 100%; /* Чтобы инпуты были одинаковой ширины */
+    box-sizing: border-box; /* Чтобы padding не раздувал ширину */
+}
+
+button {
+    padding: 10px 20px;
+    border: 1px solid black;
+    border-radius: 8px;
+    cursor: pointer;
+    background: white;
+    width: fit-content; /* Кнопка по размеру текста */
+}
+
+.form-group > button{
+    margin-top: 10%;
+    align-self: center;
+}
