@@ -1,4 +1,12 @@
 spring:
+  thymeleaf:
+    encoding: UTF-8
+    mode: HTML
+    cache: false
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
   datasource:
     url: jdbc:postgresql://localhost:5432/pharmacy_chain
     username: postgres

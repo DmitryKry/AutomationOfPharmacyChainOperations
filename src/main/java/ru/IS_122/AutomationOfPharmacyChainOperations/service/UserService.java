@@ -23,6 +23,6 @@ public class UserService {
                 new BeanPropertyRowMapper<>(UserOfPharmacy.class),
                 login, password
         );
-        return users.get(0);
+        return users.isEmpty() ? null : users.get(0);
     }
 }

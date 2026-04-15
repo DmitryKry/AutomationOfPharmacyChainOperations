@@ -6,23 +6,33 @@
         <link rel="stylesheet" th:href="@{/style.css}">
     </HEAD>
     <body>
-    <form th:action="@{/api/pharmacy/login}" method="post" th:if="${user == null}">
-        <div id="Entrace">
-            <h2 th:if="${error == null}" th:text="#{view.title}"></h2>
-            <h2 th:if="${error != null}" th:text="#{error}"></h2>
-            <div class="form-group">
-                <label for="login">Login</label>
-                <br>
-                <input type="text" id="login" name="login" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <br>
-                <input type="password" id="password" name="password" required>
-                <button type="submit" th:class="ButtonPost">Войти</button>
-            </div>
-
+        <div class="menu">
+            <a class="authorization" th:text="#{authorization}"></a>
+            <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+            <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+            <a class="pharmacies" th:text="#{pharmacies}"></a>
+            <a class="medicines" th:text="#{medicines}"></a>
         </div>
-    </form>
+        <form th:action="@{/api/pharmacy/login}" method="post" th:if="${user == null}">
+            <div class="Entrace">
+                <h2 th:if="${error == null}" th:text="#{view.title}"></h2>
+                <h2 th:if="${error != null}" th:utext="#{error}"></h2>
+                <div class="form-group">
+                    <label for="login" th:text="#{login}"></label>
+                    <br>
+                    <input type="text" id="login" name="login" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" th:text="#{password}"></label>
+                    <br>
+                    <input type="password" id="password" name="password" required>
+                    <button type="submit" th:class="ButtonPost">Войти</button>
+                </div>
+                <div th:id="more_active">
+                    <a th:id="forgot" th:text="#{forgot}"></a>
+                    <a th:id="registration_maybe" th:href="@{/api/pharmacy/registration}" th:text="#{registration_maybe}"></a>
+                </div>
+            </div>
+        </form>
     </body>
 </HTML>

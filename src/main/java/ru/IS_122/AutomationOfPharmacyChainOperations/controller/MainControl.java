@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.Pharmacy;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.UserOfPharmacy;
@@ -36,21 +33,42 @@ public class MainControl {
     }
 
     @GetMapping("/login")
-    public String inputUser(@RequestParam(required = false) String login,
-                          @RequestParam(required = false) String password,
-                          Model model,
-                          HttpSession session) {
-        if (login != null){
-            UserOfPharmacy user = userService.findOfUser(login, password);
-            // 2. Обработка результата
-            if (user != null) {
-                model.addAttribute("user", user);
-                return "userPlace"; // страница после успешного входа
-            } else {
-                model.addAttribute("error", "Неверный логин или пароль");
-                return "entrace"; // вернуться на страницу входа с ошибкой
-            }
-        }
+    public String showLoginPage(Model model) {
         return "entrace";
+    }
+
+    @PostMapping("/login")
+    public String processLogin(@RequestParam String login,
+                               @RequestParam String password,
+                               Model model,
+                               HttpSession session) {
+        UserOfPharmacy user = userService.findOfUser(login, password);
+        if (user != null) {
+            model.addAttribute("user", user);
+            return "userPlace";
+        } else {
+            model.addAttribute("error", "Неверный логин или пароль");
+            return "entrace";
+        }
+    }
+
+    @GetMapping("/registration")
+    public String showRegistrationPage(Model model) {
+        return "registration";
+    }
+
+    @PostMapping("/registration")
+    public String processRegistration(@RequestParam String login,
+                               @RequestParam String password,
+                               Model model,
+                               HttpSession session) {
+        UserOfPharmacy user = userService.findOfUser(login, password);
+        if (user != null) {
+            model.addAttribute("user", user);
+            return "userPlace";
+        } else {
+            model.addAttribute("error", "Неверный логин или пароль");
+            return "entrace";
+        }
     }
 }
