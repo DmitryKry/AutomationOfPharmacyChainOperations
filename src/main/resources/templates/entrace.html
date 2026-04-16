@@ -1,38 +1,39 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <HEAD>
-        <meta charset="UTF-8">
-        <title>Вход</title>
-        <link rel="stylesheet" th:href="@{/style.css}">
-    </HEAD>
-    <body>
-        <div class="menu">
-            <a class="authorization" th:text="#{authorization}"></a>
-            <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
-            <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
-            <a class="pharmacies" th:text="#{pharmacies}"></a>
-            <a class="medicines" th:text="#{medicines}"></a>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</HEAD>
+<body>
+<div class="menu">
+    <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+    <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+    <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+    <a class="pharmacies" th:text="#{pharmacies}"></a>
+    <a class="medicines" th:text="#{medicines}"></a>
+</div>
+<form th:action="@{/api/pharmacy/login}" method="post" th:if="${user == null}">
+    <div class="Entrace">
+        <h2 th:if="${error == null}" th:text="#{view.title}"></h2>
+        <h2 th:if="${error == 1}" th:utext="#{error}"></h2>
+        <h2 th:if="${error == 2}" th:utext="#{successfulCreate}"></h2>
+        <div class="form-group">
+            <label for="login" th:text="#{login}"></label>
+            <br>
+            <input type="text" id="login" name="login" required>
         </div>
-        <form th:action="@{/api/pharmacy/login}" method="post" th:if="${user == null}">
-            <div class="Entrace">
-                <h2 th:if="${error == null}" th:text="#{view.title}"></h2>
-                <h2 th:if="${error != null}" th:utext="#{error}"></h2>
-                <div class="form-group">
-                    <label for="login" th:text="#{login}"></label>
-                    <br>
-                    <input type="text" id="login" name="login" required>
-                </div>
-                <div class="form-group">
-                    <label for="password" th:text="#{password}"></label>
-                    <br>
-                    <input type="password" id="password" name="password" required>
-                    <button type="submit" th:class="ButtonPost">Войти</button>
-                </div>
-                <div th:id="more_active">
-                    <a th:id="forgot" th:text="#{forgot}"></a>
-                    <a th:id="registration_maybe" th:href="@{/api/pharmacy/registration}" th:text="#{registration_maybe}"></a>
-                </div>
-            </div>
-        </form>
-    </body>
+        <div class="form-group">
+            <label for="password" th:text="#{password}"></label>
+            <br>
+            <input type="password" id="password" name="password" required>
+            <button type="submit" th:class="ButtonPost" th:text="#{entrace}"></button>
+        </div>
+        <div th:id="more_active">
+            <a th:id="forgot" th:text="#{forgot}"></a>
+            <a th:id="registration_maybe" th:href="@{/api/pharmacy/registration}" th:text="#{registration_maybe}"></a>
+        </div>
+    </div>
+</form>
+</body>
 </HTML>

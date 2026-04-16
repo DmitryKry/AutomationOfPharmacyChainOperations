@@ -12,7 +12,8 @@ import ru.IS_122.AutomationOfPharmacyChainOperations.model.Pharmacy;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.UserOfPharmacy;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.PharmacyService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.UserService;
-
+import org.springframework.beans.factory.annotation.Value;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,23 @@ import java.util.List;
 @RequestMapping("/api/pharmacy")
 @AllArgsConstructor
 public class MainControl {
+
+    public enum ErrorCode {
+        NO_ERROR(0),
+        AUTHORIZATION_FAILED(1),
+        REGISTRATION_SUCCESS(2);
+
+        private final int code;
+
+        ErrorCode(int code) {
+            this.code = code;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+
     @Autowired
     private PharmacyService pharmacyService;
 
@@ -47,7 +65,7 @@ public class MainControl {
             model.addAttribute("user", user);
             return "userPlace";
         } else {
-            model.addAttribute("error", "Неверный логин или пароль");
+            model.addAttribute("error", ErrorCode.AUTHORIZATION_FAILED.getCode());
             return "entrace";
         }
     }
@@ -59,15 +77,20 @@ public class MainControl {
 
     @PostMapping("/registration")
     public String processRegistration(@RequestParam String login,
-                               @RequestParam String password,
+                                      @RequestParam String password,
+                                      @RequestParam LocalDate data_of_birt,
+                                      @RequestParam String phone,
+                                      @RequestParam String passport,
+                                      @RequestParam String fio,
+                                      @RequestParam String email,
                                Model model,
                                HttpSession session) {
-        UserOfPharmacy user = userService.findOfUser(login, password);
-        if (user != null) {
-            model.addAttribute("user", user);
-            return "userPlace";
+        String error = userService.UserCreate(login, password, data_of_birt, phone, passport, fio, email);
+        if (error != null) {
+            model.addAttribute("error", error);
+            return "registration";
         } else {
-            model.addAttribute("error", "Неверный логин или пароль");
+            model.addAttribute("error", ErrorCode.REGISTRATION_SUCCESS.getCode());
             return "entrace";
         }
     }

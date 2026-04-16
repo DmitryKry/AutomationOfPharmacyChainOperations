@@ -66,22 +66,18 @@ a{
 
 .Entrace {
     position: fixed;
-    /* Устанавливаем точку начала в центр */
     left: 50%;
     top: 50%;
-    /* Сдвигаем блок назад на половину его собственной ширины и высоты */
     transform: translate(-50%, -50%);
 
-    /* Вместо огромного padding используйте небольшие значения для красоты */
-    padding-top: 5%;
+    padding-top: 1%;
     padding-left: 5%;
     padding-right: 5%;
     padding-bottom: 1%;
-    background: white; /* Чтобы видеть границы блока */
-    border-radius: 10%;
+    background: white;
+    border-radius: 15% / 10%;
     border: 3px solid black;
 
-    /* Чтобы инпуты были друг под другом */
     display: flex;
     flex-direction: column;
     gap: 1%;
@@ -91,6 +87,7 @@ a{
     font-size: clamp(16px, 2.5vw, 2.8vh);
     margin: 0;
     padding: 0;
+    text-align: center;
 }
 #more_active > a{
     display: inline-block;
@@ -158,4 +155,23 @@ button {
 .form-group > button{
     margin-top: 10%;
     align-self: center;
+}
+
+#errorCheak {
+    width: 100%;           /* или max-width: 500px */
+    max-width: 300px;     /* максимальная ширина */
+    text-align: center;
+}
+
+#errorCheak h2 {
+    margin: 0;            /* убираем отступы h2 */
+    padding: 0;           /* убираем падинг h2 */
+    word-wrap: break-word; /* перенос длинных слов */
+}
+
+#filter{
+    height: 95%;
+    margin-top: 0%;
+    width: 20%;
+    border: black solid 1px;
 }

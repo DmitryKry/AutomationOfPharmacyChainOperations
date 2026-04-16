@@ -7,3 +7,60 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE PROCEDURE user_pkg.set_of_user(
+    p_login varchar,
+    p_data_of_birt date,
+    p_phone varchar,
+    p_passport varchar,
+    p_fio varchar,
+    p_email varchar,
+    p_password varchar,
+	p_error out varchar
+) AS $$
+BEGIN
+
+    IF p_phone IS NOT NULL AND TRIM(p_phone) = '' THEN
+            p_phone := NULL;
+    END IF;
+
+        IF p_passport IS NOT NULL AND TRIM(p_passport) = '' THEN
+            p_passport := NULL;
+    END IF;
+
+        IF p_email IS NOT NULL AND TRIM(p_email) = '' THEN
+            p_email := NULL;
+    END IF;
+    INSERT INTO userofpharmacy (
+        login,
+        data_of_birt,
+        phone,
+        passport,
+        fio,
+        email,
+        password
+    ) VALUES (
+        p_login,
+        p_data_of_birt,
+        p_phone,
+        p_passport,
+        p_fio,
+        p_email,
+        p_password
+    );
+
+EXCEPTION
+    WHEN unique_violation THEN
+        CASE
+            WHEN SQLERRM LIKE '%userofpharmacy_login_key%' THEN
+                p_error := 'Пользователь с логином "' || p_login || '" уже существует';
+            WHEN SQLERRM LIKE '%userofpharmacy_email_key%' THEN
+                p_error := 'Пользователь с email "' || p_email || '" уже существует';
+            WHEN SQLERRM LIKE '%userofpharmacy_phone_key%' THEN
+                p_error := 'Пользователь с телефоном "' || p_phone || '" уже существует';
+            WHEN SQLERRM LIKE '%userofpharmacy_passport_key%' THEN
+                p_error := 'Пользователь с паспортом "' || p_passport || '" уже существует';
+            ELSE
+                p_error := 'Нарушение уникальности: ' || SQLERRM;
+        END CASE;
+END;
+$$ LANGUAGE plpgsql;

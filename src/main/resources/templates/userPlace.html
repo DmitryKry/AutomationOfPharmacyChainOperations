@@ -1,25 +1,48 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <HEAD>
-        <meta charset="UTF-8">
-        <title>Вход</title>
-        <link rel="stylesheet" th:href="@{/style.css}">
-    </HEAD>
-    <body>
-        <div class="menu">
-            <a class="authorization" th:text="#{authorization}"></a>
-            <a class="registration" th:text="#{registration}"></a>
-            <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
-            <a class="pharmacies" th:text="#{pharmacies}"></a>
-            <a class="medicines" th:text="#{medicines}"></a>
-        </div>
-        <div class="AllInfo">
-            <div th:id="filter"></div>
-            <div th:id="pharmacies"></div>
-            <div th:if="${user != null}">
-                <p>Добро пожаловать, <span th:text="${user.login}">Имя пользователя</span>!</p>
-            </div>
-        </div>
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</HEAD>
+<body>
+<div class="menu">
+    <a class="authorization" th:text="#{authorization}"></a>
+    <a class="registration" th:text="#{registration}"></a>
+    <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+    <a class="pharmacies" th:text="#{pharmacies}"></a>
+    <a class="medicines" th:text="#{medicines}"></a>
+</div>
+<div class="AllInfo">
+    <div th:id="filter">
+        <form th:action="@{/api/pharmacy/registration}" method="post">
+                <h2 th:if="${error == null}" th:text="#{view.registration}"></h2>
+                <div th:id="errorCheak" th:if="${error != null}">
+                    <h2 th:if="${error != null}" th:text="${error}"></h2>
+                </div>
+                <div class="form-group">
+                    <label for="adress" th:text="#{login}"></label>
+                    <br>
+                    <input type="text" id="adress" name="adress">
+                </div>
+                <div class="form-group">
+                    <label for="grade" th:text="#{login}"></label>
+                    <br>
+                    <input type="text" id="grade" name="grade">
+                </div>
+                <div class="form-group">
+                    <label for="coverage" th:text="#{password}"></label>
+                    <br>
+                    <input type="password" id="coverage" name="coverage">
+                    <button type="submit" th:class="ButtonPost" th:text="#{regisres}"></button>
+                </div>
+        </form>
+    </div>
+    <div th:id="pharmacies"></div>
+    <div th:if="${user != null}">
+        <p>Добро пожаловать, <span th:text="${user.login}">Имя пользователя</span>!</p>
+    </div>
+</div>
 
-    </body>
+</body>
 </HTML>
