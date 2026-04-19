@@ -6,20 +6,17 @@
     <link rel="stylesheet" th:href="@{/style.css}">
 </HEAD>
 <body>
-<div class="menu">
-    <a class="authorization" th:text="#{authorization}"></a>
-    <a class="registration" th:text="#{registration}"></a>
-    <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
-    <a class="pharmacies" th:text="#{pharmacies}"></a>
-    <a class="medicines" th:text="#{medicines}"></a>
-</div>
 <div class="AllInfo">
+    <div class="menu">
+        <a class="authorization" th:text="#{authorization}"></a>
+        <a class="registration" th:text="#{registration}"></a>
+        <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+        <a class="pharmacies" th:text="#{pharmacies}"></a>
+        <a class="medicines" th:text="#{medicines}"></a>
+    </div>
     <div th:id="filter">
         <form th:action="@{/api/pharmacy/registration}" method="post">
-                <h2 th:if="${error == null}" th:text="#{view.registration}"></h2>
-                <div th:id="errorCheak" th:if="${error != null}">
-                    <h2 th:if="${error != null}" th:text="${error}"></h2>
-                </div>
+                <h2 th:if="${error == null}" th:text="#{filter}"></h2>
                 <div class="form-group">
                     <label for="adress" th:text="#{login}"></label>
                     <br>

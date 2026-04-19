@@ -1,0 +1,21 @@
+-- Table: public.review
+
+-- DROP TABLE IF EXISTS public.review;
+
+CREATE TABLE IF NOT EXISTS public.review
+(
+    id numeric NOT NULL DEFAULT nextval('allobjects'::regclass),
+    id_pharmacy numeric NOT NULL,
+    grade numeric(1,1) NOT NULL,
+    message character varying(350) COLLATE pg_catalog."default",
+    CONSTRAINT review_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_id_pharmacy FOREIGN KEY (id_pharmacy)
+    REFERENCES public.pharmacy (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.review
+    OWNER to postgres;

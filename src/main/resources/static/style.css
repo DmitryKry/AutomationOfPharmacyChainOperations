@@ -1,4 +1,6 @@
 .menu{
+    display: flex;
+    flex-wrap: wrap;
     width: 102%;
     height: 6%;
     border-bottom: 3px solid black;
@@ -170,8 +172,15 @@ button {
 }
 
 #filter{
-    height: 95%;
-    margin-top: 0%;
+    position: fixed;
+    height: 25%;
+    top: 6.5%;
+    left: 0.1%;
     width: 20%;
     border: black solid 1px;
+}
+
+.AllInfo {
+    display: flex;
+    flex-direction: column;
 }
