@@ -3,43 +3,61 @@
     flex-wrap: wrap;
     width: 102%;
     height: 6%;
-    border-bottom: 3px solid black;
+    border-bottom: 1px solid red;
     position: fixed;
     top: 0.1%;
     left: -1%;
     transition: 0.5s;
-    background-color: black;
-}
-a{
-    text-decoration: none;
+    background-color: white;
 }
 
 .menu:hover{
-    box-shadow: 0px 0px 10px black;
+    box-shadow: 0px 0px 10px red;
     /*background: black;*/
 }
 
-.menu > a{
+a{
+    text-decoration: none;
     display: inline-block;
-    border: 1px solid black;
+    border: 1px solid red;
     background: white;
     user-select: none;
-    margin-top: 0.5%;
-    margin-left: 1%;
+    color: red;
+    transition: 0.5s;
+    border-radius: 15% 15% / 100% 100%;
+    font-size: clamp(4px, 1vw, 2vh);
     padding-right: 1%;
     padding-left: 1%;
     padding-top: 0.5%;
     padding-bottom: 0.5%;
-    border-radius: 15% 15% / 100% 100%;
-    color: black;
-    transition: 0.5s;
-    font-size: clamp(4px, 1vw, 2vh);
 }
 
-.menu > a:hover {
-    box-shadow: 0px 0px 10px black;
-    background: black;
+button{
+    border: 1px solid black;
+        border-radius: 25% 25% / 100% 100%;
+        cursor: pointer;
+        background: white;
+        width: fit-content; /* Кнопка по размеру текста */
+        padding-right: 6%;
+    padding-left: 6%;
+            padding-top: 3%;
+            padding-bottom: 3%;
+}
+
+.menu > a{
+    margin-top: 0.5%;
+    margin-left: 1%;
+
+}
+
+a:hover {
+    box-shadow: 0px 0px 10px red;
+    background: red;
     color: white;
+    padding-right: 1%;
+    padding-left: 1%;
+    padding-top: 0.5%;
+    padding-bottom: 0.5%;
 }
 .registration {
     position: absolute;
@@ -71,18 +89,22 @@ a{
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-
+    transition: 0.5s;
     padding-top: 1%;
     padding-left: 5%;
     padding-right: 5%;
     padding-bottom: 1%;
     background: white;
     border-radius: 15% / 10%;
-    border: 3px solid black;
+    border: 1px solid red;
 
     display: flex;
     flex-direction: column;
     gap: 1%;
+}
+
+.Entrace:hover{
+    box-shadow: 0px 0px 10px red;
 }
 
 .Entrace > h2 {
@@ -92,31 +114,19 @@ a{
     text-align: center;
 }
 #more_active > a{
-    display: inline-block;
-    border: 1px solid black;
-    background: white;
-    user-select: none;
     margin-top: 0.5%;
     padding-right: 3%;
     padding-left: 3%;
     padding-top: 1.5%;
     padding-bottom: 1.5%;
     border-radius: 15% 15% / 100% 100%;
-    color: black;
-    transition: 0.5s;
     margin-left: 3%;
     margin-top: 10%;
-    font-size: clamp(14px, 1.8vw, 1.8vh)
 
 }
 #more_active > a:first-child{
     position: relative;
     left: -2%;
-}
-#more_active > a:hover {
-    box-shadow: 0px 0px 10px black;
-    background: black;
-    color: white;
 }
 
 .form-group {
@@ -135,23 +145,19 @@ a{
 
 input {
     padding: 2%;
-    border: 1px solid black;
+    border: 1px solid red;
     border-radius: 5% 5% / 100% 100%;
     width: 100%; /* Чтобы инпуты были одинаковой ширины */
     box-sizing: border-box; /* Чтобы padding не раздувал ширину */
 }
 
-button {
-    border: 1px solid black;
-    border-radius: 25% 25% / 100% 100%;
-    cursor: pointer;
-    background: white;
-    width: fit-content; /* Кнопка по размеру текста */
+input:hover{
+    box-shadow: 0px 0px 10px red;
+}
+
+#Entrace > button {
     margin-top: 0.5%;
-    padding-right: 6%;
-    padding-left: 6%;
-    padding-top: 3%;
-    padding-bottom: 3%;
+
 }
 
 .form-group > button{
@@ -173,11 +179,19 @@ button {
 
 #filter{
     position: fixed;
-    height: 25%;
+    height: 35%;
     top: 6.5%;
     left: 0.1%;
     width: 20%;
     border: black solid 1px;
+    border-radius: 5% / 5%;
+}
+
+#openFilter > button{
+    size: 2%;
+    top: 8%;
+    left:5%
+    margin-left:0%;
 }
 
 .AllInfo {
