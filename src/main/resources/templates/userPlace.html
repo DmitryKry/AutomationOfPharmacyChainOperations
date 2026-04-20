@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <title>Вход</title>
     <link rel="stylesheet" th:href="@{/style.css}">
+    <script>
+        // Скрипт в head, но обёрнут в событие загрузки DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            var toggleBtn = document.querySelector('.toggle-link');
+            var openFilter = document.getElementById('openFilter');
+
+            if (toggleBtn && openFilter) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openFilter.classList.toggle('hide-filter');
+                });
+            }
+        });
+    </script>
 </HEAD>
 <body>
 <div class="AllInfo">
@@ -35,8 +49,9 @@
                     <button type="submit" th:class="ButtonPost" th:text="#{find}"></button>
                 </div>
             </form>
+            <a th:id="create" th:text="#{create}"></a>
+            <a class="toggle-link"></a>
         </div>
-        <button type="submit"></button>
     </div>
     <div th:id="pharmacies"></div>
     <div th:if="${user != null}">
