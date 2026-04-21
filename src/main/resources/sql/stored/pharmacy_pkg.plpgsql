@@ -31,3 +31,50 @@ VALUES (name, legal_name, inn, kpp, ogrn, address, city, region, postal_code);
 end;
 $$ LANGUAGE plpgsql;
 
+create or replace procedure pharmacy_pkg.create_new_pharmacy(p_name character varying(200),  p_legal_name character varying(200),
+                                                                    p_inn character varying(12), p_kpp character varying(9),
+                                                                    p_ogrn character varying(13), p_address character varying(255),
+                                                                    p_city character varying(100), p_region character varying(100),
+                                                                    p_postal_code character varying(10), p_error out varchar)
+as $$
+begin
+    insert into pharmacy (name, legal_name, inn, kpp, ogrn, address, city, region, postal_code)
+    values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_city, p_region, p_postal_code);
+EXCEPTION
+    -- Нарушение уникальности имени
+    WHEN unique_violation THEN
+        IF EXISTS (SELECT 1 FROM pharmacy WHERE name = p_name) THEN
+            p_error := 'ERROR: Аптека с названием "' || p_name || '" уже существует';
+        ELSIF EXISTS (SELECT 1 FROM pharmacy WHERE inn = p_inn) THEN
+            p_error := 'ERROR: Аптека с ИНН "' || p_inn || '" уже существует';
+        ELSIF EXISTS (SELECT 1 FROM pharmacy WHERE ogrn = p_ogrn) THEN
+            p_error := 'ERROR: Аптека с ОГРН "' || p_ogrn || '" уже существует';
+        ELSIF EXISTS (SELECT 1 FROM pharmacy WHERE address = p_address) THEN
+            p_error := 'ERROR: Аптека с адресом "' || p_address || '" уже существует';
+ELSE
+            p_error := 'ERROR: Нарушение уникальности при создании аптеки';
+END IF;
+
+    -- Нарушение NOT NULL constraint
+WHEN not_null_violation THEN
+        p_error := 'ERROR: Обязательное поле не может быть NULL';
+
+    -- Нарушение foreign key (если будут)
+WHEN foreign_key_violation THEN
+        p_error := 'ERROR: Нарушение внешнего ключа';
+
+    -- Превышение длины строки
+WHEN string_data_right_truncation THEN
+        p_error := 'ERROR: Превышена допустимая длина одного из полей';
+
+    -- Неверный формат данных
+WHEN invalid_parameter_value THEN
+        p_error := 'ERROR: Неверный формат данных';
+
+    -- Другая ошибка
+WHEN OTHERS THEN
+        p_error := 'ERROR: Неизвестная ошибка - ' || SQLERRM;
+end;
+$$ LANGUAGE plpgsql;
+
+

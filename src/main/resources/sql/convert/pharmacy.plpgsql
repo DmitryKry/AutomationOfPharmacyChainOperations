@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS public.pharmacy
 (
-    id numeric NOT NULL DEFAULT nextval('allobjects'::regclass),
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
     name character varying(200) COLLATE pg_catalog."default" NOT NULL,
     legal_name character varying(200) COLLATE pg_catalog."default",
     inn character varying(12) COLLATE pg_catalog."default",
@@ -14,10 +14,29 @@ CREATE TABLE IF NOT EXISTS public.pharmacy
     city character varying(100) COLLATE pg_catalog."default" NOT NULL,
     region character varying(100) COLLATE pg_catalog."default",
     postal_code character varying(10) COLLATE pg_catalog."default",
-    CONSTRAINT pharmacy_pkey PRIMARY KEY (id)
-)
+    opening_date date DEFAULT CURRENT_DATE,
+    closing_date date,
+    status character varying(20) COLLATE pg_catalog."default" DEFAULT 'active'::character varying,
+    CONSTRAINT pharmacy_pkey PRIMARY KEY (id),
+    CONSTRAINT pharmacy_address_unique UNIQUE (address),
+    CONSTRAINT pharmacy_inn_unique UNIQUE (inn),
+    CONSTRAINT pharmacy_name_city_unique UNIQUE (name, city),
+    CONSTRAINT pharmacy_name_unique UNIQUE (name),
+    CONSTRAINT pharmacy_ogrn_unique UNIQUE (ogrn),
+    CONSTRAINT pharmacy_dates_check CHECK (closing_date IS NULL OR closing_date >= opening_date),
+    CONSTRAINT pharmacy_status_check CHECK (status::text = ANY (ARRAY['active'::character varying, 'closed'::character varying, 'renovation'::character varying, 'temporary_closed'::character varying]::text[]))
+    )
 
-TABLESPACE pg_default;
+    TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.pharmacy
     OWNER to postgres;
+
+COMMENT ON COLUMN public.pharmacy.opening_date
+    IS 'Дата открытия аптеки';
+
+COMMENT ON COLUMN public.pharmacy.closing_date
+    IS 'Дата закрытия аптеки (если закрыта)';
+
+COMMENT ON COLUMN public.pharmacy.status
+    IS 'Статус аптеки: active, closed, renovation, temporary_closed';

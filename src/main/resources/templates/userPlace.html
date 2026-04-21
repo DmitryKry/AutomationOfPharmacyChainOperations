@@ -49,11 +49,61 @@
                     <button type="submit" th:class="ButtonPost" th:text="#{find}"></button>
                 </div>
             </form>
-            <a th:id="create" th:text="#{create}"></a>
+            <a th:href="@{/api/pharmacy/userPlace(addPharmacy=${addPharmacy==0 ? 1 : 0})}" th:id="create" th:text="#{create}"></a>
             <a class="toggle-link"></a>
         </div>
     </div>
-    <div th:id="pharmacies"></div>
+    <div th:id="pharmacies" th:if="${addPharmacy == 1}">
+        <form th:action="@{/api/pharmacy/registration}" method="post">
+            <div class="form-group">
+                <label for="name_pharmacy" th:text="#{name_pharmacy}"></label>
+                <br>
+                <input type="text" id="name_pharmacy" name="name_pharmacy">
+            </div>
+            <div class="form-group">
+                <label for="legal_name_pharmacy" th:text="#{legal_name_pharmacy}"></label>
+                <br>
+                <input type="text" id="legal_name_pharmacy" name="legal_name_pharmacy">
+            </div>
+            <div class="form-group">
+                <label for="INN" th:text="#{INN}"></label>
+                <br>
+                <input type="text" id="INN" name="INN">
+            </div>
+            <div class="form-group">
+                <label for="KPP" th:text="#{KPP}"></label>
+                <br>
+                <input type="text" id="KPP" name="KPP">
+            </div>
+            <div class="form-group">
+                <label for="OGRN" th:text="#{OGRN}"></label>
+                <br>
+                <input type="text" id="OGRN" name="OGRN">
+            </div>
+            <div class="form-group">
+                <label for="adress_pharmacy" th:text="#{adress_pharmacy}"></label>
+                <br>
+                <input type="text" id="adress_pharmacy" name="adress_pharmacy">
+            </div>
+            <div class="form-group">
+                <label for="CITY" th:text="#{CITY}"></label>
+                <br>
+                <input type="text" id="CITY" name="CITY">
+            </div>
+            <div class="form-group">
+                <label for="REGION" th:text="#{REGION}"></label>
+                <br>
+                <input type="text" id="REGION" name="REGION">
+            </div>
+            <div class="form-group">
+                <label for="POSTAL_CODE" th:text="#{POSTAL_CODE}"></label>
+                <br>
+                <input type="password" id="POSTAL_CODE" name="POSTAL_CODE">
+                <button type="submit" th:class="ButtonPost" th:text="#{create}"></button>
+            </div>
+        </form>
+        <a th:href="@{/api/pharmacy/userPlace(addPharmacy=0)}" th:id="close-button">✕</a>
+    </div>
     <div th:if="${user != null}">
         <p>Добро пожаловать, <span th:text="${user.login}">Имя пользователя</span>!</p>
     </div>

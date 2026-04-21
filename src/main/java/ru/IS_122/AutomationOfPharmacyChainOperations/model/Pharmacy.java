@@ -30,6 +30,9 @@ public class Pharmacy {
     @Column(name = "kpp", nullable = false, length = 9)
     @NonNull
     private String kpp;
+    @Column(name = "ogrn", nullable = false, length = 13)
+    @NonNull
+    private String ogrn;
     @Column(name = "address", nullable = false, length = 255)
     @NonNull
     private String address;

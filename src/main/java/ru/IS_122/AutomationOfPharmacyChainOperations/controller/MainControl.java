@@ -94,4 +94,45 @@ public class MainControl {
             return "entrace";
         }
     }
+
+    @GetMapping("/userPlace")
+    public String showUserPlacePage(@RequestParam(defaultValue = "0") long addPharmacy,
+                                    Model model) {
+        model.addAttribute("addPharmacy", addPharmacy);
+        return "userPlace";
+    }
+
+    @PostMapping("/userPlace")
+    public String createPharmacy(@RequestParam String name,
+                                 @RequestParam String legal_name,
+                                 @RequestParam String inn,
+                                 @RequestParam String kpp,
+                                 @RequestParam String ogrn,
+                                 @RequestParam String address,
+                                 @RequestParam String city,
+                                 @RequestParam String region,
+                                 @RequestParam String postal_code,
+                               Model model,
+                               HttpSession session) {
+        Pharmacy pharmacy = Pharmacy.builder()
+                .name(name)
+                .legal_name(legal_name)
+                .inn(inn)
+                .kpp(kpp)
+                .ogrn(ogrn)
+                .address(address)
+                .city(city)
+                .region(region)
+                .postal_code(postal_code)
+                .build();
+
+        String error = pharmacyService.createPharmacy(pharmacy);
+        if (error != null) {
+            model.addAttribute("user", error);
+            return "userPlace";
+        } else {
+            model.addAttribute("error", ErrorCode.AUTHORIZATION_FAILED.getCode());
+            return "entrace";
+        }
+    }
 }

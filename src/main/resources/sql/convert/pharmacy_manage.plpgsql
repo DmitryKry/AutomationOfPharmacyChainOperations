@@ -1,0 +1,43 @@
+-- Table: public.pharmacy_manage
+
+-- DROP TABLE IF EXISTS public.pharmacy_manage;
+
+CREATE TABLE IF NOT EXISTS public.pharmacy_manage
+(
+    id numeric NOT NULL DEFAULT nextval('allobjects'::regclass),
+    id_of_pharmacy numeric NOT NULL,
+    id_of_worker numeric NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pharmacy_manage_pkey PRIMARY KEY (id),
+    CONSTRAINT unique_pharmacy_worker UNIQUE (id_of_pharmacy, id_of_worker),
+    CONSTRAINT fk_pharmacy_manage_pharmacy FOREIGN KEY (id_of_pharmacy)
+    REFERENCES public.pharmacy (id) MATCH SIMPLE
+                         ON UPDATE NO ACTION
+                         ON DELETE CASCADE,
+    CONSTRAINT fk_pharmacy_manage_worker FOREIGN KEY (id_of_worker)
+    REFERENCES public.workers (id) MATCH SIMPLE
+                         ON UPDATE NO ACTION
+                         ON DELETE CASCADE
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.pharmacy_manage
+    OWNER to postgres;
+-- Index: idx_pharmacy_manage_pharmacy
+
+-- DROP INDEX IF EXISTS public.idx_pharmacy_manage_pharmacy;
+
+CREATE INDEX IF NOT EXISTS idx_pharmacy_manage_pharmacy
+    ON public.pharmacy_manage USING btree
+    (id_of_pharmacy ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_pharmacy_manage_worker
+
+-- DROP INDEX IF EXISTS public.idx_pharmacy_manage_worker;
+
+CREATE INDEX IF NOT EXISTS idx_pharmacy_manage_worker
+    ON public.pharmacy_manage USING btree
+    (id_of_worker ASC NULLS LAST)
+    TABLESPACE pg_default;
