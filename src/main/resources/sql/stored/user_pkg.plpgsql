@@ -64,3 +64,28 @@ EXCEPTION
         END CASE;
 END;
 $$ LANGUAGE plpgsql;
+
+create or replace function user_pkg.get_administrator(p_fio varchar(100))
+RETURNS SETOF workers as $$
+begin
+RETURN QUERY
+SELECT workers.* FROM workers
+join userofpharmacy on workers.id_of_user = userofpharmacy.id
+WHERE workers.id_of_role = 1
+  AND LOWER(userofpharmacy.fio) LIKE LOWER(CONCAT('%', p_fio, '%'))
+    LIMIT 5;
+end;
+$$ language plpgsql;
+
+
+
+
+
+
+
+
+
+
+
+
+

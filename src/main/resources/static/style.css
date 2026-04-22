@@ -34,16 +34,17 @@ a{
 
 button{
     border: 1px solid red;
-    border-radius: 25% 25% / 100% 100%;
+    border-radius: 25px 25px / 100px 100px;
     cursor: pointer;
     background: white;
     color: red;
     transition: 0.5s;
     width: fit-content; /* Кнопка по размеру текста */
-    padding-right: 6%;
-    padding-left: 6%;
-    padding-top: 3%;
-    padding-bottom: 3%;
+    font-size: clamp(16px, 2.5vw, 2.8vh);
+    padding-right: 10px;
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 button:hover{
@@ -90,12 +91,25 @@ a:hover {
 
 #pharmacies{
     position: fixed;
-    left: 37%;
-    top: 10%;
+    left: 17%;
+    top: 20%;
     border: red solid 1px;
     width: 25%;
-    padding: 2.5%;
-    border-radius: 5%;
+}
+
+#pharmaciesSecond{
+    position: fixed;
+    left: 57%;
+    top: 20%;
+    border: red solid 1px;
+    width: 25%;
+}
+
+#pharmaciesSecond > a{
+    position: relative;
+    margin-top: 1%;
+    left: 44%;
+    margin-bottom: 3%;
 }
 
 .Entrace {
@@ -149,6 +163,7 @@ a:hover {
     flex-direction: column;
     /* Чтобы группа не сжималась в точку, задаем ширину */
     width: 100%;
+    margin-bottom: 3%;
 }
 
 label {
@@ -275,4 +290,14 @@ input:hover{
 #pharmacies > #close-button:hover{
     box-shadow: none !important;
     color: white;
+}
+
+#createPharmacy{
+    position: fixed;
+    bottom: 3%;
+    left: 47%;
+}
+
+#fioInput{
+    margin-top: 3%;
 }

@@ -2,23 +2,23 @@ CREATE SCHEMA IF NOT EXISTS pharmacy_pkg;
 
 CREATE OR REPLACE FUNCTION pharmacy_pkg.get_all_pharmacies() RETURNS REFCURSOR AS $$
 DECLARE
-    p_cursor REFCURSOR;
+p_cursor REFCURSOR;
 BEGIN
-    OPEN p_cursor FOR
-        SELECT *
-        FROM pharmacy
-        ORDER BY id;
-	 RETURN p_cursor;
+OPEN p_cursor FOR
+SELECT *
+FROM pharmacy
+ORDER BY id;
+RETURN p_cursor;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION pharmacy_pkg.get_all_pharmacies_table()
 RETURNS SETOF pharmacy AS $$
 BEGIN
-    RETURN QUERY
-        SELECT *
-        FROM pharmacy p
-        ORDER BY p.id;
+RETURN QUERY
+SELECT *
+FROM pharmacy p
+ORDER BY p.id;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -35,11 +35,16 @@ create or replace procedure pharmacy_pkg.create_new_pharmacy(p_name character va
                                                                     p_inn character varying(12), p_kpp character varying(9),
                                                                     p_ogrn character varying(13), p_address character varying(255),
                                                                     p_city character varying(100), p_region character varying(100),
-                                                                    p_postal_code character varying(10), p_error out varchar)
+                                                                    p_postal_code character varying(10), id_of_worker NUMERIC, p_error out varchar)
 as $$
+declare
+id_pharmacy numeric;
 begin
-    insert into pharmacy (name, legal_name, inn, kpp, ogrn, address, city, region, postal_code)
-    values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_city, p_region, p_postal_code);
+insert into pharmacy (name, legal_name, inn, kpp, ogrn, address, city, region, postal_code)
+values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_city, p_region, p_postal_code)
+    RETURNING ID INTO id_pharmacy;
+insert into pharmacy_manage(id_of_pharmacy, id_of_worker)
+values (id_pharmacy, id_of_worker);
 EXCEPTION
     -- Нарушение уникальности имени
     WHEN unique_violation THEN

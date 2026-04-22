@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.Pharmacy;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.UserOfPharmacy;
+import ru.IS_122.AutomationOfPharmacyChainOperations.model.Workers;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.PharmacyService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.WeakHashMap;
 
 @Controller
 @RequestMapping("/api/pharmacy")
@@ -85,7 +88,15 @@ public class MainControl {
                                       @RequestParam String email,
                                Model model,
                                HttpSession session) {
-        String error = userService.UserCreate(login, password, data_of_birt, phone, passport, fio, email);
+        UserOfPharmacy user = UserOfPharmacy.builder()
+                .login(login)
+                .password(password)
+                .dataOfBirt(data_of_birt)
+                .phone(phone)
+                .passport(passport)
+                .fio(fio)
+                .email(email).build();
+        String error = userService.UserCreate(user);
         if (error != null) {
             model.addAttribute("error", error);
             return "registration";
@@ -135,4 +146,31 @@ public class MainControl {
             return "entrace";
         }
     }
+
+    @GetMapping("/pharmacyCreate")
+    public String showPharmacyCreatePage(@RequestParam(defaultValue = "false") boolean addAdministrator,
+                                         @RequestParam(defaultValue = "") String fio, Model model) {
+        model.addAttribute("addAdministrator", addAdministrator);
+        if (fio != null && fio.length() >= 2) {
+            model.addAttribute("workers", userService.searchWorkers(fio));
+        } else {
+            model.addAttribute("workers", new ArrayList<>());
+        }
+        return "pharmacyCreate";
+    }
+
+    @GetMapping("/workers/search")
+    @ResponseBody
+    public List<Workers> searchWorkers(@RequestParam String fio) {
+        try {
+            if (fio == null || fio.length() < 2) {
+                return Collections.emptyList();
+            }
+            return userService.searchWorkers(fio);
+        } catch (Exception e) {
+            e.printStackTrace(); // Это выведет реальную ошибку в консоль IDEA
+            return new ArrayList<>();
+        }
+    }
+
 }

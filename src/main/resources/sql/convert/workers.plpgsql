@@ -1,0 +1,41 @@
+-- Table: public.workers
+
+-- DROP TABLE IF EXISTS public.workers;
+
+CREATE TABLE IF NOT EXISTS public.workers
+(
+    id numeric NOT NULL DEFAULT nextval('allobjects'::regclass),
+    id_of_user numeric,
+    salary numeric(6,2),
+    hire_date date NOT NULL DEFAULT CURRENT_DATE,
+    dismissal_date date,
+    payment_account character varying(20) COLLATE pg_catalog."default",
+    education text COLLATE pg_catalog."default",
+    certificate_number character varying(50) COLLATE pg_catalog."default",
+    certificate_expiry date,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    id_of_role numeric,
+    CONSTRAINT workers_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_user_workers FOREIGN KEY (id_of_user)
+    REFERENCES public.userofpharmacy (id) MATCH SIMPLE
+                         ON UPDATE NO ACTION
+                         ON DELETE NO ACTION,
+    CONSTRAINT fk_workers_role FOREIGN KEY (id_of_role)
+    REFERENCES public.role (id) MATCH SIMPLE
+                         ON UPDATE NO ACTION
+                         ON DELETE SET NULL
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.workers
+    OWNER to postgres;
+-- Index: idx_workers_role
+
+-- DROP INDEX IF EXISTS public.idx_workers_role;
+
+CREATE INDEX IF NOT EXISTS idx_workers_role
+    ON public.workers USING btree
+    (id_of_role ASC NULLS LAST)
+    TABLESPACE pg_default;

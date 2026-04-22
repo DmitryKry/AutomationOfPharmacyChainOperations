@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+
+    <script>
+        // Ждем полной загрузки DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            const fioInput = document.getElementById('fioInput');
+            const datalist = document.getElementById('workersList');
+            const hiddenInput = document.getElementById('finalAdminId');
+
+            console.log("Скрипт запущен, поле найдено:", fioInput !== null);
+
+            fioInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                console.log("Введено символов:", query.length);
+
+                if (query.length < 2) {
+                    datalist.innerHTML = '';
+                    return;
+                }
+
+                // Используем правильный путь (добавляем @{/} если нужно через Thymeleaf)
+                const url = `/api/pharmacy/workers/search?fio=${encodeURIComponent(query)}`;
+
+                fetch(url)
+                    .then(response => {
+                        console.log("Статус ответа сервера:", response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Данные от сервера:", data);
+                        datalist.innerHTML = ''; // Очистка старых вариантов
+
+                        if (data && data.length > 0) {
+                            noDataMessage.style.display = 'none'; // Прячем ошибку
+                            data.forEach(worker => {
+                                const option = document.createElement('option');
+                                option.value = worker.fio; // Пользователь видит ФИО
+                                option.dataset.id = worker.id; // Скрытый ID
+                                datalist.appendChild(option);
+                            });
+                        } else {
+                            // Если массив пустой [], показываем надпись
+                            noDataMessage.style.display = 'block';
+                        }
+
+                        data.forEach(worker => {
+                            const option = document.createElement('option');
+                            // Важно: в value кладем ФИО, чтобы оно отображалось в списке
+                            option.value = worker.fio;
+                            // Дополнительно можно показать ID рядом (необязательно)
+                            option.textContent = "ID: " + worker.id;
+                            // Сохраняем ID в атрибут для извлечения
+                            option.dataset.id = worker.id;
+                            datalist.appendChild(option);
+                        });
+
+                        // Пытаемся найти ID, если введенный текст совпал с вариантом
+                        const selectedWorker = data.find(w => w.fio === query);
+                        if (selectedWorker) {
+                            hiddenInput.value = selectedWorker.id;
+                            console.log("ID найден и записан в hidden:", hiddenInput.value);
+                        }
+                    })
+                    .catch(err => console.error("Ошибка запроса:", err));
+            });
+        });
+    </script>
+</HEAD>
+<body>
+<div class="AllInfo">
+    <div class="menu">
+        <a class="authorization" th:text="#{authorization}"></a>
+        <a class="registration" th:text="#{registration}"></a>
+        <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+        <a class="pharmacies" th:text="#{pharmacies}"></a>
+        <a class="medicines" th:text="#{medicines}"></a>
+    </div>
+    <form th:action="@{/api/pharmacy/registration}" method="post">
+        <div th:id="pharmacies" >
+            <div class="form-group">
+                <label for="name_pharmacy" th:text="#{name_pharmacy}"></label>
+                <br>
+                <input type="text" id="name_pharmacy" name="name_pharmacy">
+            </div>
+            <div class="form-group">
+                <label for="legal_name_pharmacy" th:text="#{legal_name_pharmacy}"></label>
+                <br>
+                <input type="text" id="legal_name_pharmacy" name="legal_name_pharmacy">
+            </div>
+            <div class="form-group">
+                <label for="INN" th:text="#{INN}"></label>
+                <br>
+                <input type="text" id="INN" name="INN">
+            </div>
+            <div class="form-group">
+                <label for="KPP" th:text="#{KPP}"></label>
+                <br>
+                <input type="text" id="KPP" name="KPP">
+            </div>
+            <div class="form-group">
+                <label for="OGRN" th:text="#{OGRN}"></label>
+                <br>
+                <input type="text" id="OGRN" name="OGRN">
+            </div>
+
+        </div>
+        <div th:id="pharmaciesSecond">
+            <div class="form-group">
+                <label for="adress_pharmacy" th:text="#{adress_pharmacy}"></label>
+                <br>
+                <input type="text" id="adress_pharmacy" name="adress_pharmacy">
+            </div>
+            <div class="form-group">
+                <label for="CITY" th:text="#{CITY}"></label>
+                <br>
+                <input type="text" id="CITY" name="CITY">
+            </div>
+            <div class="form-group">
+                <label for="REGION" th:text="#{REGION}"></label>
+                <br>
+                <input type="text" id="REGION" name="REGION">
+            </div>
+            <div class="form-group">
+                <label for="fioInput" th:text="#{administrator}"></label>
+                <!-- Добавили list="workersList" -->
+                <input type="text" id="fioInput" list="workersList" autocomplete="off">
+                <datalist id="workersList"></datalist>
+                <div id="noDataMessage" style="color: red; display: none; font-size: 0.8em; margin-top: 5px;">
+                    Сотрудник не найден
+                </div>
+                <input type="hidden" name="administrator" id="finalAdminId">
+            </div>
+            <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${addAdministrator == false ? true : false})}"
+               th:text="#{find}"></a>
+
+            <div class="form-group">
+                <label for="POSTAL_CODE" th:text="#{POSTAL_CODE}"></label>
+                <br>
+                <input type="password" id="POSTAL_CODE" name="POSTAL_CODE">
+            </div>
+
+        </div>
+        <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{create}"></button>
+    </form>
+</div>
+
+</body>
+</HTML>
