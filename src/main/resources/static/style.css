@@ -34,13 +34,13 @@ a{
 
 button{
     border: 1px solid red;
-    border-radius: 25px 25px / 100px 100px;
+    border-radius: 15% 15% / 100% 100%;
     cursor: pointer;
     background: white;
     color: red;
     transition: 0.5s;
     width: fit-content; /* Кнопка по размеру текста */
-    font-size: clamp(16px, 2.5vw, 2.8vh);
+    font-size: clamp(6px, 1.8vw, 2vh);
     padding-right: 10px;
     padding-left: 10px;
     padding-top: 5px;
@@ -57,6 +57,30 @@ a:hover {
     box-shadow: 0px 0px 10px red;
     background: red;
     color: white;
+}
+
+label {
+    margin-bottom: 0.1%;
+    text-align: center;
+    color: red;
+    font-size: clamp(6px, 1.8vw, 2vh);
+}
+
+input {
+    border: 1px solid red;
+    border-radius: 50px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2%;
+    outline: none;
+}
+
+input:hover{
+    box-shadow: 0px 0px 10px red;
+}
+
+input:focus {
+    border-color: red;
 }
 
 .menu > a{
@@ -91,17 +115,18 @@ a:hover {
 
 #pharmacies{
     position: fixed;
-    left: 17%;
-    top: 20%;
-    border: red solid 1px;
+    left: 31%;
+    top: 25%;
+    border: red solid 0px;
     width: 25%;
 }
 
 #pharmaciesSecond{
     position: fixed;
-    left: 57%;
-    top: 20%;
-    border: red solid 1px;
+    left: 56.1%;
+
+    top: 20.5%;
+    border: red solid 0px;
     width: 25%;
 }
 
@@ -164,24 +189,6 @@ a:hover {
     /* Чтобы группа не сжималась в точку, задаем ширину */
     width: 100%;
     margin-bottom: 3%;
-}
-
-label {
-    margin-bottom: 0.1%;
-    text-align: center;
-    color: red;
-}
-
-input {
-    padding: 2%;
-    border: 1px solid red;
-    border-radius: 5% 5% / 100% 100%;
-    width: 100%; /* Чтобы инпуты были одинаковой ширины */
-    box-sizing: border-box; /* Чтобы padding не раздувал ширину */
-}
-
-input:hover{
-    box-shadow: 0px 0px 10px red;
 }
 
 #Entrace > button {
@@ -301,3 +308,92 @@ input:hover{
 #fioInput{
     margin-top: 3%;
 }
+
+#forPhoto{
+    width: 25%;
+    height: 35%;
+    border: RED solid 1px;
+    position: fixed;
+    left: 3%;
+    top: 15%;
+}
+
+.findPerconal {
+    position: fixed;
+    width: 40%;
+    height: 40%;
+    left: 30%;
+    top: 25%;
+    background-color: white;
+    border-radius: 8px; /* Скругленные углы выглядят современнее */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); /* Тень, чтобы окно "парило" */
+    padding: 20px;
+    border: none; /* Убираем рамку, если есть тень */
+    border-top: 5px solid red; /* Тонкая красная линия сверху для акцента */
+    z-index: 1000;
+}
+
+.findPerconal input {
+    width: 75%;
+    margin-left: 5%;
+}
+
+.findPerconal button {
+    padding: 10px 20px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.findPerconal button:hover {
+    background-color: #b30000; /* Темнеет при наведении */
+}
+
+/* Верхний блок с формой поиска */
+.findPerconal > div:first-child {
+    padding: 20px;
+    border-bottom: 1px solid red; /* Отделяем верх */
+    text-align: center;
+}
+
+/* Средний блок с контентом */
+#contentForFindPerconal {
+    padding: 20px;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Нижний блок со ссылками */
+.findPerconal > div:last-child {
+    padding: 15px;
+    border-top: 1px solid red; /* Отделяем низ */
+    display: flex;
+    justify-content: center; /* Центрируем ссылки по горизонтали */
+    gap: 30px; /* Расстояние между ссылками */
+    background-color: #fafafa;
+}
+
+/*
+.findPerconal{
+    position: fixed;
+    width: 40%;
+    height: 50%;
+    left: 30%;
+    top: 25%;
+    background-color: white;
+    border: red solid 1px;
+}
+
+.findPerconal input {
+    margin-top: 0.5%;
+    width: 70%;
+    margin-left: 1%;
+}
+
+.findPerconal button {
+}*/
