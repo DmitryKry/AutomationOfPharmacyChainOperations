@@ -113,21 +113,20 @@ input:focus {
     left: 10%;
 }
 
-#pharmacies{
+.createObject{
     position: fixed;
-    left: 31%;
-    top: 25%;
     border: red solid 0px;
     width: 25%;
 }
 
-#pharmaciesSecond{
-    position: fixed;
-    left: 56.1%;
+#pharmacies{
+    left: 31%;
+    top: 25%;
+}
 
+#pharmaciesSecond{
+    left: 56.1%;
     top: 20.5%;
-    border: red solid 0px;
-    width: 25%;
 }
 
 #pharmaciesSecond > a{
@@ -376,6 +375,19 @@ input:focus {
     justify-content: center; /* Центрируем ссылки по горизонтали */
     gap: 30px; /* Расстояние между ссылками */
     background-color: #fafafa;
+}
+
+#worker{
+    left: 37%;
+    top:20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+#worker a {
+    margin-bottom: 1%;
 }
 
 /*

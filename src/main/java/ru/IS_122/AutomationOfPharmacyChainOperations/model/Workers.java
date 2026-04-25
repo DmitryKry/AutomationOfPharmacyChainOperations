@@ -25,7 +25,7 @@ public class Workers {
     @Column(name = "id_of_user")
     private BigDecimal id_of_user;
 
-    @Column(name = "salary", precision = 6, scale = 2)
+    @Column(name = "salary", precision = 12, scale = 2)
     private BigDecimal salary;
 
     @Column(name = "hire_date", nullable = false)

@@ -61,4 +61,9 @@ public class UserService {
         String sql = "SELECT * FROM user_pkg.get_administrator(?)";
         return jdbcTemplate.query(sql, new Object[]{fio}, new BeanPropertyRowMapper<>(Workers.class));
     }
+
+    public List<UserOfPharmacy> searchUsers(@RequestParam String fio) {
+        String sql = "SELECT * FROM user_pkg.get_users(?)";
+        return jdbcTemplate.query(sql, new Object[]{fio}, new BeanPropertyRowMapper<>(UserOfPharmacy.class));
+    }
 }

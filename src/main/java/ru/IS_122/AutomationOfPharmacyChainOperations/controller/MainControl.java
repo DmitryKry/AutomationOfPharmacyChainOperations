@@ -159,18 +159,26 @@ public class MainControl {
         return "pharmacyCreate";
     }
 
-    @GetMapping("/workers/search")
-    @ResponseBody
-    public List<Workers> searchWorkers(@RequestParam String fio) {
-        try {
-            if (fio == null || fio.length() < 2) {
-                return Collections.emptyList();
-            }
-            return userService.searchWorkers(fio);
-        } catch (Exception e) {
-            e.printStackTrace(); // Это выведет реальную ошибку в консоль IDEA
-            return new ArrayList<>();
-        }
+
+
+    @GetMapping("/workerCreate")
+    public String showWorkerCreatePage(@RequestParam(defaultValue = "false") boolean addRole,
+                                       @RequestParam(defaultValue = "false") boolean addUser,
+                                       @RequestParam(defaultValue = "") String fio, Model model) {
+        model.addAttribute("users", userService.searchUsers(fio));
+        model.addAttribute("addRole", addRole);
+        model.addAttribute("addUser", addUser);
+        return "workersCreate";
     }
 
+    @PostMapping("/workerCreate")
+    public String showWorkerCreatePageTakeUsers(@RequestParam(defaultValue = "false") boolean addRole,
+                                                @RequestParam String searchUser,
+                                       @RequestParam(defaultValue = "true") boolean addUser,
+                                       @RequestParam(defaultValue = "") String fio, Model model) {
+        model.addAttribute("users", userService.searchUsers(searchUser));
+        model.addAttribute("addRole", addRole);
+        model.addAttribute("addUser", addUser);
+        return "workersCreate";
+    }
 }

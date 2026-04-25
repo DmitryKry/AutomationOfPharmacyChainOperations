@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</HEAD>
+<body>
+<div class="AllInfo">
+    <div class="menu">
+        <a class="authorization" th:text="#{authorization}"></a>
+        <a class="registration" th:text="#{registration}"></a>
+        <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+        <a class="pharmacies" th:text="#{pharmacies}"></a>
+        <a class="medicines" th:text="#{medicines}"></a>
+    </div>
+    <div th:id="forPhoto"></div>
+    <form th:action="@{/api/pharmacy/registration}" method="post">
+        <div th:class="createObject" th:id="worker">
+            <div class="form-group">
+                <label for="id_of_user" th:text="#{id_of_user}"></label>
+                <br>
+                <input type="text" id="id_of_user" name="id_of_user">
+            </div>
+            <a th:href="@{/api/pharmacy/workerCreate(addUser=${addUser == false ? true : false})}"
+               th:text="#{find}"></a>
+            <div class="form-group">
+                <label for="salary" th:text="#{salary}"></label>
+                <br>
+                <input type="text" id="salary" name="salary">
+            </div>
+            <div class="form-group">
+                <label for="INN" th:text="#{INN}"></label>
+                <br>
+                <input type="text" id="INN" name="INN">
+            </div>
+            <div class="form-group">
+                <label for="id_of_role" th:text="#{id_of_role}"></label>
+                <br>
+                <input type="text" id="id_of_role" name="id_of_role">
+            </div>
+            <a th:href="@{/api/pharmacy/workerCreate(addRole=${addRole == false ? true : false})}"
+               th:text="#{find}"></a>
+            <div class="form-group">
+                <label for="education" th:text="#{education}"></label>
+                <br>
+                <input type="text" id="education" name="education">
+            </div>
+            <div class="form-group">
+                <label for="snils" th:text="#{snils}"></label>
+                <br>
+                <input type="text" id="snils" name="snils">
+            </div>
+            <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{create}"></button>
+        </div>
+    </form>
+    <div th:class="findPerconal" th:if="${addUser == true}">
+        <div>
+            <form th:action="@{/api/pharmacy/workerCreate}" method="post">
+                <input th:name="searchUser" th:type="text">
+                <button th:text="#{find}">
+                </button>
+            </form>
+        </div>
+        <div th:id="contentForFindPerconal">
+            <ul>
+                <li th:each="u : ${users}">
+                    <div th:id="Transfer">
+                        <a th:href="@{/api/pharmacy/workerCreate}">
+                            <span th:text="${u.getFio()} + ' ' + ${u.getId()}"></span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <a th:href="@{/api/pharmacy/workerCreate(addUser=false)}" th:text="#{cancel}"></a>
+        </div>
+    </div>
+    <div th:class="findPerconal" th:if="${addRole == true}">
+        <div>
+            <form th:action="@{/api/pharmacy/registration}" method="post">
+                <input th:type="text">
+                <button th:text="#{find}">
+                </button>
+            </form>
+        </div>
+        <div th:id="contentForFindPerconal">
+        </div>
+        <div>
+            <a th:href="@{/api/pharmacy/pharmacyCreate}"th:text="#{add}"></a>
+            <a th:href="@{/api/pharmacy/workerCreate(addRole=false)}" th:text="#{cancel}"></a>
+        </div>
+    </div>
+</div>
+
+</body>
+</HTML>

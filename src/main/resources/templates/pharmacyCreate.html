@@ -16,7 +16,7 @@
     </div>
     <div th:id="forPhoto"></div>
     <form th:action="@{/api/pharmacy/registration}" method="post">
-        <div th:id="pharmacies" >
+        <div th:class="createObject" th:id="pharmacies" >
             <div class="form-group">
                 <label for="name_pharmacy" th:text="#{name_pharmacy}"></label>
                 <br>
@@ -44,7 +44,7 @@
             </div>
 
         </div>
-        <div th:id="pharmaciesSecond">
+        <div th:class="createObject" th:id="pharmaciesSecond">
             <div class="form-group">
                 <label for="adress_pharmacy" th:text="#{adress_pharmacy}"></label>
                 <br>
@@ -87,7 +87,7 @@
         <div th:id="contentForFindPerconal">
         </div>
         <div>
-            <a th:href="@{/api/pharmacy/pharmacyCreate}"th:text="#{create}"></a>
+            <a th:href="@{/api/pharmacy/workerCreate}"th:text="#{add}"></a>
             <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${false})}" th:text="#{cancel}"></a>
         </div>
     </div>
