@@ -35,6 +35,12 @@ public class Workers {
     @Column(name = "dismissal_date")
     private LocalDate dismissal_date;
 
+    @Column(name = "inn", length = 12)
+    private String inn;
+
+    @Column(name = "snils", length = 11)
+    private String snils;
+
     @Column(name = "payment_account", length = 20)
     private String payment_account;
 
@@ -58,12 +64,13 @@ public class Workers {
     @Column(name = "id_of_role")
     private BigDecimal id_of_role;
 
-    // Связь с пользователем (если нужна)
+    @Transient
+    private String userFio;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_of_user", insertable = false, updatable = false)
     private UserOfPharmacy user;
 
-    // Связь с ролью (если нужна)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_of_role", insertable = false, updatable = false)
     private Role role;

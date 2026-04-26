@@ -3,6 +3,7 @@ package ru.IS_122.AutomationOfPharmacyChainOperations.service;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.IS_122.AutomationOfPharmacyChainOperations.model.Role;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.UserOfPharmacy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.Workers;
@@ -57,13 +58,56 @@ public class UserService {
         return null;
     }
 
-    public List<Workers> searchWorkers(@RequestParam String fio) {
+    public List<Workers> searchAdministrators(@RequestParam String fio) {
         String sql = "SELECT * FROM user_pkg.get_administrator(?)";
         return jdbcTemplate.query(sql, new Object[]{fio}, new BeanPropertyRowMapper<>(Workers.class));
+    }
+
+    public List<Workers> getAdministrators() {
+        String sql = "SELECT * FROM user_pkg.get_administrators() as (id numeric, user_fio varchar)";
+        return jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(Workers.class));
     }
 
     public List<UserOfPharmacy> searchUsers(@RequestParam String fio) {
         String sql = "SELECT * FROM user_pkg.get_users(?)";
         return jdbcTemplate.query(sql, new Object[]{fio}, new BeanPropertyRowMapper<>(UserOfPharmacy.class));
+    }
+
+    public List<Role> getRoles() {
+        String sql = "SELECT * FROM user_pkg.get_roles()";
+        return jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(Role.class));
+    }
+
+    public String workerCreate(Workers worker) {
+
+        String sql = "CALL user_pkg.set_worker(?, ?, ?, ?, ?, ?, ?)";
+
+        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setBigDecimal(1, worker.getId_of_user());
+            cs.setBigDecimal(2, worker.getSalary());
+            cs.setString(3, worker.getEducation());
+            cs.setBigDecimal(4, worker.getId_of_role());
+            cs.setString(5, worker.getInn());
+            cs.setString(6, worker.getSnils());
+            cs.registerOutParameter(7, Types.VARCHAR);
+            cs.execute();
+            return cs.getString(7);
+        });
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            return errorMessage;
+        }
+
+        return null;
+    }
+
+    public void roleCreate(Role role) {
+
+        String sql = "CALL user_pkg.set_role(?)";
+
+        jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setString(1, role.getName());
+            return cs.execute();
+        });
     }
 }

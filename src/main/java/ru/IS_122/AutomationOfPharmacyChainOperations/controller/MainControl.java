@@ -9,16 +9,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.Pharmacy;
+import ru.IS_122.AutomationOfPharmacyChainOperations.model.Role;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.UserOfPharmacy;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.Workers;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.PharmacyService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.WeakHashMap;
+import java.util.*;
 
 @Controller
 @RequestMapping("/api/pharmacy")
@@ -147,37 +147,117 @@ public class MainControl {
         }
     }
 
+    @GetMapping("/pharmacy")
+    public String showPharmacyPage(Model model) {
+        return "userPlace";
+    }
+
     @GetMapping("/pharmacyCreate")
     public String showPharmacyCreatePage(@RequestParam(defaultValue = "false") boolean addAdministrator,
-                                         @RequestParam(defaultValue = "") String fio, Model model) {
+                                         @RequestParam(defaultValue = "") String selectAdmin,
+                                         @RequestParam(required = false) BigDecimal idAdmin, Model model) {
         model.addAttribute("addAdministrator", addAdministrator);
-        if (fio != null && fio.length() >= 2) {
-            model.addAttribute("workers", userService.searchWorkers(fio));
-        } else {
-            model.addAttribute("workers", new ArrayList<>());
-        }
+        model.addAttribute("idAdmin", idAdmin);
+        model.addAttribute("selectAdmin", selectAdmin);
+        model.addAttribute("addAdministrators", userService.getAdministrators());
         return "pharmacyCreate";
     }
 
+    @PostMapping("/pharmacyCreate")
+    public String pharmacyCreatePage(Pharmacy form,
+                                     @RequestParam(defaultValue = "false") boolean addAdministrator,
+                                     @RequestParam(defaultValue = "") String selectAdmin,
+                                     @RequestParam(required = false) BigDecimal idAdmin, Model model) {
+        Pharmacy pharmacy = Pharmacy.builder()
+                .name(form.getName())
+                .legal_name(form.getLegal_name())
+                .inn(form.getInn())
+                .kpp(form.getKpp())
+                .ogrn(form.getOgrn())
+                .address(form.getAddress())
+                .city(form.getCity())
+                .region(form.getRegion())
+                .postal_code(form.getPostal_code())
+                .build();
+        pharmacyService.createPharmacy(pharmacy);
+        model.addAttribute("addAdministrator", addAdministrator);
+        model.addAttribute("idAdmin", idAdmin);
+        model.addAttribute("selectAdmin", selectAdmin);
+        return "pharmacyCreate";
+    }
 
+    @PostMapping("/pharmacyCreate/addAdministrator")
+    public String pharmacyCreatePage(@RequestParam String addAdministratorName,
+                                     @RequestParam(defaultValue = "true") boolean addAdministrator, Model model) {
+        model.addAttribute("addAdministrators", userService.searchAdministrators(addAdministratorName));
+        model.addAttribute("addAdministrator", addAdministrator);
+        return "pharmacyCreate";
+    }
 
     @GetMapping("/workerCreate")
     public String showWorkerCreatePage(@RequestParam(defaultValue = "false") boolean addRole,
                                        @RequestParam(defaultValue = "false") boolean addUser,
-                                       @RequestParam(defaultValue = "") String fio, Model model) {
+                                       @RequestParam(defaultValue = "false") boolean createRole,
+                                       @RequestParam(defaultValue = "") String fio,
+                                       @RequestParam(required = false) BigDecimal idUser,
+                                       @RequestParam(required = false) BigDecimal idRole,
+                                       @RequestParam(defaultValue = "") String selectRole,
+                                       @RequestParam(defaultValue = "") String selectUser, Model model) {
         model.addAttribute("users", userService.searchUsers(fio));
+        model.addAttribute("roles", userService.getRoles());
+        model.addAttribute("addRole", addRole);
+        model.addAttribute("addUser", addUser);
+        model.addAttribute("createRole", createRole);
+        model.addAttribute("idUser", idUser);
+        model.addAttribute("idRole", idRole);
+        model.addAttribute("selectRole", selectRole);
+        model.addAttribute("selectUser", selectUser);
+        return "workersCreate";
+    }
+
+    @PostMapping("/workerCreate/searchUsers")
+    public String showWorkerCreatePageTakeUsersSearchUsers(@RequestParam(defaultValue = "false") boolean addRole,
+                                                @RequestParam String searchUser,
+                                       @RequestParam(defaultValue = "true") boolean addUser,
+                                       @RequestParam(defaultValue = "") String fio, Model model) {
+        model.addAttribute("users", userService.searchUsers(searchUser));
         model.addAttribute("addRole", addRole);
         model.addAttribute("addUser", addUser);
         return "workersCreate";
     }
 
     @PostMapping("/workerCreate")
-    public String showWorkerCreatePageTakeUsers(@RequestParam(defaultValue = "false") boolean addRole,
-                                                @RequestParam String searchUser,
-                                       @RequestParam(defaultValue = "true") boolean addUser,
-                                       @RequestParam(defaultValue = "") String fio, Model model) {
-        model.addAttribute("users", userService.searchUsers(searchUser));
+    public String showWorkerCreatePage(@RequestParam(defaultValue = "false") boolean addRole,
+                                                @RequestParam(defaultValue = "false") boolean addUser,
+                                       @RequestParam BigDecimal id_of_user,
+                                       @RequestParam BigDecimal salary,
+                                       @RequestParam String education,
+                                       @RequestParam BigDecimal id_of_role,
+                                       @RequestParam String INN,
+                                       @RequestParam String snils, Model model) {
+        Workers worker = Workers.builder()
+                .id_of_user(id_of_user)
+                .salary(salary)
+                .education(education)
+                .id_of_role(id_of_role)
+                .inn(INN)
+                .snils(snils)
+                .build();
+        userService.workerCreate(worker);
         model.addAttribute("addRole", addRole);
+        model.addAttribute("addUser", addUser);
+        return "workersCreate";
+    }
+
+    @PostMapping("/workerCreate/createRole")
+    public String showWorkerCreatePageCreateRole(@RequestParam(defaultValue = "true") boolean addRole,
+                                                 @RequestParam(defaultValue = "false") boolean createRole,
+                                                @RequestParam(defaultValue = "true") boolean addUser,
+                                                @RequestParam(defaultValue = "") String roleName, Model model) {
+        Role role = Role.builder().name(roleName).build();
+        userService.roleCreate(role);
+        model.addAttribute("addRole", addRole);
+        model.addAttribute("createRole", createRole);
         model.addAttribute("addUser", addUser);
         return "workersCreate";
     }

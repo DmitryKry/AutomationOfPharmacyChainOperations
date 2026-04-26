@@ -16,6 +16,10 @@
     /*background: black;*/
 }
 
+ul {
+    list-style-type: none;
+}
+
 a{
     text-decoration: none;
     display: inline-block;
@@ -389,6 +393,23 @@ input:focus {
 #worker a {
     margin-bottom: 1%;
 }
+
+#createRole{
+    height: auto;
+    min-height: 100px;
+
+}
+
+#createRole div{
+    border-top: white solid 0px;
+}
+
+#createRole input{
+    font-size: clamp(16px, 1.5vw, 3vh);
+}
+
+
+
 
 /*
 .findPerconal{

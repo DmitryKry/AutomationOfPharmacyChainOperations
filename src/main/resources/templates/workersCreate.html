@@ -8,21 +8,24 @@
 <body>
 <div class="AllInfo">
     <div class="menu">
-        <a class="authorization" th:text="#{authorization}"></a>
-        <a class="registration" th:text="#{registration}"></a>
+        <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+        <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
         <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
-        <a class="pharmacies" th:text="#{pharmacies}"></a>
+        <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
         <a class="medicines" th:text="#{medicines}"></a>
     </div>
     <div th:id="forPhoto"></div>
-    <form th:action="@{/api/pharmacy/registration}" method="post">
+    <form th:action="@{/api/pharmacy/workerCreate}" method="post">
         <div th:class="createObject" th:id="worker">
             <div class="form-group">
                 <label for="id_of_user" th:text="#{id_of_user}"></label>
                 <br>
-                <input type="text" id="id_of_user" name="id_of_user">
+                <input type="hidden" th:name="id_of_user" th:value="${idUser}">
+                <input type="text" id="id_of_user"  th:value="${selectUser}" readonly >
+
             </div>
-            <a th:href="@{/api/pharmacy/workerCreate(addUser=${addUser == false ? true : false})}"
+            <a th:href="@{/api/pharmacy/workerCreate(addUser=${addUser == false ? true : false}, idRole=${idRole},
+            selectRole=${selectRole}, idUser=${idUser}, selectUser=${selectUser})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="salary" th:text="#{salary}"></label>
@@ -37,9 +40,11 @@
             <div class="form-group">
                 <label for="id_of_role" th:text="#{id_of_role}"></label>
                 <br>
-                <input type="text" id="id_of_role" name="id_of_role">
+                <input type="hidden" th:name="id_of_role" th:value="${idRole}">
+                <input type="text" id="id_of_role" th:value="${selectRole}" readonly>
             </div>
-            <a th:href="@{/api/pharmacy/workerCreate(addRole=${addRole == false ? true : false})}"
+            <a th:href="@{/api/pharmacy/workerCreate(addRole=${addRole == false ? true : false}, idRole=${idRole},
+            selectRole=${selectRole}, idUser=${idUser}, selectUser=${selectUser})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="education" th:text="#{education}"></label>
@@ -56,7 +61,7 @@
     </form>
     <div th:class="findPerconal" th:if="${addUser == true}">
         <div>
-            <form th:action="@{/api/pharmacy/workerCreate}" method="post">
+            <form th:action="@{/api/pharmacy/workerCreate/searchUsers}" method="post">
                 <input th:name="searchUser" th:type="text">
                 <button th:text="#{find}">
                 </button>
@@ -66,8 +71,9 @@
             <ul>
                 <li th:each="u : ${users}">
                     <div th:id="Transfer">
-                        <a th:href="@{/api/pharmacy/workerCreate}">
-                            <span th:text="${u.getFio()} + ' ' + ${u.getId()}"></span>
+                        <a th:href="@{/api/pharmacy/workerCreate(idUser=${u.getId()}, selectUser=${u.getFio()},
+                        idRole=${idRole}, selectRole=${selectRole})}">
+                            <span th:text="${u.getFio()} + ' id: ' + ${u.getId()}"></span>
                         </a>
                     </div>
                 </li>
@@ -78,18 +84,32 @@
         </div>
     </div>
     <div th:class="findPerconal" th:if="${addRole == true}">
-        <div>
-            <form th:action="@{/api/pharmacy/registration}" method="post">
-                <input th:type="text">
-                <button th:text="#{find}">
-                </button>
-            </form>
-        </div>
         <div th:id="contentForFindPerconal">
+            <ul>
+                <li th:each="r : ${roles}">
+                    <div th:id="Transfer">
+                        <a th:href="@{/api/pharmacy/workerCreate(idRole=${r.getId()}, selectRole=${r.getName()},
+                        idUser=${idUser}, selectUser=${selectUser})}">
+                            <span th:text="${r.getName()}"></span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
         </div>
         <div>
-            <a th:href="@{/api/pharmacy/pharmacyCreate}"th:text="#{add}"></a>
+            <a th:href="@{/api/pharmacy/workerCreate(addRole=false, createRole=true)}"th:text="#{add}"></a>
             <a th:href="@{/api/pharmacy/workerCreate(addRole=false)}" th:text="#{cancel}"></a>
+        </div>
+    </div>
+
+    <div th:class="findPerconal" th:id="createRole" th:if="${createRole == true}">
+        <form th:action="@{/api/pharmacy/workerCreate/createRole}" method="post">
+            <input th:name="roleName" th:type="text">
+            <button th:text="#{create}"></button>
+
+        </form>
+        <div>
+            <a th:href="@{/api/pharmacy/workerCreate(createRole=false, addRole=true)}" th:text="#{cancel}"></a>
         </div>
     </div>
 </div>

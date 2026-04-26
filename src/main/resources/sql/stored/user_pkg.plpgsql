@@ -65,23 +65,95 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
-create or replace function user_pkg.get_administrator(p_fio varchar(100))
-RETURNS SETOF workers as $$
-begin
+CREATE OR REPLACE FUNCTION user_pkg.get_administrator(p_fio VARCHAR(100))
+RETURNS SETOF workers AS $$
+BEGIN
 RETURN QUERY
-SELECT workers.* FROM workers
-join userofpharmacy on workers.id_of_user = userofpharmacy.id
-WHERE workers.id_of_role = 1
-  AND LOWER(userofpharmacy.fio) LIKE LOWER(CONCAT('%', p_fio, '%'));
-end;
-$$ language plpgsql;
+SELECT w.*, u.fio
+FROM workers w
+         JOIN userofpharmacy u ON w.id_of_user = u.id
+WHERE w.id_of_role = 1
+  AND LOWER(u.fio) LIKE LOWER(CONCAT('%', p_fio, '%'));
+END;
+$$ LANGUAGE plpgsql;
 
-create or replace function user_pkg.get_users(p_fio varchar(100))
-RETURNS SETOF userofpharmacy as $$
-begin
+CREATE OR REPLACE FUNCTION user_pkg.get_administrators()
+RETURNS SETOF RECORD AS $$
+BEGIN
 RETURN QUERY
-SELECT * FROM userofpharmacy
-WHERE LOWER(userofpharmacy.fio) LIKE LOWER(CONCAT('%', p_fio, '%'));
+SELECT w.id, u.fio user_fio
+FROM workers w
+         JOIN userofpharmacy u ON w.id_of_user = u.id
+WHERE w.id_of_role = 1;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION user_pkg.get_users(p_fio VARCHAR(100))
+RETURNS SETOF userofpharmacy AS $$
+BEGIN
+RETURN QUERY
+SELECT *
+FROM userofpharmacy
+WHERE LOWER(fio) LIKE LOWER(CONCAT('%', p_fio, '%'));
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION user_pkg.get_roles()
+RETURNS SETOF role AS $$
+BEGIN
+RETURN QUERY
+SELECT * FROM role;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE user_pkg.set_worker(
+    p_id_of_user NUMERIC,
+    p_salary NUMERIC(12,2),
+    p_education TEXT,
+    p_id_of_role NUMERIC,
+    p_inn CHARACTER VARYING(12),
+    p_snils CHARACTER VARYING(11),
+    INOUT p_error VARCHAR
+) AS $$
+DECLARE
+v_constraint_name TEXT;
+BEGIN
+INSERT INTO workers (id_of_user, salary, education, id_of_role, inn, snils)
+VALUES (p_id_of_user, p_salary, p_education, p_id_of_role, p_inn, p_snils);
+
+EXCEPTION
+    WHEN unique_violation THEN
+        GET STACKED DIAGNOSTICS v_constraint_name = CONSTRAINT_NAME;
+        IF v_constraint_name = 'workers_inn_unique' THEN
+            p_error := 'Сотрудник с таким ИНН уже существует';
+        ELSIF v_constraint_name = 'workers_snils_unique' THEN
+            p_error := 'Сотрудник с таким СНИЛС уже существует';
+        ELSE
+            p_error := 'Дублирование уникального значения: ' || v_constraint_name;
+        END IF;
+
+    WHEN check_violation THEN
+        GET STACKED DIAGNOSTICS v_constraint_name = CONSTRAINT_NAME;
+        IF v_constraint_name = 'workers_inn_check' THEN
+            p_error := 'ИНН должен состоять ровно из 12 цифр';
+        ELSIF v_constraint_name = 'workers_snils_check' THEN
+            p_error := 'СНИЛС должен состоять ровно из 11 цифр';
+        ELSE
+            p_error := 'Нарушение формата данных (CHECK): ' || v_constraint_name;
+        END IF;
+
+    WHEN foreign_key_violation THEN
+        p_error := 'Указанный пользователь или роль не существуют в базе данных';
+
+    WHEN OTHERS THEN
+        p_error := 'Ошибка при сохранении сотрудника: ' || sqlerrm;
+END;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure user_pkg.set_role(p_name character varying(200))
+as $$
+begin
+insert into role (name) values (p_name);
 end;
 $$ language plpgsql;
 
