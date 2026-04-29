@@ -11,20 +11,23 @@ CREATE TABLE IF NOT EXISTS public.pharmacy
     kpp character varying(9) COLLATE pg_catalog."default",
     ogrn character varying(13) COLLATE pg_catalog."default",
     address character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    city character varying(100) COLLATE pg_catalog."default" NOT NULL,
     region character varying(100) COLLATE pg_catalog."default",
     postal_code character varying(10) COLLATE pg_catalog."default",
     opening_date date DEFAULT CURRENT_DATE,
     closing_date date,
     status character varying(20) COLLATE pg_catalog."default" DEFAULT 'active'::character varying,
+    id_city numeric,
     CONSTRAINT pharmacy_pkey PRIMARY KEY (id),
     CONSTRAINT pharmacy_address_unique UNIQUE (address),
     CONSTRAINT pharmacy_inn_unique UNIQUE (inn),
-    CONSTRAINT pharmacy_name_city_unique UNIQUE (name, city),
     CONSTRAINT pharmacy_name_unique UNIQUE (name),
     CONSTRAINT pharmacy_ogrn_unique UNIQUE (ogrn),
-    CONSTRAINT pharmacy_dates_check CHECK (closing_date IS NULL OR closing_date >= opening_date),
-    CONSTRAINT pharmacy_status_check CHECK (status::text = ANY (ARRAY['active'::character varying, 'closed'::character varying, 'renovation'::character varying, 'temporary_closed'::character varying]::text[]))
+    CONSTRAINT fk_id_city FOREIGN KEY (id_city)
+    REFERENCES public.city (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION,
+    CONSTRAINT pharmacy_status_check CHECK (status::text = ANY (ARRAY['active'::character varying, 'closed'::character varying, 'renovation'::character varying, 'temporary_closed'::character varying]::text[])),
+    CONSTRAINT pharmacy_dates_check CHECK (closing_date IS NULL OR closing_date >= opening_date)
     )
 
     TABLESPACE pg_default;

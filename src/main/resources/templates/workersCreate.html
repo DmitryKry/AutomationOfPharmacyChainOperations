@@ -71,7 +71,7 @@
             <ul>
                 <li th:each="u : ${users}">
                     <div th:id="Transfer">
-                        <a th:href="@{/api/pharmacy/workerCreate(idUser=${u.getId()}, selectUser=${u.getFio()},
+                        <a th:class="personnelLists" th:href="@{/api/pharmacy/workerCreate(idUser=${u.getId()}, selectUser=${u.getFio()},
                         idRole=${idRole}, selectRole=${selectRole})}">
                             <span th:text="${u.getFio()} + ' id: ' + ${u.getId()}"></span>
                         </a>
@@ -88,7 +88,7 @@
             <ul>
                 <li th:each="r : ${roles}">
                     <div th:id="Transfer">
-                        <a th:href="@{/api/pharmacy/workerCreate(idRole=${r.getId()}, selectRole=${r.getName()},
+                        <a th:class="personnelLists" th:href="@{/api/pharmacy/workerCreate(idRole=${r.getId()}, selectRole=${r.getName()},
                         idUser=${idUser}, selectUser=${selectUser})}">
                             <span th:text="${r.getName()}"></span>
                         </a>

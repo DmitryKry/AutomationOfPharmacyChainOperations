@@ -34,14 +34,14 @@ $$ LANGUAGE plpgsql;
 create or replace procedure pharmacy_pkg.create_new_pharmacy(p_name character varying(200),  p_legal_name character varying(200),
                                                                     p_inn character varying(12), p_kpp character varying(9),
                                                                     p_ogrn character varying(13), p_address character varying(255),
-                                                                    p_city character varying(100), p_region character varying(100),
+                                                                    p_ID_CITY numeric, p_region character varying(100),
                                                                     p_postal_code character varying(10), id_of_worker NUMERIC, p_error out varchar)
 as $$
 declare
 id_pharmacy numeric;
 begin
-insert into pharmacy (name, legal_name, inn, kpp, ogrn, address, city, region, postal_code)
-values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_city, p_region, p_postal_code)
+insert into pharmacy (name, legal_name, inn, kpp, ogrn, address, ID_CITY, region, postal_code)
+values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_ID_CITY, p_region, p_postal_code)
     RETURNING ID INTO id_pharmacy;
 insert into pharmacy_manage(id_of_pharmacy, id_of_worker)
 values (id_pharmacy, id_of_worker);
@@ -83,3 +83,62 @@ end;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION pharmacy_pkg.get_all_city()
+RETURNS SETOF city AS $$
+BEGIN
+RETURN QUERY
+SELECT *
+FROM city p;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION pharmacy_pkg.find_city(p_name character varying(100))
+RETURNS SETOF city AS $$
+BEGIN
+RETURN QUERY
+SELECT p.name
+FROM city p
+where p.name = p_name;
+END;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure pharmacy_pkg.create_new_city(p_name character varying(200),  p_region character varying(200),
+       p_error out varchar)
+as $$
+declare
+id_pharmacy numeric;
+begin
+insert into city (name, region)
+values (p_name, p_region);
+EXCEPTION
+    -- Нарушение уникальности имени
+    WHEN unique_violation THEN
+        IF EXISTS (SELECT 1 FROM pharmacy WHERE name = p_name) THEN
+            p_error := 'ERROR: Аптека с названием "' || p_name || '" уже существует';
+        ELSIF EXISTS (SELECT 1 FROM pharmacy WHERE region = p_region) THEN
+            p_error := 'ERROR: Аптека с регионом "' || p_region || '" уже существует';
+    ELSE
+            p_error := 'ERROR: Нарушение уникальности при создании аптеки';
+END IF;
+
+    -- Нарушение NOT NULL constraint
+WHEN not_null_violation THEN
+        p_error := 'ERROR: Обязательное поле не может быть NULL';
+
+    -- Нарушение foreign key (если будут)
+WHEN foreign_key_violation THEN
+        p_error := 'ERROR: Нарушение внешнего ключа';
+
+    -- Превышение длины строки
+WHEN string_data_right_truncation THEN
+        p_error := 'ERROR: Превышена допустимая длина одного из полей';
+
+    -- Неверный формат данных
+WHEN invalid_parameter_value THEN
+        p_error := 'ERROR: Неверный формат данных';
+
+    -- Другая ошибка
+WHEN OTHERS THEN
+        p_error := 'ERROR: Неизвестная ошибка - ' || SQLERRM;
+end;
+$$ LANGUAGE plpgsql;

@@ -1,0 +1,7 @@
+create table city(
+                     id numeric primary key not null default nextval('allobjects'),
+                     name VARCHAR(100) NOT NULL,
+                     region VARCHAR(100) NOT NULL, -- Регион хранится здесь
+                     CONSTRAINT uq_city_ UNIQUE (name),
+                     CONSTRAINT uq_region UNIQUE (region)
+)

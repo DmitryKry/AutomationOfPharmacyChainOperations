@@ -36,9 +36,9 @@ public class Pharmacy {
     @Column(name = "address", nullable = false, length = 255)
     @NonNull
     private String address;
-    @Column(name = "city", nullable = false, length = 100)
+    @Column(name = "ID_CITY", nullable = false)
     @NonNull
-    private String city;
+    private BigDecimal ID_CITY;
     @Column(name = "region", nullable = false, length = 100)
     @NonNull
     private String region;

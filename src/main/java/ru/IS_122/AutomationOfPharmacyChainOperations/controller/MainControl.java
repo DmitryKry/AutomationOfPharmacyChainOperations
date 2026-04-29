@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
-import ru.IS_122.AutomationOfPharmacyChainOperations.model.Pharmacy;
-import ru.IS_122.AutomationOfPharmacyChainOperations.model.Role;
-import ru.IS_122.AutomationOfPharmacyChainOperations.model.UserOfPharmacy;
-import ru.IS_122.AutomationOfPharmacyChainOperations.model.Workers;
+import ru.IS_122.AutomationOfPharmacyChainOperations.model.*;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.PharmacyService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -114,27 +111,19 @@ public class MainControl {
     }
 
     @PostMapping("/userPlace")
-    public String createPharmacy(@RequestParam String name,
-                                 @RequestParam String legal_name,
-                                 @RequestParam String inn,
-                                 @RequestParam String kpp,
-                                 @RequestParam String ogrn,
-                                 @RequestParam String address,
-                                 @RequestParam String city,
-                                 @RequestParam String region,
-                                 @RequestParam String postal_code,
+    public String createPharmacy(Pharmacy form,
                                Model model,
                                HttpSession session) {
         Pharmacy pharmacy = Pharmacy.builder()
-                .name(name)
-                .legal_name(legal_name)
-                .inn(inn)
-                .kpp(kpp)
-                .ogrn(ogrn)
-                .address(address)
-                .city(city)
-                .region(region)
-                .postal_code(postal_code)
+                .name(form.getName())
+                .legal_name(form.getLegal_name())
+                .inn(form.getInn())
+                .kpp(form.getKpp())
+                .ogrn(form.getOgrn())
+                .address(form.getAddress())
+                .ID_CITY(form.getID_CITY())
+                .region(form.getRegion())
+                .postal_code(form.getPostal_code())
                 .build();
 
         String error = pharmacyService.createPharmacy(pharmacy);
@@ -154,12 +143,23 @@ public class MainControl {
 
     @GetMapping("/pharmacyCreate")
     public String showPharmacyCreatePage(@RequestParam(defaultValue = "false") boolean addAdministrator,
+                                         @RequestParam(defaultValue = "false") boolean addCity,
+                                         @RequestParam(defaultValue = "false") boolean createCity,
                                          @RequestParam(defaultValue = "") String selectAdmin,
-                                         @RequestParam(required = false) BigDecimal idAdmin, Model model) {
+                                         @RequestParam(defaultValue = "") String selectCityRegion,
+                                         @RequestParam(defaultValue = "") String selectCity,
+                                         @RequestParam(required = false) BigDecimal idAdmin,
+                                         @RequestParam(required = false) BigDecimal idCity,Model model) {
         model.addAttribute("addAdministrator", addAdministrator);
+        model.addAttribute("addCity", addCity);
+        model.addAttribute("createCity", createCity);
         model.addAttribute("idAdmin", idAdmin);
+        model.addAttribute("idCity", idCity);
         model.addAttribute("selectAdmin", selectAdmin);
+        model.addAttribute("selectCityRegion", selectCityRegion);
+        model.addAttribute("selectCity", selectCity);
         model.addAttribute("addAdministrators", userService.getAdministrators());
+        model.addAttribute("cities", pharmacyService.getAllCities());
         return "pharmacyCreate";
     }
 
@@ -175,7 +175,7 @@ public class MainControl {
                 .kpp(form.getKpp())
                 .ogrn(form.getOgrn())
                 .address(form.getAddress())
-                .city(form.getCity())
+                .ID_CITY(form.getID_CITY())
                 .region(form.getRegion())
                 .postal_code(form.getPostal_code())
                 .build();
@@ -189,8 +189,35 @@ public class MainControl {
     @PostMapping("/pharmacyCreate/addAdministrator")
     public String pharmacyCreatePage(@RequestParam String addAdministratorName,
                                      @RequestParam(defaultValue = "true") boolean addAdministrator, Model model) {
-        model.addAttribute("addAdministrators", userService.searchAdministrators(addAdministratorName));
+        if (!addAdministratorName.isEmpty())
+            model.addAttribute("addAdministrators", userService.searchAdministrators(addAdministratorName));
+        else
+            model.addAttribute("addAdministrators", userService.getAdministrators());
         model.addAttribute("addAdministrator", addAdministrator);
+        return "pharmacyCreate";
+    }
+
+    @PostMapping("/pharmacyCreate/addCity")
+    public String pharmacyCreatePageAddCity(@RequestParam String addCity,
+                                     @RequestParam(defaultValue = "false") boolean addAdministrator, Model model) {
+        if (!addCity.isEmpty())
+            model.addAttribute("cities", pharmacyService.findCities(addCity));
+        else
+            model.addAttribute("cities", pharmacyService.getAllCities());
+        model.addAttribute("addAdministrator", addAdministrator);
+        return "pharmacyCreate";
+    }
+
+
+    @PostMapping("/pharmacyCreate/createCity")
+    public String pharmacyCreatePageCreateCity(City city,
+                                               @RequestParam(defaultValue = "false") boolean createCity,
+                                               @RequestParam(defaultValue = "false") boolean addCity,
+                                               @RequestParam(defaultValue = "false") boolean addAdministrator, Model model) {
+        pharmacyService.createCity(city);
+        model.addAttribute("addAdministrator", createCity);
+        model.addAttribute("addAdministrator", addAdministrator);
+        model.addAttribute("addAdministrator", addCity);
         return "pharmacyCreate";
     }
 
@@ -261,4 +288,6 @@ public class MainControl {
         model.addAttribute("addUser", addUser);
         return "workersCreate";
     }
+
+
 }

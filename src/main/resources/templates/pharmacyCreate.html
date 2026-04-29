@@ -52,13 +52,15 @@
             </div>
             <div class="form-group">
                 <label for="CITY" th:text="#{CITY}"></label>
-                <br>
-                <input type="text" id="CITY" name="CITY">
+                <input type="hidden" th:name="CITY" th:value="${idCity}">
+                <input type="text" id="CITY"  th:value="${selectCity}" readonly >
             </div>
+            <a th:href="@{/api/pharmacy/pharmacyCreate(addCity=${addCity == false ? true : false})}"
+               th:text="#{find}"></a>
             <div class="form-group">
                 <label for="REGION" th:text="#{REGION}"></label>
                 <br>
-                <input type="text" id="REGION" name="REGION">
+                <input type="text" id="REGION" name="REGION" th:value="${selectCityRegion}" readonly>
             </div>
             <div class="form-group">
                 <label for="fioInput" th:text="#{administrator}"></label>
@@ -77,8 +79,8 @@
     </form>
     <div th:class="findPerconal" th:if="${addAdministrator == true}">
         <div>
-            <form th:action="@{/api/pharmacy/registration}" method="post">
-                <input th:type="text">
+            <form th:action="@{/api/pharmacy/pharmacyCreate/addAdministrator}" method="post">
+                <input th:type="text" th:name="addAdministratorName">
                 <button th:text="#{find}">
                 </button>
             </form>
@@ -87,7 +89,7 @@
             <ul>
                 <li th:each="a : ${addAdministrators}">
                     <div th:id="Transfer">
-                        <a th:href="@{/api/pharmacy/pharmacyCreate(idAdmin=${a.getId()}, selectAdmin=${a.userFio})}">
+                        <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(idAdmin=${a.getId()}, selectAdmin=${a.userFio})}">
                             <span th:text="${a.userFio} + ' id: ' + ${a.getId()}"></span>
                         </a>
                     </div>
@@ -97,6 +99,48 @@
         <div>
             <a th:href="@{/api/pharmacy/workerCreate}"th:text="#{add}"></a>
             <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${false})}" th:text="#{cancel}"></a>
+        </div>
+    </div>
+    <div th:class="findPerconal" th:if="${addCity == true}">
+        <div>
+            <form th:action="@{/api/pharmacy/registration}" method="post">
+                <input th:type="text">
+                <button th:text="#{find}">
+                </button>
+            </form>
+        </div>
+        <div th:id="contentForFindPerconal">
+            <ul>
+                <li th:each="c : ${cities}">
+                    <div th:id="Transfer">
+                        <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(
+                        selectCity=${c.getName()}, selectCityRegion=${c.getRegion()}, idCity=${c.id})}">
+                            <span th:text="${c.getName()}"></span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <a th:href="@{/api/pharmacy/pharmacyCreate(createCity = ${true})}"th:text="#{add}"></a>
+            <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${false})}" th:text="#{cancel}"></a>
+        </div>
+    </div>
+    <div th:class="findPerconal" th:id="createCity" th:if="${createCity == true}">
+        <form th:action="@{/api/pharmacy/pharmacyCreate/createCity}" method="post">
+            <label for="createC" th:text="#{CITY}"></label>
+            <br>
+            <input id="createC"  th:name="name" th:type="text">
+            <br>
+            <label for="createR" th:text="#{REGION}"></label>
+            <br>
+            <input id="createR" th:name="region" th:type="text">
+            <br>
+            <button th:text="#{create}"></button>
+
+        </form>
+        <div>
+            <a th:href="@{/api/pharmacy/workerCreate(createRole=false, addRole=true)}" th:text="#{cancel}"></a>
         </div>
     </div>
 </div>

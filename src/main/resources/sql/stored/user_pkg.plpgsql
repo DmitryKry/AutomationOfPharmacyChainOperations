@@ -66,10 +66,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION user_pkg.get_administrator(p_fio VARCHAR(100))
-RETURNS SETOF workers AS $$
+RETURNS TABLE(id numeric(38,2), user_fio VARCHAR) AS $$
 BEGIN
 RETURN QUERY
-SELECT w.*, u.fio
+SELECT w.id, u.fio user_fio
 FROM workers w
          JOIN userofpharmacy u ON w.id_of_user = u.id
 WHERE w.id_of_role = 1
