@@ -8,6 +8,7 @@ import ru.IS_122.AutomationOfPharmacyChainOperations.model.City;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.Pharmacy;
 
 
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Date;
 import java.sql.Types;
@@ -24,8 +25,8 @@ public class PharmacyService {
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pharmacy.class));
     }
 
-    public String createPharmacy(Pharmacy pharmacy) {
-        String sql = "CALL user_pkg.create_new_pharmacy(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public String createPharmacy(Pharmacy pharmacy, BigDecimal idAdmin) {
+        String sql = "CALL pharmacy_pkg.create_new_pharmacy(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             cs.setString(1, pharmacy.getName());
@@ -34,12 +35,13 @@ public class PharmacyService {
             cs.setString(4, pharmacy.getKpp());
             cs.setString(5, pharmacy.getOgrn());
             cs.setString(6, pharmacy.getAddress());
-            cs.setBigDecimal(7, pharmacy.getID_CITY());
+            cs.setObject(7, pharmacy.getID_CITY());
             cs.setString(8, pharmacy.getRegion());
             cs.setString(9, pharmacy.getPostal_code());
-            cs.registerOutParameter(10, Types.VARCHAR);
+            cs.setObject(10, idAdmin);
+            cs.registerOutParameter(11, Types.VARCHAR);
             cs.execute();
-            return cs.getString(10);
+            return cs.getString(11);
         });
 
         if (errorMessage != null && !errorMessage.isEmpty()) {

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Создание лекарственного препарата</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</HEAD>
+<body>
+<div class="AllInfo">
+    <div class="menu">
+        <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+        <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+        <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+        <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
+        <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicine}"></a>
+    </div>
+    <div th:id="forPhoto"></div>
+
+    <form th:action="@{/api/pharmacy/medicineCreate}" method="post">
+
+        <!-- ============================================= -->
+        <!-- БЛОК 1: ОСНОВНАЯ ИНФОРМАЦИЯ О ПРЕПАРАТЕ -->
+        <!-- ============================================= -->
+        <div th:class="createObject" th:id="medicineMainInfo">
+            <h3 th:text="#{medicine.main.info}"></h3>
+
+            <div class="form-group">
+                <label for="name" th:text="#{medicine.name}"></label>
+                <span class="required">*</span>
+                <br>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="international_name" th:text="#{medicine.international_name}"></label>
+                <br>
+                <input type="text" id="international_name" name="international_name">
+            </div>
+
+            <div class="form-group">
+                <label for="dosage_strength" th:text="#{medicine.dosage_strength}"></label>
+                <br>
+                <input type="text" id="dosage_strength" name="dosage_strength" placeholder="например: 500 мг, 10 мг/мл">
+            </div>
+
+            <div class="form-group">
+                <label for="package_quantity" th:text="#{medicine.package_quantity}"></label>
+                <br>
+                <input type="number" id="package_quantity" name="package_quantity" min="1">
+            </div>
+
+            <div class="form-group">
+                <label for="prescription_required" th:text="#{medicine.prescription_required}"></label>
+                <br>
+                <select id="prescription_required" name="prescription_required">
+                    <option value="true" th:text="#{yes}" selected></option>
+                    <option value="false" th:text="#{no}" selected></option>
+                </select>
+            </div>
+
+            <!-- Справочники: Бренд, Форма выпуска, Единица измерения -->
+            <div class="form-group">
+                <label for="brand_id" th:text="#{medicine.brand}"></label>
+                <input type="hidden" th:name="brand_id" th:value="${brand_id}">
+                <input type="text" id="brand_id" th:value="${selectBrand}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addBrand=${addBrand == false ? true : false})}"
+               th:text="#{find}"></a>
+            <div class="form-group">
+                <label for="dosage_form_id" th:text="#{medicine.dosage_form}"></label>
+                <input type="hidden" th:name="dosage_form_id" th:value="${dosage_form_id}">
+                <input type="text" id="dosage_form_id" th:value="${selectDosageForm}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addDosageForm=${addDosageForm == false ? true : false})}"
+               th:text="#{find}"></a>
+            <div class="form-group">
+                <label for="unit_of_measure_id" th:text="#{medicine.unit_of_measure}"></label>
+                <input type="hidden" th:name="unit_of_measure_id" th:value="${unit_of_measure_id}">
+                <input type="text" id="unit_of_measure_id" th:value="${selectUnitOfMeasure}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addUnitOfMeasure=${addUnitOfMeasure == false ? true : false})}"
+               th:text="#{find}"></a>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- БЛОК 2: РЕГИСТРАЦИОННЫЕ ДАННЫЕ -->
+        <!-- ============================================= -->
+        <div th:class="createObject" th:id="medicineRegistrationInfo">
+            <h3 th:text="#{medicine.registration.info}"></h3>
+
+            <div class="form-group">
+                <label for="registration_number" th:text="#{medicine.registration_number}"></label>
+                <br>
+                <input type="text" id="registration_number" name="registration_number" placeholder="ЛП-XXXXXX">
+            </div>
+
+            <div class="form-group">
+                <label for="registration_date" th:text="#{medicine.registration_date}"></label>
+                <br>
+                <input type="date" id="registration_date" name="registration_date">
+            </div>
+
+            <div class="form-group">
+                <label for="atc_id" th:text="#{medicine.atc_code}"></label>
+                <input type="hidden" th:name="atc_id" th:value="${atc_id}">
+                <input type="text" id="atc_id" th:value="${selectAtc}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addAtc=${addAtc == false ? true : false})}"
+               th:text="#{find}"></a>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- БЛОК 3: УСЛОВИЯ ХРАНЕНИЯ -->
+        <!-- ============================================= -->
+        <div th:class="createObject" th:id="medicineStorageInfo">
+            <h3 th:text="#{medicine.storage.info}"></h3>
+
+            <div class="form-group">
+                <label for="shelf_life_months" th:text="#{medicine.shelf_life}"></label>
+                <br>
+                <input type="number" id="shelf_life_months" name="shelf_life_months" min="1" max="120">
+            </div>
+
+            <div class="form-group">
+                <label for="storage_temperature_min" th:text="#{medicine.temp_min}"></label>
+                <br>
+                <input type="number" id="storage_temperature_min" name="storage_temperature_min" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label for="storage_temperature_max" th:text="#{medicine.temp_max}"></label>
+                <br>
+                <input type="number" id="storage_temperature_max" name="storage_temperature_max" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label for="requires_refrigeration" th:text="#{medicine.refrigeration}"></label>
+                <br>
+                <select id="requires_refrigeration" name="requires_refrigeration">
+                    <option value="true" th:text="#{yes}">Да</option>
+                    <option value="false" th:text="#{no}" selected>Нет</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="light_sensitive" th:text="#{medicine.light_sensitive}"></label>
+                <br>
+                <select id="light_sensitive" name="light_sensitive">
+                    <option value="true" th:text="#{yes}">Да</option>
+                    <option value="false" th:text="#{no}" selected>Нет</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="requires_dark_storage" th:text="#{medicine.dark_storage}"></label>
+                <br>
+                <select id="requires_dark_storage" name="requires_dark_storage">
+                    <option value="true" th:text="#{yes}">Да</option>
+                    <option value="false" th:text="#{no}" selected>Нет</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- БЛОК 4: ПРОИЗВОДИТЕЛЬ И СТРАНА -->
+        <!-- ============================================= -->
+        <div th:class="createObject" th:id="medicineManufacturerInfo">
+            <h3 th:text="#{medicine.manufacturer.info}"></h3>
+
+            <div class="form-group">
+                <label for="manufacturer_id" th:text="#{medicine.manufacturer}"></label>
+                <input type="hidden" th:name="manufacturer_id" th:value="${manufacturer_id}">
+                <input type="text" id="manufacturer_id" th:value="${selectManufacturer}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addManufacturer=${addManufacturer == false ? true : false})}"
+               th:text="#{find}"></a>
+            <div class="form-group">
+                <label for="country_id" th:text="#{medicine.country}"></label>
+                <input type="hidden" th:name="country_id" th:value="${country_id}">
+                <input type="text" id="country_id" th:value="${selectCountry}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addCountry=${addCountry == false ? true : false})}"
+               th:text="#{find}"></a>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- БЛОК 5: КЛАССИФИКАЦИЯ -->
+        <!-- ============================================= -->
+        <div th:class="createObject" th:id="medicineClassificationInfo">
+            <h3 th:text="#{medicine.classification.info}"></h3>
+
+            <div class="form-group">
+                <label for="pharmacological_group_id" th:text="#{medicine.pharma_group}"></label>
+                <input type="hidden" th:name="pharmacological_group_id" th:value="${pharmacological_group_id}">
+                <input type="text" id="pharmacological_group_id" th:value="${selectPharmacologicalGroup}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addPharmacologicalGroup=${addPharmacologicalGroup == false ? true : false})}"
+               th:text="#{find}"></a>
+            <div class="form-group">
+                <label for="therapeutic_group_id" th:text="#{medicine.therapeutic_group}"></label>
+                <input type="hidden" th:name="therapeutic_group_id" th:value="${therapeutic_group_id}">
+                <input type="text" id="therapeutic_group_id" th:value="${selectTherapeuticGroup}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addTherapeuticGroup=${addTherapeuticGroup == false ? true : false})}"
+               th:text="#{find}"></a>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- БЛОК 6: РЕЦЕПТУРА И УПАКОВКА -->
+        <!-- ============================================= -->
+        <div th:class="createObject" th:id="medicinePackageInfo">
+            <h3 th:text="#{medicine.package.info}"></h3>
+
+            <div class="form-group">
+                <label for="prescription_form_id" th:text="#{medicine.prescription_form}"></label>
+                <input type="hidden" th:name="prescription_form_id" th:value="${prescription_form_id}">
+                <input type="text" id="prescription_form_id" th:value="${selectPrescriptionForm}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addPrescriptionForm=${addPrescriptionForm == false ? true : false})}"
+               th:text="#{find}"></a>
+
+            <div class="form-group">
+                <label for="package_type_id" th:text="#{medicine.package_type}"></label>
+                <input type="hidden" th:name="package_type_id" th:value="${package_type_id}">
+                <input type="text" id="package_type_id" th:value="${selectPackageType}" readonly>
+            </div>
+            <a th:href="@{/api/pharmacy/medicineCreate(addPackageType=${addPackageType == false ? true : false})}"
+               th:text="#{find}"></a>
+        </div>
+
+        <!-- Кнопка отправки -->
+        <button type="submit" th:class="ButtonPost" th:id="createMedicine" th:text="#{create}"></button>
+    </form>
+
+    <!-- ============================================= -->
+    <!-- МОДАЛЬНЫЕ ОКНА ДЛЯ ДОБАВЛЕНИЯ СПРАВОЧНИКОВ -->
+    <!-- ============================================= -->
+
+    <!-- Добавление бренда -->
+    <div th:class="findPerconal" th:if="${addBrand == true}">
+        <div>
+            <form th:action="@{/api/pharmacy/medicineCreate/addBrand}" method="post">
+                <input type="text" name="brandName" th:placeholder="#{medicine.brand}">
+                <button th:text="#{find}">Найти</button>
+            </form>
+        </div>
+        <div th:id="contentForFindPerconal">
+            <ul>
+                <li th:each="b : ${brands}">
+                    <div th:id="Transfer">
+                        <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                            brand_id=${b.getId()},
+                            selectBrand=${b.getName()},
+                            addBrand=${false})}">
+                            <span th:text="${b.getName()}"></span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <a th:href="@{/api/pharmacy/brandCreate}" th:text="#{add}"></a>
+            <a th:href="@{/api/pharmacy/medicineCreate(addBrand=${false})}" th:text="#{cancel}"></a>
+        </div>
+    </div>
+
+    <!-- Добавление формы выпуска -->
+    <div th:class="findPerconal" th:if="${addDosageForm == true}">
+        <div>
+            <form th:action="@{/api/pharmacy/medicineCreate/addDosageForm}" method="post">
+                <input type="text" name="dosageFormName" th:placeholder="#{medicine.dosage_form}">
+                <button th:text="#{find}">Найти</button>
+            </form>
+        </div>
+        <div th:id="contentForFindPerconal">
+            <ul>
+                <li th:each="df : ${dosageForms}">
+                    <div th:id="Transfer">
+                        <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                            dosage_form_id=${df.getId()},
+                            selectDosageForm=${df.getName()},
+                            addDosageForm=${false})}">
+                            <span th:text="${df.getName()}"></span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <a th:href="@{/api/pharmacy/dosageFormCreate}" th:text="#{add}"></a>
+            <a th:href="@{/api/pharmacy/medicineCreate(addDosageForm=${false})}" th:text="#{cancel}"></a>
+        </div>
+    </div>
+
+    <!-- Добавление производителя -->
+    <div th:class="findPerconal" th:if="${addManufacturer == true}">
+        <div>
+            <form th:action="@{/api/pharmacy/medicineCreate/addManufacturer}" method="post">
+                <input type="text" name="manufacturerName" th:placeholder="#{medicine.manufacturer}">
+                <button th:text="#{find}">Найти</button>
+            </form>
+        </div>
+        <div th:id="contentForFindPerconal">
+            <ul>
+                <li th:each="m : ${manufacturers}">
+                    <div th:id="Transfer">
+                        <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                            manufacturer_id=${m.getId()},
+                            selectManufacturer=${m.getName()},
+                            addManufacturer=${false})}">
+                            <span th:text="${m.getName()}"></span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <a th:href="@{/api/pharmacy/manufacturerCreate}" th:text="#{add}"></a>
+            <a th:href="@{/api/pharmacy/medicineCreate(addManufacturer=${false})}" th:text="#{cancel}"></a>
+        </div>
+    </div>
+
+    <!-- Аналогично для остальных справочников: страна, АТХ, фармгруппа, теругруппа, тип рецепта, тип упаковки, единица измерения -->
+
+</div>
+</body>
+</html>

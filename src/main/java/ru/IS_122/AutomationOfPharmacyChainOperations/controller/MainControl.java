@@ -109,7 +109,7 @@ public class MainControl {
         model.addAttribute("addPharmacy", addPharmacy);
         return "userPlace";
     }
-
+/*
     @PostMapping("/userPlace")
     public String createPharmacy(Pharmacy form,
                                Model model,
@@ -135,7 +135,7 @@ public class MainControl {
             return "entrace";
         }
     }
-
+*/
     @GetMapping("/pharmacy")
     public String showPharmacyPage(Model model) {
         return "userPlace";
@@ -167,6 +167,9 @@ public class MainControl {
     public String pharmacyCreatePage(Pharmacy form,
                                      @RequestParam(defaultValue = "false") boolean addAdministrator,
                                      @RequestParam(defaultValue = "") String selectAdmin,
+                                     @RequestParam(defaultValue = "") String selectCityRegion,
+                                     @RequestParam(defaultValue = "") String selectCity,
+                                     @RequestParam(required = false) BigDecimal idCity,
                                      @RequestParam(required = false) BigDecimal idAdmin, Model model) {
         Pharmacy pharmacy = Pharmacy.builder()
                 .name(form.getName())
@@ -179,31 +182,58 @@ public class MainControl {
                 .region(form.getRegion())
                 .postal_code(form.getPostal_code())
                 .build();
-        pharmacyService.createPharmacy(pharmacy);
+        pharmacyService.createPharmacy(pharmacy, idAdmin);
         model.addAttribute("addAdministrator", addAdministrator);
         model.addAttribute("idAdmin", idAdmin);
         model.addAttribute("selectAdmin", selectAdmin);
+        model.addAttribute("idAdmin", idAdmin);
+        model.addAttribute("idCity", idCity);
+        model.addAttribute("selectAdmin", selectAdmin);
+        model.addAttribute("selectCityRegion", selectCityRegion);
+        model.addAttribute("selectCity", selectCity);
         return "pharmacyCreate";
     }
 
     @PostMapping("/pharmacyCreate/addAdministrator")
     public String pharmacyCreatePage(@RequestParam String addAdministratorName,
+                                     @RequestParam(defaultValue = "") String selectAdmin,
+                                     @RequestParam(defaultValue = "") String selectCityRegion,
+                                     @RequestParam(defaultValue = "") String selectCity,
+                                     @RequestParam(required = false) BigDecimal idAdmin,
+                                     @RequestParam(required = false) BigDecimal idCity,
                                      @RequestParam(defaultValue = "true") boolean addAdministrator, Model model) {
         if (!addAdministratorName.isEmpty())
             model.addAttribute("addAdministrators", userService.searchAdministrators(addAdministratorName));
         else
             model.addAttribute("addAdministrators", userService.getAdministrators());
         model.addAttribute("addAdministrator", addAdministrator);
+        model.addAttribute("idAdmin", idAdmin);
+        model.addAttribute("idCity", idCity);
+        model.addAttribute("selectAdmin", selectAdmin);
+        model.addAttribute("selectCityRegion", selectCityRegion);
+        model.addAttribute("selectCity", selectCity);
+        model.addAttribute("addAdministrator", addAdministrator);
         return "pharmacyCreate";
     }
 
     @PostMapping("/pharmacyCreate/addCity")
     public String pharmacyCreatePageAddCity(@RequestParam String addCity,
+                                            @RequestParam(defaultValue = "") String selectAdmin,
+                                            @RequestParam(defaultValue = "") String selectCityRegion,
+                                            @RequestParam(defaultValue = "") String selectCity,
+                                            @RequestParam(required = false) BigDecimal idAdmin,
+                                            @RequestParam(required = false) BigDecimal idCity,
                                      @RequestParam(defaultValue = "false") boolean addAdministrator, Model model) {
         if (!addCity.isEmpty())
             model.addAttribute("cities", pharmacyService.findCities(addCity));
         else
             model.addAttribute("cities", pharmacyService.getAllCities());
+        model.addAttribute("addAdministrator", addAdministrator);
+        model.addAttribute("idAdmin", idAdmin);
+        model.addAttribute("idCity", idCity);
+        model.addAttribute("selectAdmin", selectAdmin);
+        model.addAttribute("selectCityRegion", selectCityRegion);
+        model.addAttribute("selectCity", selectCity);
         model.addAttribute("addAdministrator", addAdministrator);
         return "pharmacyCreate";
     }
@@ -289,5 +319,14 @@ public class MainControl {
         return "workersCreate";
     }
 
+    @GetMapping("/medicinePlace")
+    public String showMedicinePlacePage(Model model) {
+        return "medicinePlace";
+    }
+
+    @GetMapping("/medicineCreate")
+    public String showMedicineCreatePage(Model model) {
+        return "medicineCreate";
+    }
 
 }

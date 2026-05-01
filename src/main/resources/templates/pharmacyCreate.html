@@ -15,32 +15,32 @@
         <a class="medicines" th:text="#{medicines}"></a>
     </div>
     <div th:id="forPhoto"></div>
-    <form th:action="@{/api/pharmacy/registration}" method="post">
+    <form th:action="@{/api/pharmacy/pharmacyCreate}" method="post">
         <div th:class="createObject" th:id="pharmacies" >
             <div class="form-group">
                 <label for="name_pharmacy" th:text="#{name_pharmacy}"></label>
                 <br>
-                <input type="text" id="name_pharmacy" name="name_pharmacy">
+                <input type="text" id="name_pharmacy" name="name">
             </div>
             <div class="form-group">
                 <label for="legal_name_pharmacy" th:text="#{legal_name_pharmacy}"></label>
                 <br>
-                <input type="text" id="legal_name_pharmacy" name="legal_name_pharmacy">
+                <input type="text" id="legal_name_pharmacy" name="legal_name">
             </div>
             <div class="form-group">
                 <label for="INN" th:text="#{INN}"></label>
                 <br>
-                <input type="text" id="INN" name="INN">
+                <input type="text" id="INN" name="inn">
             </div>
             <div class="form-group">
                 <label for="KPP" th:text="#{KPP}"></label>
                 <br>
-                <input type="text" id="KPP" name="KPP">
+                <input type="text" id="KPP" name="kpp">
             </div>
             <div class="form-group">
                 <label for="OGRN" th:text="#{OGRN}"></label>
                 <br>
-                <input type="text" id="OGRN" name="OGRN">
+                <input type="text" id="OGRN" name="ogrn">
             </div>
 
         </div>
@@ -48,38 +48,42 @@
             <div class="form-group">
                 <label for="adress_pharmacy" th:text="#{adress_pharmacy}"></label>
                 <br>
-                <input type="text" id="adress_pharmacy" name="adress_pharmacy">
+                <input type="text" id="adress_pharmacy" name="address">
             </div>
             <div class="form-group">
                 <label for="CITY" th:text="#{CITY}"></label>
-                <input type="hidden" th:name="CITY" th:value="${idCity}">
+                <input type="hidden" th:name="ID_CITY" th:value="${idCity}">
                 <input type="text" id="CITY"  th:value="${selectCity}" readonly >
             </div>
-            <a th:href="@{/api/pharmacy/pharmacyCreate(addCity=${addCity == false ? true : false})}"
+            <a th:href="@{/api/pharmacy/pharmacyCreate(addCity=${addCity == false ? true : false},
+            selectAdmin=${selectAdmin}, idAdmin=${idAdmin})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="REGION" th:text="#{REGION}"></label>
                 <br>
-                <input type="text" id="REGION" name="REGION" th:value="${selectCityRegion}" readonly>
+                <input type="text" id="REGION" name="region" th:value="${selectCityRegion}" readonly>
             </div>
             <div class="form-group">
                 <label for="fioInput" th:text="#{administrator}"></label>
-                <input type="hidden" th:name="fioInput" th:value="${idAdmin}">
+                <input type="hidden" th:name="idAdmin" th:value="${idAdmin}">
                 <input type="text" id="fioInput"  th:value="${selectAdmin}" readonly >
             </div>
-            <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${addAdministrator == false ? true : false})}"
+            <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${addAdministrator == false ? true : false},
+            idCity=${idCity}, selectCity=${selectCity},
+            selectCityRegion=${selectCityRegion})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="POSTAL_CODE" th:text="#{POSTAL_CODE}"></label>
                 <br>
-                <input type="text" id="POSTAL_CODE" name="POSTAL_CODE">
+                <input type="text" id="POSTAL_CODE" name="postal_code">
             </div>
         </div>
         <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{create}"></button>
     </form>
     <div th:class="findPerconal" th:if="${addAdministrator == true}">
         <div>
-            <form th:action="@{/api/pharmacy/pharmacyCreate/addAdministrator}" method="post">
+            <form th:action="@{/api/pharmacy/pharmacyCreate/addAdministrator(idCity=${idCity}, selectCity=${selectCity},
+            REGION=${REGION})}" method="post">
                 <input th:type="text" th:name="addAdministratorName">
                 <button th:text="#{find}">
                 </button>
@@ -89,7 +93,9 @@
             <ul>
                 <li th:each="a : ${addAdministrators}">
                     <div th:id="Transfer">
-                        <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(idAdmin=${a.getId()}, selectAdmin=${a.userFio})}">
+                        <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(idAdmin=${a.getId()},
+                        selectAdmin=${a.userFio}, idCity=${idCity}, selectCity=${selectCity},
+                        selectCityRegion=${selectCityRegion})}">
                             <span th:text="${a.userFio} + ' id: ' + ${a.getId()}"></span>
                         </a>
                     </div>
@@ -114,7 +120,8 @@
                 <li th:each="c : ${cities}">
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(
-                        selectCity=${c.getName()}, selectCityRegion=${c.getRegion()}, idCity=${c.id})}">
+                        selectCity=${c.getName()}, selectCityRegion=${c.getRegion()}, idCity=${c.id},
+                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin})}">
                             <span th:text="${c.getName()}"></span>
                         </a>
                     </div>
@@ -127,7 +134,7 @@
         </div>
     </div>
     <div th:class="findPerconal" th:id="createCity" th:if="${createCity == true}">
-        <form th:action="@{/api/pharmacy/pharmacyCreate/createCity}" method="post">
+        <form th:action="@{/api/pharmacy/pharmacyCreate/createCity(selectAdmin=${selectAdmin}, idAdmin=${idAdmin})}" method="post">
             <label for="createC" th:text="#{CITY}"></label>
             <br>
             <input id="createC"  th:name="name" th:type="text">

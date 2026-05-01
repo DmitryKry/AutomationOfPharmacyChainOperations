@@ -26,12 +26,12 @@
         <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
         <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
         <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
-        <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace}"></a>
+        <a class="medicines" th:text="#{medicines}"></a>
     </div>
     <div th:id="openFilter">
         <div th:id="filter">
             <form th:action="@{/api/pharmacy/registration}" method="post">
-                <h2 align="center" th:text="#{filter}"></h2>
+                <h2 align="center" th:text="#{filterMedicine}"></h2>
                 <div class="form-group">
                     <label for="adress" th:text="#{adress}"></label>
                     <br>
@@ -49,7 +49,7 @@
                     <button type="submit" th:class="ButtonPost" th:text="#{find}"></button>
                 </div>
             </form>
-            <a th:href="@{/api/pharmacy/pharmacyCreate}" th:id="create" th:text="#{create}"></a>
+            <a th:href="@{/api/pharmacy/medicineCreate}" th:id="create" th:text="#{create}"></a>
             <a class="toggle-link"></a>
         </div>
     </div>

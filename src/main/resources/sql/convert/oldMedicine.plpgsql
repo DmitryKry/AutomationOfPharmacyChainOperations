@@ -1,0 +1,224 @@
+-- Table: public.medicine
+
+-- DROP TABLE IF EXISTS public.medicine;
+
+CREATE TABLE IF NOT EXISTS public.medicine
+(
+    id numeric NOT NULL DEFAULT nextval('allobjects'::regclass),
+    name character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    international_name character varying(200) COLLATE pg_catalog."default",
+    dosage_strength character varying(50) COLLATE pg_catalog."default",
+    package_quantity integer,
+    prescription_required boolean DEFAULT true,
+    registration_number character varying(50) COLLATE pg_catalog."default",
+    registration_date date,
+    shelf_life_months integer,
+    storage_temperature_min integer,
+    storage_temperature_max integer,
+    requires_refrigeration boolean DEFAULT false,
+    light_sensitive boolean DEFAULT false,
+    requires_dark_storage boolean DEFAULT false,
+    is_active boolean DEFAULT true,
+    is_vital boolean DEFAULT false,
+    is_available boolean DEFAULT true,
+    created_at timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by numeric,
+    updated_by numeric,
+    is_deleted boolean DEFAULT false,
+    pharmacological_group_id numeric,
+    therapeutic_group_id numeric,
+    manufacturer_id numeric,
+    country_id numeric,
+    prescription_form_id numeric,
+    dosage_form_id numeric,
+    unit_of_measure_id numeric,
+    brand_id numeric,
+    atc_id numeric,
+    package_type_id numeric,
+    CONSTRAINT medicine_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_medicine_atc FOREIGN KEY (atc_id)
+        REFERENCES public.atc_classification (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_medicine_brand FOREIGN KEY (brand_id)
+        REFERENCES public.brand (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_medicine_country FOREIGN KEY (country_id)
+        REFERENCES public.country (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_medicine_dosage_form FOREIGN KEY (dosage_form_id)
+        REFERENCES public.dosage_form (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_medicine_manufacturer FOREIGN KEY (manufacturer_id)
+        REFERENCES public.manufacturer (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_medicine_package_type FOREIGN KEY (package_type_id)
+        REFERENCES public.package_type (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_medicine_pharma_group FOREIGN KEY (pharmacological_group_id)
+        REFERENCES public.pharmacological_group (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_medicine_prescription_form FOREIGN KEY (prescription_form_id)
+        REFERENCES public.prescription_form (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_medicine_therapeutic_group FOREIGN KEY (therapeutic_group_id)
+        REFERENCES public.therapeutic_group (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_medicine_unit_of_measure FOREIGN KEY (unit_of_measure_id)
+        REFERENCES public.unit_of_measure (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.medicine
+    OWNER to postgres;
+
+COMMENT ON TABLE public.medicine
+    IS 'Реестр лекарственных средств аптечной сети';
+
+COMMENT ON COLUMN public.medicine.id
+    IS 'Первичный ключ: уникальный идентификатор препарата';
+
+COMMENT ON COLUMN public.medicine.name
+    IS 'Торговое наименование препарата';
+
+COMMENT ON COLUMN public.medicine.international_name
+    IS 'МНН (Международное непатентованное название)';
+
+COMMENT ON COLUMN public.medicine.dosage_strength
+    IS 'Дозировка и концентрация активного вещества';
+
+COMMENT ON COLUMN public.medicine.package_quantity
+    IS 'Количество единиц (таблеток/ампул) в одной упаковке';
+
+COMMENT ON COLUMN public.medicine.prescription_required
+    IS 'Флаг: требуется ли рецепт для отпуска';
+
+COMMENT ON COLUMN public.medicine.registration_number
+    IS 'Номер регистрационного удостоверения ГРЛС';
+
+COMMENT ON COLUMN public.medicine.registration_date
+    IS 'Дата внесения в гос. реестр';
+
+COMMENT ON COLUMN public.medicine.shelf_life_months
+    IS 'Срок годности в месяцах';
+
+COMMENT ON COLUMN public.medicine.storage_temperature_min
+    IS 'Минимальная температура хранения (°C)';
+
+COMMENT ON COLUMN public.medicine.storage_temperature_max
+    IS 'Максимальная температура хранения (°C)';
+
+COMMENT ON COLUMN public.medicine.requires_refrigeration
+    IS 'Флаг: необходимо ли хранение в холодильнике';
+
+COMMENT ON COLUMN public.medicine.light_sensitive
+    IS 'Флаг: чувствительность к свету';
+
+COMMENT ON COLUMN public.medicine.requires_dark_storage
+    IS 'Флаг: обязательное хранение в темном месте';
+
+COMMENT ON COLUMN public.medicine.is_active
+    IS 'Статус записи: активна или архивирована';
+
+COMMENT ON COLUMN public.medicine.is_vital
+    IS 'Флаг: входит ли в перечень ЖНВЛП';
+
+COMMENT ON COLUMN public.medicine.is_available
+    IS 'Флаг: доступность препарата для продажи';
+
+COMMENT ON COLUMN public.medicine.created_at
+    IS 'Дата и время создания записи';
+
+COMMENT ON COLUMN public.medicine.updated_at
+    IS 'Дата и время последнего изменения';
+
+COMMENT ON COLUMN public.medicine.created_by
+    IS 'ID пользователя, создавшего запись';
+
+COMMENT ON COLUMN public.medicine.updated_by
+    IS 'ID пользователя, изменившего запись';
+
+COMMENT ON COLUMN public.medicine.is_deleted
+    IS 'Флаг мягкого удаления';
+
+COMMENT ON COLUMN public.medicine.pharmacological_group_id
+    IS 'ID фармакологической группы';
+
+COMMENT ON COLUMN public.medicine.therapeutic_group_id
+    IS 'ID терапевтической группы';
+
+COMMENT ON COLUMN public.medicine.manufacturer_id
+    IS 'ID завода-изготовителя';
+
+COMMENT ON COLUMN public.medicine.country_id
+    IS 'ID страны производства';
+
+COMMENT ON COLUMN public.medicine.prescription_form_id
+    IS 'ID типа рецептурного бланка';
+
+COMMENT ON COLUMN public.medicine.dosage_form_id
+    IS 'ID формы выпуска (таблетки, мази и т.д.)';
+
+COMMENT ON COLUMN public.medicine.unit_of_measure_id
+    IS 'ID единицы измерения дозировки';
+
+COMMENT ON COLUMN public.medicine.brand_id
+    IS 'ID бренда препарата';
+
+COMMENT ON COLUMN public.medicine.atc_id
+    IS 'ID кода АТХ классификации';
+
+COMMENT ON COLUMN public.medicine.package_type_id
+    IS 'ID типа упаковки';
+-- Index: idx_medicine_international_name
+
+-- DROP INDEX IF EXISTS public.idx_medicine_international_name;
+
+CREATE INDEX IF NOT EXISTS idx_medicine_international_name
+    ON public.medicine USING btree
+    (international_name COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_medicine_is_active
+
+-- DROP INDEX IF EXISTS public.idx_medicine_is_active;
+
+CREATE INDEX IF NOT EXISTS idx_medicine_is_active
+    ON public.medicine USING btree
+    (is_active ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_medicine_is_vital
+
+-- DROP INDEX IF EXISTS public.idx_medicine_is_vital;
+
+CREATE INDEX IF NOT EXISTS idx_medicine_is_vital
+    ON public.medicine USING btree
+    (is_vital ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_medicine_name
+
+-- DROP INDEX IF EXISTS public.idx_medicine_name;
+
+CREATE INDEX IF NOT EXISTS idx_medicine_name
+    ON public.medicine USING btree
+    (name COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_medicine_prescription
+
+-- DROP INDEX IF EXISTS public.idx_medicine_prescription;
+
+CREATE INDEX IF NOT EXISTS idx_medicine_prescription
+    ON public.medicine USING btree
+    (prescription_required ASC NULLS LAST)
+    TABLESPACE pg_default;
