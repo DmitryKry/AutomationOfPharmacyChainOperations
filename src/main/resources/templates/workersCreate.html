@@ -6,7 +6,6 @@
     <link rel="stylesheet" th:href="@{/style.css}">
 </HEAD>
 <body>
-<div class="AllInfo">
     <div class="menu">
         <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
         <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
@@ -112,7 +111,6 @@
             <a th:href="@{/api/pharmacy/workerCreate(createRole=false, addRole=true)}" th:text="#{cancel}"></a>
         </div>
     </div>
-</div>
 
 </body>
 </HTML>

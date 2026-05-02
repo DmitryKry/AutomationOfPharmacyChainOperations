@@ -300,10 +300,6 @@ input:focus {
     transform: translateX(-100%);
 }
 
-.AllInfo {
-    display: flex;
-    flex-direction: column;
-}
 
 #close-button {
     position: absolute;
@@ -470,3 +466,30 @@ input:focus {
 
 .findPerconal button {
 }*/
+.createObject{
+    align-items: center;
+}
+.createObject > a{
+    border-radius: 25% 25% / 100% 100%;
+    padding-right: 2%;
+    padding-left: 2%;
+
+}
+
+#forPhoto1 {
+    background: #fafafa;
+    border: 2px dashed red;
+    border-radius: 10px;
+    height: 50%;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    aspect-ratio: 1 / 1;  /* квадрат */
+    color: red;
+    font-weight: bold;
+    font-size: 16px;
+    height: 300px;
+}
