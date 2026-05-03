@@ -15,8 +15,11 @@
         <a class="medicines" th:text="#{medicines}"></a>
     </div>
     <div th:id="forPhoto"></div>
+
     <form th:action="@{/api/pharmacy/pharmacyCreate}" method="post">
+
         <div th:class="createObject" th:id="pharmacies" >
+            <h3 th:text="#{pharmacy.registration.details}"></h3>
             <div class="form-group">
                 <label for="name_pharmacy" th:text="#{name_pharmacy}"></label>
                 <br>
@@ -45,6 +48,7 @@
 
         </div>
         <div th:class="createObject" th:id="pharmaciesSecond">
+            <h3 th:text="#{pharmacy.contact.info}"></h3>
             <div class="form-group">
                 <label for="adress_pharmacy" th:text="#{adress_pharmacy}"></label>
                 <br>
@@ -147,7 +151,7 @@
 
         </form>
         <div>
-            <a th:href="@{/api/pharmacy/workerCreate(createRole=false, addRole=true)}" th:text="#{cancel}"></a>
+            <a th:href="@{/api/pharmacy/pharmacyCreate(createRole=false, addRole=true)}" th:text="#{cancel}"></a>
         </div>
     </div>
 </div>

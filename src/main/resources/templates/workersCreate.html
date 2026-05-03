@@ -15,7 +15,9 @@
     </div>
     <div th:id="forPhoto"></div>
     <form th:action="@{/api/pharmacy/workerCreate}" method="post">
+
         <div th:class="createObject" th:id="worker">
+            <h3 th:text="#{workerInfo}"></h3>
             <div class="form-group">
                 <label for="id_of_user" th:text="#{id_of_user}"></label>
                 <br>
