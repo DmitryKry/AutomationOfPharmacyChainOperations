@@ -577,3 +577,68 @@ input:focus, select:focus {
     border-bottom: 2px solid red;
     font-size: clamp(16px, 2.5vw, 2.8vh);
 }
+
+/*-----------------------------------------------------*/
+/* Стили для формы создания формы рецепта */
+#createPrescriptionForm form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#createPrescriptionForm label {
+    display: block;
+    margin-bottom: 5px;
+    color: red;
+    font-weight: bold;
+}
+
+#createPrescriptionForm input,
+#createPrescriptionForm select {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+
+#createPrescriptionForm button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#createPrescriptionForm button:hover {
+    background: darkred;
+}
+
+#createPrescriptionForm div {
+    text-align: center;
+    margin-top: 15px;
+}
+
+
+#createPrescriptionForm button {
+    display: block;
+    margin: 10px auto 0 auto;
+    width: fit-content;
+}
+
+#createPrescriptionForm > div {
+    text-align: center;
+}
+
+#createPrescriptionForm{
+    height: auto;
+    min-height: 5%;
+}
+
+#createPrescriptionForm form > a {
+    align-self: center;
+}

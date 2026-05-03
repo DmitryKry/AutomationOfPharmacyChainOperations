@@ -325,8 +325,95 @@ public class MainControl {
     }
 
     @GetMapping("/medicineCreate")
-    public String showMedicineCreatePage(Model model) {
+    public String showMedicineCreatePage(@RequestParam(defaultValue = "false") boolean addBrand,
+                                         @RequestParam(defaultValue = "false") boolean addDosageForm,
+                                         @RequestParam(defaultValue = "false") boolean addManufacturer,
+                                         @RequestParam(defaultValue = "false") boolean addCountry,
+                                         @RequestParam(defaultValue = "false") boolean addAtc,
+                                         @RequestParam(defaultValue = "false") boolean addPharmacologicalGroup,
+                                         @RequestParam(defaultValue = "false") boolean addTherapeuticGroup,
+                                         @RequestParam(defaultValue = "false") boolean addPrescriptionForm,
+                                         @RequestParam(defaultValue = "false") boolean addPackageType,
+                                         @RequestParam(defaultValue = "false") boolean createCountry,
+
+                                         Model model) {
+        model.addAttribute("addBrand", addBrand);
+        model.addAttribute("addDosageForm", addDosageForm);
+        model.addAttribute("addManufacturer", addManufacturer);
+        model.addAttribute("addCountry", addCountry);
+        model.addAttribute("addAtc", addAtc);
+        model.addAttribute("addPharmacologicalGroup", addPharmacologicalGroup);
+        model.addAttribute("addTherapeuticGroup", addTherapeuticGroup);
+        model.addAttribute("addPrescriptionForm", addPrescriptionForm);
+        model.addAttribute("addPackageType", addPackageType);
+        model.addAttribute("createCountry", createCountry);
+
         return "medicineCreate";
     }
+
+    @GetMapping("medicineCreate/prescriptionFormCreate")
+    public String showPrescriptionFormCreatePage(@RequestParam(defaultValue = "true") boolean createPrescriptionForm,
+                                                  Model model) {
+        model.addAttribute("createPrescriptionForm", createPrescriptionForm);
+        return "medicineCreate";
+    }
+
+
+    @GetMapping("medicineCreate/packageTypeCreate")
+    public String showPackageTypeCreatePage(@RequestParam(defaultValue = "true") boolean createPackageType,
+                                                 Model model) {
+        model.addAttribute("createPackageType", createPackageType);
+        return "medicineCreate";
+    }
+
+    @GetMapping("medicineCreate/pharmacologicalGroupCreate")
+    public String showPharmacologicalGroupCreatePage(@RequestParam(defaultValue = "true") boolean pharmacologicalGroupCreate,
+                                            Model model) {
+        model.addAttribute("pharmacologicalGroupCreate", pharmacologicalGroupCreate);
+        return "medicineCreate";
+    }
+
+    @GetMapping("medicineCreate/therapeuticGroupCreate")
+    public String showTherapeuticGroupCreatePage(@RequestParam(defaultValue = "true") boolean therapeuticGroupCreate,
+                                                     Model model) {
+        model.addAttribute("therapeuticGroupCreate", therapeuticGroupCreate);
+        return "medicineCreate";
+    }
+
+    @GetMapping("medicineCreate/manufacturerCreate")
+    public String showManufacturerCreatePage(@RequestParam(defaultValue = "true") boolean manufacturerCreate,
+                                                 Model model) {
+        model.addAttribute("manufacturerCreate", manufacturerCreate);
+        return "medicineCreate";
+    }
+
+    @GetMapping("medicineCreate/atcCreate")
+    public String showAtcCreatePage(@RequestParam(defaultValue = "true") boolean atcCreate,
+                                             Model model) {
+        model.addAttribute("atcCreate", atcCreate);
+        return "medicineCreate";
+    }
+
+    @GetMapping("medicineCreate/dosageFormCreate")
+    public String showDosageFormCreatePage(@RequestParam(defaultValue = "true") boolean dosageFormCreate,
+                                    Model model) {
+        model.addAttribute("dosageFormCreate", dosageFormCreate);
+        return "medicineCreate";
+    }
+
+    @GetMapping("medicineCreate/dosageFormCreate/methodOfAdministrationCreate")
+    public String showMethodOfAdministrationCreatePage(@RequestParam(defaultValue = "true") boolean methodOfAdministrationCreate,
+                                      Model model) {
+        model.addAttribute("methodOfAdministrationCreate", methodOfAdministrationCreate);
+        return "medicineCreate";
+    }
+
+    @GetMapping("medicineCreate/brandCreate")
+    public String showBrandCreatePage(@RequestParam(defaultValue = "true") boolean brandCreate,
+                                           Model model) {
+        model.addAttribute("brandCreate", brandCreate);
+        return "medicineCreate";
+    }
+
 
 }
