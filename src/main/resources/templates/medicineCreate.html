@@ -367,7 +367,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(createCountry=true)}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineCreate/createCountry}" th:text="#{add}"></a>
         <a th:href="@{/api/pharmacy/medicineCreate(addCountry=${false})}" th:text="#{cancel}"></a>
     </div>
 </div>
@@ -388,7 +388,7 @@
                             atc_id=${a.getId()},
                             selectAtc=${a.getCode()},
                             addAtc=${false})}">
-                        <span th:text="${a.getCode() + ' - ' + a.getName()}"></span>
+                        <span th:text="${a.getCode() + ': ' + a.getDescription()}"></span>
                     </a>
                 </div>
             </li>
@@ -553,7 +553,7 @@
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${brandCreate == true}">
     <form th:action="@{/api/pharmacy/medicineCreate/brandCreate}" method="post">
         <label for="BrandName" th:text="#{name}"></label>
-        <input th:name="BrandName" id="BrandName" th:type="text" th:placeholder="#{medicine.brand}">
+        <input th:name="brandName" id="BrandName" th:type="text" th:placeholder="#{medicine.brand}">
         <button th:text="#{create}"></button>
     </form>
     <div>
@@ -589,11 +589,13 @@
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${manufacturerCreate == true}">
     <form th:action="@{/api/pharmacy/medicineCreate/manufacturerCreate}" method="post">
         <label for="ManufacturerName" th:text="#{name}"></label>
-        <input th:name="ManufacturerName" id="ManufacturerName" th:type="text" >
+        <input th:name="name" id="ManufacturerName" th:type="text" >
         <label for="ManufacturerAddress" th:text="#{adress}"></label>
-        <input th:name="ManufacturerAddress" id="ManufacturerAddress" th:type="text" >
+        <input th:name="address" id="ManufacturerAddress" th:type="text" >
         <label for="ManufacturerPhone" th:text="#{phone}"></label>
-        <input th:name="ManufacturerPhone" id="ManufacturerPhone" th:type="text">
+        <input th:name="phone" id="ManufacturerPhone" th:type="text">
+        <label for="website" th:text="#{website}"></label>
+        <input th:name="phone" id="website" th:type="text">
         <button th:text="#{create}"></button>
     </form>
     <div>
@@ -604,9 +606,9 @@
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${atcCreate == true}">
     <form th:action="@{/api/pharmacy/medicineCreate/atcCreate}" method="post">
         <label for="ManufacturerCode" th:text="#{medicine.atc_code}"></label>
-        <input th:name="ManufacturerCode" id="ManufacturerCode" th:type="text" th:placeholder="#{medicine.atc_code}">
+        <input th:name="code" id="ManufacturerCode" th:type="text" th:placeholder="#{medicine.atc_code}">
         <label for="ManufacturerInfo" th:text="#{aboutInfo}"></label>
-        <input th:name="ManufacturerInfo" id="ManufacturerInfo" th:type="text" th:placeholder="#{aboutInfo}">
+        <input th:name="description" id="ManufacturerInfo" th:type="text" th:placeholder="#{aboutInfo}">
         <button th:text="#{create}"></button>
     </form>
     <div>
@@ -683,6 +685,13 @@
     </form>
     <div>
         <a th:href="@{/api/pharmacy/medicineCreate/dosageFormCreate}" th:text="#{cancel}"></a>
+    </div>
+</div>
+
+<div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
+    <H3 th:text="${InfoError}"></H3>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineCreate(InfoErrorShow = false)}" th:text="#{Ok}"></a>
     </div>
 </div>
 </body>

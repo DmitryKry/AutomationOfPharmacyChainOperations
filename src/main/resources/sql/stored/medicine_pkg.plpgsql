@@ -1,0 +1,141 @@
+CREATE SCHEMA IF NOT EXISTS medicine_pkg;
+
+create or replace function medicine_pkg.getBrands()
+returns setof brand as $$
+begin
+return query
+select * from brand;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.findBrands(p_name varchar)
+returns setof brand as $$
+begin
+return query
+select * from brand
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.createBrand(p_name varchar, p_error out varchar)
+as $$
+begin
+if p_name != '' and position(' ' in p_name) = 0 then
+insert into brand(name)
+values (p_name);
+else
+p_error := 'В названии присутствуют пробелы!';
+end if;
+exception
+when unique_violation then
+        p_error := concat('Бренд с именем ', p_name, ' уже существует');
+when not_null_violation then
+        p_error := 'Название бренда не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;
+
+
+create or replace function medicine_pkg.getAtcList()
+returns setof atc_classification as $$
+begin
+return query
+select * from atc_classification;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.findAtcCode(p_code varchar)
+returns setof atc_classification as $$
+begin
+return query
+select * from atc_classification
+where LOWER(code) LIKE LOWER(CONCAT('%', p_code, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.createAtcCode(p_code varchar, p_description varchar, p_error out varchar)
+as $$
+begin
+if p_code != '' and position(' ' in p_code) = 0 then
+insert into atc_classification(code, description)
+values (p_code, p_description);
+else
+p_error := 'В названии присутствуют пробелы!';
+end if;
+exception
+when unique_violation then
+        p_error := concat('АТХ-код ', p_code, ' уже существует');
+when not_null_violation then
+        p_error := 'Название бренда не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;
+
+
+
+create or replace function medicine_pkg.getManufuctureList()
+returns setof manufacturer as $$
+begin
+return query
+select * from manufacturer;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.findManufucture(p_name varchar)
+returns setof manufacturer as $$
+begin
+return query
+select * from manufacturer
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.createManufucture(p_name varchar, p_address varchar,
+       p_phone varchar, p_website varchar, p_error out varchar)
+as $$
+begin
+if p_name is not null and p_name != '' then
+        insert into manufacturer(name, address, phone, website)
+        values (p_name, p_address, p_phone, p_website);
+else
+        p_error := 'Название производителя не может быть пустым';
+end if;
+exception
+when unique_violation then
+        p_error := concat('Производитель с названием ', p_name, ' уже существует');
+when not_null_violation then
+        p_error := 'Название производителя не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+create or replace function medicine_pkg.getСountriesList()
+returns setof country as $$
+begin
+return query
+select * from country;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.findCountry(p_name varchar)
+returns setof country as $$
+begin
+return query
+select * from country
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.createCountry(p_name varchar, p_error out varchar)
+as $$
+begin
+insert into country(name)
+values (p_name);
+exception
+when unique_violation then
+        p_error := concat('Страна с названием ', p_name, ' уже существует');
+when not_null_violation then
+        p_error := 'Название страны не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;

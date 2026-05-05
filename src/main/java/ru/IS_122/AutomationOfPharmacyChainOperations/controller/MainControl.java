@@ -3,12 +3,14 @@ package ru.IS_122.AutomationOfPharmacyChainOperations.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
+import org.apache.catalina.Session;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.*;
+import ru.IS_122.AutomationOfPharmacyChainOperations.service.MedicineService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.PharmacyService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +45,8 @@ public class MainControl {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    MedicineService medicineService;
 
 
     @GetMapping("/admin")
@@ -335,19 +339,71 @@ public class MainControl {
                                          @RequestParam(defaultValue = "false") boolean addPrescriptionForm,
                                          @RequestParam(defaultValue = "false") boolean addPackageType,
                                          @RequestParam(defaultValue = "false") boolean createCountry,
-
-                                         Model model) {
+                                         @RequestParam(defaultValue = "false") boolean InfoErrorShow,
+                                         @RequestParam(required = false) BigDecimal brand_id,
+                                         @RequestParam(defaultValue = "") String selectBrand,
+                                         @RequestParam(required = false) BigDecimal atc_id,
+                                         @RequestParam(defaultValue = "") String selectAtc,
+                                         @RequestParam(required = false) BigDecimal manufacturer_id,
+                                         @RequestParam(defaultValue = "") String selectManufacturer,
+                                         @RequestParam(required = false) BigDecimal country_id,
+                                         @RequestParam(defaultValue = "") String selectCountry,
+                                         Model model, Session session) {
+        // Логирование для отладки
+        System.out.println("Received brand_id: " + brand_id);
+        System.out.println("Received selectBrand: " + selectBrand);
         model.addAttribute("addBrand", addBrand);
         model.addAttribute("addDosageForm", addDosageForm);
         model.addAttribute("addManufacturer", addManufacturer);
         model.addAttribute("addCountry", addCountry);
+        model.addAttribute("InfoErrorShow", InfoErrorShow);
         model.addAttribute("addAtc", addAtc);
         model.addAttribute("addPharmacologicalGroup", addPharmacologicalGroup);
         model.addAttribute("addTherapeuticGroup", addTherapeuticGroup);
         model.addAttribute("addPrescriptionForm", addPrescriptionForm);
         model.addAttribute("addPackageType", addPackageType);
         model.addAttribute("createCountry", createCountry);
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
 
+        if (addBrand){
+            model.addAttribute("brands", medicineService.getBrands());
+        }
+        if (addAtc){
+            model.addAttribute("atcList", medicineService.getAtcList());
+        }
+        if (addManufacturer){
+            model.addAttribute("manufacturers", medicineService.getManufuctureList());
+        }
+        if (addCountry){
+            model.addAttribute("countries", medicineService.getCountryList());
+        }
+
+
+        return "medicineCreate";
+    }
+
+    @PostMapping("/medicineCreate/addBrand")
+    public String showFindBrandPage(@RequestParam(defaultValue = "true") boolean addBrand,
+                                    @RequestParam String brandName, Model model) {
+        model.addAttribute("addBrand", addBrand);
+        Brand brand = Brand.builder().name(brandName).build();
+        model.addAttribute("brands", medicineService.findBrands(brand.getName()));
+        return "medicineCreate";
+    }
+
+    @PostMapping("/medicineCreate/addAtc")
+    public String showFindAtcCodePage(@RequestParam(defaultValue = "true") boolean addAtc,
+                                    @RequestParam String atcCode, Model model) {
+        model.addAttribute("addAtc", addAtc);
+        AtcClassification atcClassification = AtcClassification.builder().code(atcCode).build();
+        model.addAttribute("atcList", medicineService.findAtcCode(atcClassification.getCode()));
         return "medicineCreate";
     }
 
@@ -380,6 +436,15 @@ public class MainControl {
         return "medicineCreate";
     }
 
+    @PostMapping("medicineCreate/addManufacturer")
+    public String showManufacturerAddPage(@RequestParam(defaultValue = "true") boolean addManufacturer,
+                                          @RequestParam String manufacturerName,
+                                             Model model) {
+        model.addAttribute("addManufacturer", addManufacturer);
+        model.addAttribute("manufacturers", medicineService.findManufucture(manufacturerName));
+        return "medicineCreate";
+    }
+
     @GetMapping("medicineCreate/manufacturerCreate")
     public String showManufacturerCreatePage(@RequestParam(defaultValue = "true") boolean manufacturerCreate,
                                                  Model model) {
@@ -387,10 +452,42 @@ public class MainControl {
         return "medicineCreate";
     }
 
+    @PostMapping("medicineCreate/manufacturerCreate")
+    public String ManufacturerCreatePage(@RequestParam(defaultValue = "true") boolean manufacturerCreate,
+                                         @ModelAttribute Manufacturer manufacturer,
+                                             Model model) {
+        model.addAttribute("manufacturerCreate", manufacturerCreate);
+        String error = medicineService.createManufacturer(manufacturer);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
+        return "medicineCreate";
+    }
+
     @GetMapping("medicineCreate/atcCreate")
     public String showAtcCreatePage(@RequestParam(defaultValue = "true") boolean atcCreate,
                                              Model model) {
         model.addAttribute("atcCreate", atcCreate);
+        return "medicineCreate";
+    }
+
+    @PostMapping("medicineCreate/atcCreate")
+    public String AtcCodeCreatePage(@RequestParam(defaultValue = "true") boolean atcCreate,
+                                    @ModelAttribute AtcClassification atcClassification,
+                                    Model model) {
+        String error = medicineService.createAtcCode(atcClassification);
+        model.addAttribute("atcCreate", atcCreate);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
         return "medicineCreate";
     }
 
@@ -408,12 +505,36 @@ public class MainControl {
         return "medicineCreate";
     }
 
-    @GetMapping("medicineCreate/brandCreate")
-    public String showBrandCreatePage(@RequestParam(defaultValue = "true") boolean brandCreate,
+    @GetMapping("medicineCreate/createCountry")
+    public String showBrandCreatePage(@RequestParam(defaultValue = "true") boolean createCountry,
                                            Model model) {
-        model.addAttribute("brandCreate", brandCreate);
+        model.addAttribute("createCountry", createCountry);
         return "medicineCreate";
     }
 
+    @PostMapping("medicineCreate/createCountry")
+    public String BrandCreatePage(@RequestParam(defaultValue = "true") boolean createCountry,
+                                  @RequestParam String countryName, Model model) {
+        Country country = Country.builder().name(countryName).build();
+        String error = medicineService.createCountry(country);
+        model.addAttribute("createCountry", createCountry);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
+        return "medicineCreate";
+    }
+
+    @PostMapping("medicineCreate/addCountry")
+    public String showCountriesPage(@RequestParam(defaultValue = "true") boolean addCountry,
+                                    @RequestParam String countryName,
+                                    Model model) {
+        model.addAttribute("countries", medicineService.findCountry(countryName));
+        model.addAttribute("addCountry", addCountry);
+        return "medicineCreate";
+    }
 
 }

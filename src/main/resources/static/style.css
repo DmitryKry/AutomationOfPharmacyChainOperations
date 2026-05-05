@@ -403,6 +403,7 @@ input:focus, select:focus {
     border: none; /* Убираем рамку, если есть тень */
     border-top: 5px solid red; /* Тонкая красная линия сверху для акцента */
     z-index: 1000;
+    text-align: center;
 }
 
 .findPerconal input {
@@ -432,11 +433,15 @@ input:focus, select:focus {
     text-align: center;
 }
 
+.findPerconal h3{
+    color: red;
+}
+
 /* Средний блок с контентом */
 #contentForFindPerconal {
     padding: 20px;
     min-height: 200px;
-    max-height: 400px;
+    max-height: 200px;
     overflow-y: auto;
 }
 
@@ -641,4 +646,11 @@ input:focus, select:focus {
 
 #createPrescriptionForm form > a {
     align-self: center;
+}
+
+#okForm{
+    left: 40%;
+    top: 35%;
+    width: 20%;
+    height: 10%;
 }
