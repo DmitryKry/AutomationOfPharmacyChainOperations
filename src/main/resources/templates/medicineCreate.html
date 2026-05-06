@@ -500,7 +500,7 @@
                             package_type_id=${pt.getId()},
                             selectPackageType=${pt.getName()},
                             addPackageType=${false})}">
-                        <span th:text="${pt.getName()}"></span>
+                        <span th:text="${pt.getName()} + ': ' + ${pt.getDescription()}"></span>
                     </a>
                 </div>
             </li>
@@ -553,7 +553,7 @@
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${brandCreate == true}">
     <form th:action="@{/api/pharmacy/medicineCreate/brandCreate}" method="post">
         <label for="BrandName" th:text="#{name}"></label>
-        <input th:name="brandName" id="BrandName" th:type="text" th:placeholder="#{medicine.brand}">
+        <input th:name="name" id="BrandName" th:type="text" th:placeholder="#{medicine.brand}">
         <button th:text="#{create}"></button>
     </form>
     <div>
@@ -618,10 +618,10 @@
 <!-- Создание окна с Фармакологическая группа -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${pharmacologicalGroupCreate == true}">
     <form th:action="@{/api/pharmacy/medicineCreate/pharmacologicalGroupCreate}" method="post">
-        <label for="PharmacologicalGroup" th:text="#{medicine.pharma_group}"></label>
-        <input th:name="PharmacologicalGroup" ID="PharmacologicalGroup" th:type="text">
+        <label for="PharmacologicalGroup" th:text="#{name}"></label>
+        <input th:name="name" ID="PharmacologicalGroup" th:type="text">
         <label for="PharmacologicalGroupInfo" th:text="#{aboutInfo}"></label>
-        <input th:name="PharmacologicalGroupInfo" id="PharmacologicalGroupInfo" th:type="text">
+        <input th:name="description" id="PharmacologicalGroupInfo" th:type="text">
         <button th:text="#{create}"></button>
     </form>
     <div>
@@ -632,9 +632,9 @@
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${therapeuticGroupCreate == true}">
     <form th:action="@{/api/pharmacy/medicineCreate/therapeuticGroupCreate}" method="post">
         <label for="TherapeuticGroup" th:text="#{medicine.prescription_form}"></label>
-        <input th:name="TherapeuticGroup" id="TherapeuticGroup" th:type="text" th:placeholder="#{medicine.therapeutic_group}">
+        <input th:name="name" id="TherapeuticGroup" th:type="text" th:placeholder="#{medicine.therapeutic_group}">
         <label for="TherapeuticGroupInfo" th:text="#{medicine.prescription_form}"></label>
-        <input th:name="TherapeuticGroupInfo" id="TherapeuticGroupInfo" th:type="text" th:placeholder="#{aboutInfo}">
+        <input th:name="description" id="TherapeuticGroupInfo" th:type="text" th:placeholder="#{aboutInfo}">
         <button th:text="#{create}"></button>
     </form>
     <div>
@@ -643,7 +643,7 @@
 </div>
 <!-- Создание окна с Форма рецептурного бланка -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${createPrescriptionForm == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/createPrescriptionForm}" method="post">
+    <form th:action="@{/api/pharmacy/medicineCreate/prescriptionFormCreate}" method="post">
         <label for="PrescriptionForm" th:text="#{medicine.prescription_form}"></label>
         <input th:name="name" id="PrescriptionForm" th:type="text" th:placeholder="#{medicine.prescription_form}">
         <label for="descriptionPrescriptionForm" th:text="#{aboutInfo}"></label>
@@ -665,9 +665,11 @@
 </div>
 <!-- Создание окна с Тип упаковки -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${createPackageType == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/createPackageType}" method="post">
+    <form th:action="@{/api/pharmacy/medicineCreate/packageTypeCreate}" method="post">
         <label for="PackageTypeName" th:text="#{medicine.package_type}"></label>
-        <input th:name="DosageFormName" id="PackageTypeName" th:type="text">
+        <input th:name="name" id="PackageTypeName" th:type="text">
+        <label for="PackageTypeDescription" th:text="#{aboutInfo}"></label>
+        <input th:name="description" id="PackageTypeDescription" th:type="text">
         <button th:text="#{create}"></button>
     </form>
     <div>

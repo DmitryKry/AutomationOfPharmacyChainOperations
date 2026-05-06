@@ -20,12 +20,8 @@ $$ LANGUAGE plpgsql;
 create or replace procedure medicine_pkg.createBrand(p_name varchar, p_error out varchar)
 as $$
 begin
-if p_name != '' and position(' ' in p_name) = 0 then
 insert into brand(name)
 values (p_name);
-else
-p_error := 'В названии присутствуют пробелы!';
-end if;
 exception
 when unique_violation then
         p_error := concat('Бренд с именем ', p_name, ' уже существует');
@@ -137,5 +133,134 @@ when unique_violation then
         p_error := concat('Страна с названием ', p_name, ' уже существует');
 when not_null_violation then
         p_error := 'Название страны не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;
+
+
+
+
+create or replace function medicine_pkg.get_pharmacological_group_List()
+returns setof pharmacological_group as $$
+begin
+return query
+select * from pharmacological_group;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.find_pharmacological_group(p_name varchar)
+returns setof pharmacological_group as $$
+begin
+return query
+select * from pharmacological_group
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.create_pharmacological_group(p_name varchar, p_description varchar, p_error out varchar)
+as $$
+begin
+insert into pharmacological_group(name, description)
+values (p_name, p_description);
+exception
+when unique_violation then
+        p_error := concat('Фармакологическая группа с названием ', p_name, ' уже существует');
+when not_null_violation then
+        p_error := 'Название фармакологической группы не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;
+
+
+
+create or replace function medicine_pkg.get_therapeutic_group_List()
+returns setof therapeutic_group as $$
+begin
+return query
+select * from therapeutic_group;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.find_therapeutic_group(p_name varchar)
+returns setof therapeutic_group as $$
+begin
+return query
+select * from therapeutic_group
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.create_therapeutic_group(p_name varchar, p_description varchar, p_error out varchar)
+as $$
+begin
+insert into therapeutic_group(name, description)
+values (p_name, p_description);
+exception
+when unique_violation then
+        p_error := concat('Терапевтическая группа с названием ', p_name, ' уже существует');
+when not_null_violation then
+        p_error := 'Название терапевтической группы не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;
+
+
+
+create or replace function medicine_pkg.get_prescription_form_List()
+returns setof prescription_form as $$
+begin
+return query
+select * from prescription_form;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.find_prescription_form(p_name varchar)
+returns setof prescription_form as $$
+begin
+return query
+select * from prescription_form
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.create_prescription_form(p_name varchar, p_description varchar,
+       p_requires_special_blank boolean, p_storage_restriction varchar, p_error out varchar)
+as $$
+begin
+insert into prescription_form(name, description, requires_special_blank, storage_restriction)
+values (p_name, p_description, p_requires_special_blank, p_storage_restriction);
+exception
+when unique_violation then
+        p_error := concat('Форма рецептурного бланка с названием ', p_name, ' уже существует');
+when not_null_violation then
+        p_error := 'Название формы рецептурного бланка не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;
+
+
+create or replace function medicine_pkg.get_type_packaging_List()
+returns setof type_packaging as $$
+begin
+return query
+select * from type_packaging;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.find_type_packaging(p_name varchar)
+returns setof type_packaging as $$
+begin
+return query
+select * from type_packaging
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.create_type_packaging(p_name varchar, p_description varchar, p_error out varchar)
+as $$
+begin
+insert into type_packaging(name, description)
+values (p_name, p_description);
+exception
+when unique_violation then
+        p_error := concat('Тип упаковки с названием ', p_name, ' уже существует');
+when not_null_violation then
+        p_error := 'Название типа упаковки не может быть пустым';
 end;
 $$ LANGUAGE plpgsql;

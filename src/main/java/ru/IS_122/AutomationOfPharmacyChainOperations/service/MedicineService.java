@@ -127,4 +127,119 @@ public class MedicineService {
 
         return null;
     }
+
+
+
+    public List<PharmacologicalGroup> getPharmacologicalGroupList(){
+        String sql = "SELECT * FROM medicine_pkg.get_pharmacological_group_List()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PharmacologicalGroup.class));
+    }
+
+    public List<PharmacologicalGroup> findPharmacologicalGroup(String p_name){
+        String sql = "SELECT * FROM medicine_pkg.find_pharmacological_group(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PharmacologicalGroup.class), p_name);
+    }
+
+    public String createPharmacologicalGroup(PharmacologicalGroup pharmacologicalGroup){
+        String sql = "call medicine_pkg.create_pharmacological_group(?, ?, ?)";
+        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setString(1, pharmacologicalGroup.getName());
+            cs.setString(2, pharmacologicalGroup.getDescription());
+            cs.registerOutParameter(3, Types.VARCHAR);
+            cs.execute();
+            return cs.getString(3);
+        });
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            return errorMessage;
+        }
+
+        return null;
+    }
+
+
+    public List<TherapeuticGroup> getTherapeuticGroupList(){
+        String sql = "SELECT * FROM medicine_pkg.get_therapeutic_group_List()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(TherapeuticGroup.class));
+    }
+
+    public List<TherapeuticGroup> findTherapeuticGroup(String p_name){
+        String sql = "SELECT * FROM medicine_pkg.find_therapeutic_group(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(TherapeuticGroup.class), p_name);
+    }
+
+    public String createTherapeuticGroup(TherapeuticGroup therapeuticGroup){
+        String sql = "call medicine_pkg.create_therapeutic_group(?, ?, ?)";
+        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setString(1, therapeuticGroup.getName());
+            cs.setString(2, therapeuticGroup.getDescription());
+            cs.registerOutParameter(3, Types.VARCHAR);
+            cs.execute();
+            return cs.getString(3);
+        });
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            return errorMessage;
+        }
+
+        return null;
+    }
+
+
+    public List<PrescriptionForm> getPrescriptionFormList(){
+        String sql = "SELECT * FROM medicine_pkg.get_prescription_form_List()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PrescriptionForm.class));
+    }
+
+    public List<PrescriptionForm> findPrescriptionForm(String p_name){
+        String sql = "SELECT * FROM medicine_pkg.find_prescription_form(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PrescriptionForm.class), p_name);
+    }
+
+    public String createPrescriptionForm(PrescriptionForm prescriptionForm){
+        String sql = "call medicine_pkg.create_prescription_form(?, ?, ?, ?, ?)";
+        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setString(1, prescriptionForm.getName());
+            cs.setString(2, prescriptionForm.getDescription());
+            cs.setBoolean(3, prescriptionForm.isRequires_special_blank());
+            cs.setString(4, prescriptionForm.getStorage_restriction());
+            cs.registerOutParameter(5, Types.VARCHAR);
+            cs.execute();
+            return cs.getString(5);
+        });
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            return errorMessage;
+        }
+
+        return null;
+    }
+
+
+    public List<TypePackaging> getTypePackagingList(){
+        String sql = "SELECT * FROM medicine_pkg.get_type_packaging_List()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(TypePackaging.class));
+    }
+
+    public List<TypePackaging> findTypePackaging(String p_name){
+        String sql = "SELECT * FROM medicine_pkg.find_type_packaging(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(TypePackaging.class), p_name);
+    }
+
+    public String createTypePackaging(TypePackaging typePackaging){
+        String sql = "call medicine_pkg.create_type_packaging(?, ?, ?)";
+        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setString(1, typePackaging.getName());
+            cs.setString(2, typePackaging.getDescription());
+            cs.registerOutParameter(3, Types.VARCHAR);
+            cs.execute();
+            return cs.getString(3);
+        });
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            return errorMessage;
+        }
+
+        return null;
+    }
 }

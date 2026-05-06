@@ -348,6 +348,14 @@ public class MainControl {
                                          @RequestParam(defaultValue = "") String selectManufacturer,
                                          @RequestParam(required = false) BigDecimal country_id,
                                          @RequestParam(defaultValue = "") String selectCountry,
+                                         @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                         @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                         @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                         @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                         @RequestParam(required = false) BigDecimal prescription_form_id,
+                                         @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                         @RequestParam(required = false) BigDecimal package_type_id,
+                                         @RequestParam(defaultValue = "") String selectPackageType,
                                          Model model, Session session) {
         // Логирование для отладки
         System.out.println("Received brand_id: " + brand_id);
@@ -371,6 +379,14 @@ public class MainControl {
         model.addAttribute("manufacturer_id", manufacturer_id);
         model.addAttribute("selectCountry", selectCountry);
         model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
 
         if (addBrand){
             model.addAttribute("brands", medicineService.getBrands());
@@ -384,6 +400,18 @@ public class MainControl {
         if (addCountry){
             model.addAttribute("countries", medicineService.getCountryList());
         }
+        if (addPharmacologicalGroup){
+            model.addAttribute("pharmacologicalGroups", medicineService.getPharmacologicalGroupList());
+        }
+        if (addTherapeuticGroup){
+            model.addAttribute("therapeuticGroups", medicineService.getTherapeuticGroupList());
+        }
+        if (addPrescriptionForm){
+            model.addAttribute("prescriptionForms", medicineService.getPrescriptionFormList());
+        }
+        if (addPackageType){
+            model.addAttribute("packageTypes", medicineService.getTypePackagingList());
+        }
 
 
         return "medicineCreate";
@@ -395,6 +423,27 @@ public class MainControl {
         model.addAttribute("addBrand", addBrand);
         Brand brand = Brand.builder().name(brandName).build();
         model.addAttribute("brands", medicineService.findBrands(brand.getName()));
+        return "medicineCreate";
+    }
+
+    @GetMapping("medicineCreate/brandCreate")
+    public String showBrandCreatePage(@RequestParam(defaultValue = "true") boolean brandCreate, Model model) {
+        model.addAttribute("brandCreate", brandCreate);
+        return "medicineCreate";
+    }
+
+    @PostMapping("medicineCreate/brandCreate")
+    public String BrandCreatePage(@RequestParam(defaultValue = "true") boolean createCountry,
+                              @ModelAttribute Brand brand, Model model) {
+        String error = medicineService.createBrands(brand);
+        model.addAttribute("createCountry", createCountry);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
         return "medicineCreate";
     }
 
@@ -414,6 +463,30 @@ public class MainControl {
         return "medicineCreate";
     }
 
+    @PostMapping("medicineCreate/addPrescriptionForm")
+    public String showPrescriptionFormsPage(@RequestParam(defaultValue = "true") boolean addPrescriptionForm,
+                                                 @RequestParam String formName,
+                                                 Model model) {
+        model.addAttribute("addPrescriptionForm", addPrescriptionForm);
+        model.addAttribute("prescriptionForms", medicineService.findPrescriptionForm(formName));
+        return "medicineCreate";
+    }
+
+    @PostMapping("medicineCreate/prescriptionFormCreate")
+    public String PrescriptionFormCreatePage(@RequestParam(defaultValue = "true") boolean createPrescriptionForm,
+                                                 @ModelAttribute PrescriptionForm prescriptionForm, Model model) {
+        model.addAttribute("createPrescriptionForm", createPrescriptionForm);
+        String error = medicineService.createPrescriptionForm(prescriptionForm);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
+        return "medicineCreate";
+    }
+
 
     @GetMapping("medicineCreate/packageTypeCreate")
     public String showPackageTypeCreatePage(@RequestParam(defaultValue = "true") boolean createPackageType,
@@ -422,10 +495,59 @@ public class MainControl {
         return "medicineCreate";
     }
 
+    @PostMapping("medicineCreate/addPackageType")
+    public String findPackageTypePage(@RequestParam(defaultValue = "true") boolean addPackageType,
+                                            @RequestParam String packageTypeName, Model model) {
+        model.addAttribute("addPackageType", addPackageType);
+        model.addAttribute("packageTypes", medicineService.findTypePackaging(packageTypeName));
+        return "medicineCreate";
+    }
+
+    @PostMapping("medicineCreate/packageTypeCreate")
+    public String showPackageTypeCreatePage(@RequestParam(defaultValue = "true") boolean createPackageType,
+                                            @ModelAttribute TypePackaging packageType, Model model) {
+        model.addAttribute("createPackageType", createPackageType);
+        String error = medicineService.createTypePackaging(packageType);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
+        return "medicineCreate";
+    }
+
+
+    @PostMapping("medicineCreate/addPharmacologicalGroup")
+    public String findPharmacologicalGroupCreatePage(@RequestParam(defaultValue = "true") boolean addPharmacologicalGroup,
+                                                     @RequestParam String groupName,
+                                            Model model) {
+        model.addAttribute("addPharmacologicalGroup", addPharmacologicalGroup);
+        model.addAttribute("pharmacologicalGroups", medicineService.findPharmacologicalGroup(groupName));
+        return "medicineCreate";
+    }
+
     @GetMapping("medicineCreate/pharmacologicalGroupCreate")
     public String showPharmacologicalGroupCreatePage(@RequestParam(defaultValue = "true") boolean pharmacologicalGroupCreate,
-                                            Model model) {
+                                                     Model model) {
         model.addAttribute("pharmacologicalGroupCreate", pharmacologicalGroupCreate);
+        return "medicineCreate";
+    }
+
+    @PostMapping("medicineCreate/pharmacologicalGroupCreate")
+    public String PharmacologicalGroupCreatePage(@RequestParam(defaultValue = "true") boolean pharmacologicalGroupCreate,
+                                                     @ModelAttribute PharmacologicalGroup pharmacologicalGroup,
+                                                 Model model) {
+        model.addAttribute("pharmacologicalGroupCreate", pharmacologicalGroupCreate);
+        String error = medicineService.createPharmacologicalGroup(pharmacologicalGroup);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
         return "medicineCreate";
     }
 
@@ -433,6 +555,31 @@ public class MainControl {
     public String showTherapeuticGroupCreatePage(@RequestParam(defaultValue = "true") boolean therapeuticGroupCreate,
                                                      Model model) {
         model.addAttribute("therapeuticGroupCreate", therapeuticGroupCreate);
+        return "medicineCreate";
+    }
+
+    @PostMapping("medicineCreate/addTherapeuticGroup")
+    public String TherapeuticGroupCreatePage(@RequestParam(defaultValue = "true") boolean addTherapeuticGroup,
+                                             @RequestParam String groupName,
+                                             Model model) {
+        model.addAttribute("addTherapeuticGroup", addTherapeuticGroup);
+        model.addAttribute("therapeuticGroups", medicineService.findTherapeuticGroup(groupName));
+        return "medicineCreate";
+    }
+
+    @PostMapping("medicineCreate/therapeuticGroupCreate")
+    public String TherapeuticGroupCreatePage(@RequestParam(defaultValue = "true") boolean therapeuticGroupCreate,
+                                             @ModelAttribute TherapeuticGroup therapeuticGroup,
+                                                 Model model) {
+        model.addAttribute("therapeuticGroupCreate", therapeuticGroupCreate);
+        String error = medicineService.createTherapeuticGroup(therapeuticGroup);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
         return "medicineCreate";
     }
 
@@ -506,14 +653,14 @@ public class MainControl {
     }
 
     @GetMapping("medicineCreate/createCountry")
-    public String showBrandCreatePage(@RequestParam(defaultValue = "true") boolean createCountry,
+    public String showCountryPage(@RequestParam(defaultValue = "true") boolean createCountry,
                                            Model model) {
         model.addAttribute("createCountry", createCountry);
         return "medicineCreate";
     }
 
     @PostMapping("medicineCreate/createCountry")
-    public String BrandCreatePage(@RequestParam(defaultValue = "true") boolean createCountry,
+    public String CountryPage(@RequestParam(defaultValue = "true") boolean createCountry,
                                   @RequestParam String countryName, Model model) {
         Country country = Country.builder().name(countryName).build();
         String error = medicineService.createCountry(country);
@@ -536,5 +683,8 @@ public class MainControl {
         model.addAttribute("addCountry", addCountry);
         return "medicineCreate";
     }
+
+
+
 
 }
