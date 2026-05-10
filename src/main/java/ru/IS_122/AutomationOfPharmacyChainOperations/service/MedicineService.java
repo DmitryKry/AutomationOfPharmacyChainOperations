@@ -242,4 +242,59 @@ public class MedicineService {
 
         return null;
     }
+
+    public List<DosageForm> getDosageFormList(){
+        String sql = "SELECT * FROM medicine_pkg.get_type_packaging_List()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(DosageForm.class));
+    }
+
+    public List<DosageForm> findDosageForm(String p_name){
+        String sql = "SELECT * FROM medicine_pkg.find_type_packaging(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(DosageForm.class), p_name);
+    }
+
+    public String createDosageForm(TypePackaging typePackaging){
+        String sql = "call medicine_pkg.create_type_packaging(?, ?, ?)";
+        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setString(1, typePackaging.getName());
+            cs.setString(2, typePackaging.getDescription());
+            cs.registerOutParameter(3, Types.VARCHAR);
+            cs.execute();
+            return cs.getString(3);
+        });
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            return errorMessage;
+        }
+
+        return null;
+    }
+
+
+    public List<AdministrationRoute> getAdministrationRoute(){
+        String sql = "SELECT * FROM medicine_pkg.get_administration_route_List()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(AdministrationRoute.class));
+    }
+
+    public List<AdministrationRoute> findAdministrationRoute(String p_name){
+        String sql = "SELECT * FROM medicine_pkg.find_administration_route(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(AdministrationRoute.class), p_name);
+    }
+
+    public String createAdministrationRoute(TypePackaging typePackaging){
+        String sql = "call medicine_pkg.create_administration_route(?, ?, ?)";
+        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setString(1, typePackaging.getName());
+            cs.setString(2, typePackaging.getDescription());
+            cs.registerOutParameter(3, Types.VARCHAR);
+            cs.execute();
+            return cs.getString(3);
+        });
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            return errorMessage;
+        }
+
+        return null;
+    }
 }

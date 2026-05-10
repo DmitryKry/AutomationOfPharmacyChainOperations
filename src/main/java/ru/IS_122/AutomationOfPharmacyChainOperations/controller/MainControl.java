@@ -340,6 +340,7 @@ public class MainControl {
                                          @RequestParam(defaultValue = "false") boolean addPackageType,
                                          @RequestParam(defaultValue = "false") boolean createCountry,
                                          @RequestParam(defaultValue = "false") boolean InfoErrorShow,
+                                         @RequestParam(defaultValue = "false") boolean addInjectionMethods,
                                          @RequestParam(required = false) BigDecimal brand_id,
                                          @RequestParam(defaultValue = "") String selectBrand,
                                          @RequestParam(required = false) BigDecimal atc_id,
@@ -412,8 +413,20 @@ public class MainControl {
         if (addPackageType){
             model.addAttribute("packageTypes", medicineService.getTypePackagingList());
         }
+        if (addInjectionMethods){
+            model.addAttribute("InjectionMethods", medicineService.getDosageFormList());
+        }
 
 
+        return "medicineCreate";
+    }
+
+    @PostMapping("/medicineCreate/dosageFormCreate/addInjectionMethods")
+    public String showInjectionMethodsPage(@RequestParam(defaultValue = "true") boolean addInjectionMethods,
+                                    @RequestParam String brandName, Model model) {
+        model.addAttribute("addBrand", addInjectionMethods);
+        Brand brand = Brand.builder().name(brandName).build();
+        model.addAttribute("InjectionMethods", medicineService.findDosageForm(brand.getName()));
         return "medicineCreate";
     }
 
@@ -640,8 +653,17 @@ public class MainControl {
 
     @GetMapping("medicineCreate/dosageFormCreate")
     public String showDosageFormCreatePage(@RequestParam(defaultValue = "true") boolean dosageFormCreate,
+                                           @RequestParam(defaultValue = "false") boolean addInjectionMethods,
+                                           @RequestParam(required = false) BigDecimal InjectionMethods_id,
+                                           @RequestParam(defaultValue = "") String selectInjectionMethods,
                                     Model model) {
         model.addAttribute("dosageFormCreate", dosageFormCreate);
+        model.addAttribute("InjectionMethods_id", InjectionMethods_id);
+        model.addAttribute("selectInjectionMethods", selectInjectionMethods);
+        model.addAttribute("addInjectionMethods", addInjectionMethods);
+        if (addInjectionMethods){
+            model.addAttribute("InjectionMethods", medicineService.getAdministrationRoute());
+        }
         return "medicineCreate";
     }
 
@@ -683,7 +705,6 @@ public class MainControl {
         model.addAttribute("addCountry", addCountry);
         return "medicineCreate";
     }
-
 
 
 

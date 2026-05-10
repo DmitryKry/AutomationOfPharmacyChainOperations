@@ -264,3 +264,66 @@ when not_null_violation then
         p_error := 'Название типа упаковки не может быть пустым';
 end;
 $$ LANGUAGE plpgsql;
+
+
+create or replace function medicine_pkg.get_dosage_form_List()
+returns setof dosage_form as $$
+begin
+return query
+select * from dosage_form;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.find_dosage_form(p_name varchar)
+returns setof dosage_form as $$
+begin
+return query
+select * from dosage_form
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.create_dosage_form(p_name varchar, p_is_solid boolean,
+       p_is_liquid boolean, p_administration_route_id boolean, p_error out varchar)
+as $$
+begin
+insert into dosage_form(name, is_solid, is_liquid, administration_route_id)
+values (p_name, p_is_solid, p_is_liquid, p_administration_route_id);
+exception
+when unique_violation then
+        p_error := concat('Справочник лекарственных форм с названием ', p_name, ' уже существует');
+when not_null_violation then
+        p_error := 'Название справочника лекарственных форм не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;
+
+
+create or replace function medicine_pkg.get_administration_route_List()
+returns setof administration_route as $$
+begin
+return query
+select * from administration_route;
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace function medicine_pkg.find_administration_route(p_name varchar)
+returns setof administration_route as $$
+begin
+return query
+select * from administration_route
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
+end;
+$$ LANGUAGE plpgsql;
+
+create or replace procedure medicine_pkg.create_administration_route(p_name varchar, p_description varchar, p_error out varchar)
+as $$
+begin
+insert into administration_route(name, description)
+values (p_name, p_description);
+exception
+when unique_violation then
+        p_error := concat('Справочник способов применения с названием ', p_name, ' уже существует');
+when not_null_violation then
+        p_error := 'Название cправочника способов применения не может быть пустым';
+end;
+$$ LANGUAGE plpgsql;
