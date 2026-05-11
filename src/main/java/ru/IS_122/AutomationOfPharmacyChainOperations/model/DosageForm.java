@@ -35,4 +35,5 @@ public class DosageForm {
 
     @Column(nullable = false)
     private Long administration_route_id;
+
 }

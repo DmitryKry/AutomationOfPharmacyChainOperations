@@ -287,8 +287,12 @@ create or replace procedure medicine_pkg.create_dosage_form(p_name varchar, p_is
        p_is_liquid boolean, p_administration_route_id boolean, p_error out varchar)
 as $$
 begin
+if p_name != '' then
 insert into dosage_form(name, is_solid, is_liquid, administration_route_id)
 values (p_name, p_is_solid, p_is_liquid, p_administration_route_id);
+else
+   p_error := 'Название справочника лекарственных форм не может быть пустым';
+end if;
 exception
 when unique_violation then
         p_error := concat('Справочник лекарственных форм с названием ', p_name, ' уже существует');
@@ -326,4 +330,137 @@ when unique_violation then
 when not_null_violation then
         p_error := 'Название cправочника способов применения не может быть пустым';
 end;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE PROCEDURE medicine_pkg.create_medicine(
+    OUT p_error VARCHAR,
+    -- Основная информация
+    p_name VARCHAR,
+    p_international_name VARCHAR DEFAULT NULL,
+    p_dosage_strength VARCHAR DEFAULT NULL,
+    p_package_quantity INTEGER DEFAULT NULL,
+    p_prescription_required BOOLEAN DEFAULT TRUE,
+
+    -- Регистрационные данные
+    p_registration_number VARCHAR DEFAULT NULL,
+    p_registration_date DATE DEFAULT NULL,
+
+    -- Условия хранения
+    p_shelf_life_months INTEGER DEFAULT NULL,
+    p_storage_temperature_min INTEGER DEFAULT NULL,
+    p_storage_temperature_max INTEGER DEFAULT NULL,
+    p_requires_refrigeration BOOLEAN DEFAULT FALSE,
+    p_light_sensitive BOOLEAN DEFAULT FALSE,
+    p_requires_dark_storage BOOLEAN DEFAULT FALSE,
+
+    -- Статусные флаги
+    p_is_active BOOLEAN DEFAULT TRUE,
+    p_is_vital BOOLEAN DEFAULT FALSE,
+    p_is_available BOOLEAN DEFAULT TRUE,
+
+    -- Системные поля
+    p_created_by NUMERIC DEFAULT NULL,
+
+    -- Внешние ключи (ID из справочников)
+    p_pharmacological_group_id NUMERIC DEFAULT NULL,
+    p_therapeutic_group_id NUMERIC DEFAULT NULL,
+    p_manufacturer_id NUMERIC DEFAULT NULL,
+    p_country_id NUMERIC DEFAULT NULL,
+    p_prescription_form_id NUMERIC DEFAULT NULL,
+    p_dosage_form_id NUMERIC DEFAULT NULL,
+    p_brand_id NUMERIC DEFAULT NULL,
+    p_atc_id NUMERIC DEFAULT NULL,
+    p_package_type_id NUMERIC DEFAULT NULL)
+AS $$
+declare
+p_medicine_id numeric;
+BEGIN
+    p_error := NULL;
+
+    -- Валидация обязательных полей
+    IF p_name IS NULL OR trim(p_name) = '' THEN
+        p_error := 'Название препарата не может быть пустым';
+        RETURN;
+END IF;
+
+    -- Вставка данных
+INSERT INTO public.medicine (
+    name,
+    international_name,
+    dosage_strength,
+    package_quantity,
+    prescription_required,
+    registration_number,
+    registration_date,
+    shelf_life_months,
+    storage_temperature_min,
+    storage_temperature_max,
+    requires_refrigeration,
+    light_sensitive,
+    requires_dark_storage,
+    is_active,
+    is_vital,
+    is_available,
+    created_at,
+    updated_at,
+    created_by,
+    updated_by,
+    is_deleted,
+    pharmacological_group_id,
+    therapeutic_group_id,
+    manufacturer_id,
+    country_id,
+    prescription_form_id,
+    dosage_form_id,
+    unit_of_measure_id,
+    brand_id,
+    atc_id,
+    package_type_id
+) VALUES (
+             p_name,
+             p_international_name,
+             p_dosage_strength,
+             p_package_quantity,
+             p_prescription_required,
+             p_registration_number,
+             p_registration_date,
+             p_shelf_life_months,
+             p_storage_temperature_min,
+             p_storage_temperature_max,
+             p_requires_refrigeration,
+             p_light_sensitive,
+             p_requires_dark_storage,
+             p_is_active,
+             p_is_vital,
+             p_is_available,
+             CURRENT_TIMESTAMP,
+             CURRENT_TIMESTAMP,
+             p_created_by,
+             p_created_by,
+             FALSE,
+             p_pharmacological_group_id,
+             p_therapeutic_group_id,
+             p_manufacturer_id,
+             p_country_id,
+             p_prescription_form_id,
+             p_dosage_form_id,
+             p_unit_of_measure_id,
+             p_brand_id,
+             p_atc_id,
+             p_package_type_id
+         )
+    RETURNING id INTO p_medicine_id;
+
+EXCEPTION
+    WHEN unique_violation THEN
+        p_error := 'Препарат с таким названием или регистрационным номером уже существует';
+WHEN foreign_key_violation THEN
+        p_error := 'Один из внешних ключей ссылается на несуществующую запись в справочнике';
+WHEN not_null_violation THEN
+        p_error := 'Обязательное поле не может быть NULL';
+WHEN OTHERS THEN
+        p_error := concat('Ошибка при создании препарата: ', SQLERRM);
+END;
 $$ LANGUAGE plpgsql;

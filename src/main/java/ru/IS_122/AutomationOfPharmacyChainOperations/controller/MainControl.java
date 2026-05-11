@@ -357,6 +357,8 @@ public class MainControl {
                                          @RequestParam(defaultValue = "") String selectPrescriptionForm,
                                          @RequestParam(required = false) BigDecimal package_type_id,
                                          @RequestParam(defaultValue = "") String selectPackageType,
+                                         @RequestParam(required = false) BigDecimal dosage_form_id,
+                                         @RequestParam(defaultValue = "") String selectDosageForm,
                                          Model model, Session session) {
         // Логирование для отладки
         System.out.println("Received brand_id: " + brand_id);
@@ -388,6 +390,10 @@ public class MainControl {
         model.addAttribute("prescription_form_id", prescription_form_id);
         model.addAttribute("selectPackageType", selectPackageType);
         model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
 
         if (addBrand){
             model.addAttribute("brands", medicineService.getBrands());
@@ -413,20 +419,32 @@ public class MainControl {
         if (addPackageType){
             model.addAttribute("packageTypes", medicineService.getTypePackagingList());
         }
-        if (addInjectionMethods){
-            model.addAttribute("InjectionMethods", medicineService.getDosageFormList());
+        if (addDosageForm){
+            model.addAttribute("dosageForms", medicineService.getDosageFormList());
         }
 
 
         return "medicineCreate";
     }
 
+    @PostMapping("/medicineCreate")
+    public String medicineCreatePage(@ModelAttribute Medicine medicine, Model model) {
+        String error = medicineService.createMedicine(medicine);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
+        return "medicineCreate";
+    }
+
     @PostMapping("/medicineCreate/dosageFormCreate/addInjectionMethods")
     public String showInjectionMethodsPage(@RequestParam(defaultValue = "true") boolean addInjectionMethods,
-                                    @RequestParam String brandName, Model model) {
-        model.addAttribute("addBrand", addInjectionMethods);
-        Brand brand = Brand.builder().name(brandName).build();
-        model.addAttribute("InjectionMethods", medicineService.findDosageForm(brand.getName()));
+                                    @RequestParam String name, Model model) {
+        model.addAttribute("addInjectionMethods", addInjectionMethods);
+        model.addAttribute("InjectionMethods", medicineService.findAdministrationRoute(name));
         return "medicineCreate";
     }
 
@@ -651,6 +669,15 @@ public class MainControl {
         return "medicineCreate";
     }
 
+    @PostMapping("medicineCreate/addDosageForm")
+    public String findDosageFormPage(@RequestParam(defaultValue = "true") boolean addDosageForm,
+                                    @RequestParam String dosageFormName,
+                                    Model model) {
+        model.addAttribute("dosageForms", medicineService.findDosageForm(dosageFormName));
+        model.addAttribute("addDosageForm", addDosageForm);
+        return "medicineCreate";
+    }
+
     @GetMapping("medicineCreate/dosageFormCreate")
     public String showDosageFormCreatePage(@RequestParam(defaultValue = "true") boolean dosageFormCreate,
                                            @RequestParam(defaultValue = "false") boolean addInjectionMethods,
@@ -667,10 +694,43 @@ public class MainControl {
         return "medicineCreate";
     }
 
+    @PostMapping("medicineCreate/dosageFormCreate")
+    public String DosageFormCreate(@RequestParam(defaultValue = "true") boolean addDosageForm,
+                                                   @ModelAttribute DosageForm dosageForm,
+                                                   Model model) {
+        model.addAttribute("addDosageForm", addDosageForm);
+        String error = medicineService.createDosageForm(dosageForm);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
+        return "medicineCreate";
+    }
+
     @GetMapping("medicineCreate/dosageFormCreate/methodOfAdministrationCreate")
     public String showMethodOfAdministrationCreatePage(@RequestParam(defaultValue = "true") boolean methodOfAdministrationCreate,
                                       Model model) {
         model.addAttribute("methodOfAdministrationCreate", methodOfAdministrationCreate);
+        return "medicineCreate";
+    }
+
+    @PostMapping("medicineCreate/dosageFormCreate/methodOfAdministrationCreate")
+    public String MethodOfAdministrationCreatePage(@RequestParam(defaultValue = "true") boolean methodOfAdministrationCreate,
+                                                       @ModelAttribute AdministrationRoute administrationRoute,
+                                                       Model model) {
+        model.addAttribute("methodOfAdministrationCreate", methodOfAdministrationCreate);
+        String error = medicineService.createAdministrationRoute(administrationRoute);
+        model.addAttribute("methodOfAdministrationCreate", methodOfAdministrationCreate);
+        model.addAttribute("InfoErrorShow", true);
+        if (error != null) {
+            model.addAttribute("InfoError", error);
+        }
+        else {
+            model.addAttribute("InfoError", "Объект успешно создан!");
+        }
         return "medicineCreate";
     }
 
