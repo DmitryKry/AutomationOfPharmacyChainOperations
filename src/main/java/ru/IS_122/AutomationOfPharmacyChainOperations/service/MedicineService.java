@@ -301,7 +301,8 @@ public class MedicineService {
     }
 
     public String createMedicine(Medicine medicine) {
-        String sql = "call medicine_pkg.create_medicine(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "call medicine_pkg.create_medicine(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             int index = 1;
@@ -330,7 +331,6 @@ public class MedicineService {
             cs.setObject(index++, medicine.getIsVital(), Types.BOOLEAN);                  // 16 - p_is_vital
             cs.setObject(index++, medicine.getIsAvailable(), Types.BOOLEAN);              // 17 - p_is_available
 
-            cs.setObject(index++, medicine.getCreatedBy(), Types.NUMERIC);                // 18 - p_created_by
 
             cs.setObject(index++, medicine.getPharmacologicalGroupId(), Types.NUMERIC);   // 19 - p_pharmacological_group_id
             cs.setObject(index++, medicine.getTherapeuticGroupId(), Types.NUMERIC);       // 20 - p_therapeutic_group_id

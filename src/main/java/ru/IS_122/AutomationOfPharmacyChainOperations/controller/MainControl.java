@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/pharmacy")
@@ -141,7 +142,20 @@ public class MainControl {
     }
 */
     @GetMapping("/pharmacy")
-    public String showPharmacyPage(Model model) {
+    public String showPharmacyPage(@RequestParam(defaultValue = "0") int pagin,
+                                   @RequestParam(defaultValue = "1") int page,
+                                   Model model) {
+        if (page < 1) {
+            page = 1;
+            pagin = 0;
+        }
+        List<Pharmacy> pharmacies = pharmacyService.getAllPharmacies()
+                .stream()
+                .limit(15 + pagin)
+                .collect(Collectors.toList());
+        model.addAttribute("pharmacies", pharmacies);
+        model.addAttribute("pagin", pagin);
+        model.addAttribute("page", page);
         return "userPlace";
     }
 

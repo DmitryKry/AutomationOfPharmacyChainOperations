@@ -288,7 +288,7 @@
                     addManufacturer=${addManufacturer == false ? true : false})}" th:text="#{find}"></a>
                     <div class="form-group">
                         <label for="country_id" th:text="#{medicine.country}"></label>
-                        <input type="hidden" th:name="country_id" th:value="${country_id}">
+                        <input type="hidden" th:name="countryId" th:value="${country_id}">
                         <input type="text" id="country_id" th:value="${selectCountry}" readonly>
                     </div>
                     <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
@@ -317,7 +317,7 @@
                     <h3 th:text="#{medicine.classification.info}"></h3>
                     <div class="form-group">
                         <label for="pharmacological_group_id" th:text="#{medicine.pharma_group}"></label>
-                        <input type="hidden" th:name="pharmacological_group_id" th:value="${pharmacological_group_id}">
+                        <input type="hidden" th:name="pharmacologicalGroupId" th:value="${pharmacological_group_id}">
                         <input type="text" id="pharmacological_group_id" th:value="${selectPharmacologicalGroup}" readonly>
                     </div>
                     <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
@@ -341,7 +341,7 @@
                     addPharmacologicalGroup=${addPharmacologicalGroup == false ? true : false})}" th:text="#{find}"></a>
                     <div class="form-group">
                         <label for="therapeutic_group_id" th:text="#{medicine.therapeutic_group}"></label>
-                        <input type="hidden" th:name="therapeutic_group_id" th:value="${therapeutic_group_id}">
+                        <input type="hidden" th:name="therapeuticGroupId" th:value="${therapeutic_group_id}">
                         <input type="text" id="therapeutic_group_id" th:value="${selectTherapeuticGroup}" readonly>
                     </div>
                     <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
@@ -370,7 +370,7 @@
                     <h3 th:text="#{medicine.package.info}"></h3>
                     <div class="form-group">
                         <label for="prescription_form_id" th:text="#{medicine.prescription_form}"></label>
-                        <input type="hidden" th:name="prescription_form_id" th:value="${prescription_form_id}">
+                        <input type="hidden" th:name="prescriptionFormId" th:value="${prescription_form_id}">
                         <input type="text" id="prescription_form_id" th:value="${selectPrescriptionForm}" readonly>
                     </div>
                     <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
@@ -394,7 +394,7 @@
                     addPrescriptionForm=${addPrescriptionForm == false ? true : false})}" th:text="#{find}"></a>
                     <div class="form-group">
                         <label for="package_type_id" th:text="#{medicine.package_type}"></label>
-                        <input type="hidden" th:name="package_type_id" th:value="${package_type_id}">
+                        <input type="hidden" th:name="packageTypeId" th:value="${package_type_id}">
                         <input type="text" id="package_type_id" th:value="${selectPackageType}" readonly>
                     </div>
                     <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},

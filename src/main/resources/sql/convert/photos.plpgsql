@@ -1,0 +1,21 @@
+CREATE TABLE photos (
+                        id NUMERIC PRIMARY KEY default nextval('AllObjects'),
+                        entity_id NUMERIC NOT NULL,           -- ID записи (лекарства/аптеки/пользователя)
+                        entity_type CHAR(1) NOT NULL,        -- 'U', 'M', 'P'
+                        photo_path VARCHAR(500) NOT NULL,    -- путь к файлу или URL
+                        file_name VARCHAR(255),              -- оригинальное имя файла
+                        file_size BIGINT,                    -- размер в байтах
+                        content_type VARCHAR(100),           -- mime type (image/jpeg, image/png)
+                        is_main BOOLEAN DEFAULT FALSE,       -- основное фото (если несколько)
+                        sort_order INTEGER DEFAULT 0,        -- порядок сортировки
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Индексы для быстрого поиска
+                        CONSTRAINT idx_photos_entity UNIQUE (entity_id, entity_type, sort_order),
+                        CHECK (entity_type IN ('U', 'M', 'P'))
+);
+
+-- Индексы для производительности
+CREATE INDEX idx_photos_entity_lookup ON photos(entity_id, entity_type);
+CREATE INDEX idx_photos_main ON photos(entity_id, entity_type, is_main) WHERE is_main = TRUE;

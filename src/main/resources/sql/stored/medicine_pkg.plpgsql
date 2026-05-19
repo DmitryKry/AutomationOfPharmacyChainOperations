@@ -360,8 +360,6 @@ CREATE OR REPLACE PROCEDURE medicine_pkg.create_medicine(
     p_is_vital BOOLEAN DEFAULT FALSE,
     p_is_available BOOLEAN DEFAULT TRUE,
 
-    -- Системные поля
-    p_created_by NUMERIC DEFAULT NULL,
 
     -- Внешние ключи (ID из справочников)
     p_pharmacological_group_id NUMERIC DEFAULT NULL,
@@ -403,10 +401,6 @@ INSERT INTO public.medicine (
     is_active,
     is_vital,
     is_available,
-    created_at,
-    updated_at,
-    created_by,
-    updated_by,
     is_deleted,
     pharmacological_group_id,
     therapeutic_group_id,
@@ -414,7 +408,6 @@ INSERT INTO public.medicine (
     country_id,
     prescription_form_id,
     dosage_form_id,
-    unit_of_measure_id,
     brand_id,
     atc_id,
     package_type_id
@@ -435,10 +428,6 @@ INSERT INTO public.medicine (
              p_is_active,
              p_is_vital,
              p_is_available,
-             CURRENT_TIMESTAMP,
-             CURRENT_TIMESTAMP,
-             p_created_by,
-             p_created_by,
              FALSE,
              p_pharmacological_group_id,
              p_therapeutic_group_id,
@@ -446,7 +435,6 @@ INSERT INTO public.medicine (
              p_country_id,
              p_prescription_form_id,
              p_dosage_form_id,
-             p_unit_of_measure_id,
              p_brand_id,
              p_atc_id,
              p_package_type_id

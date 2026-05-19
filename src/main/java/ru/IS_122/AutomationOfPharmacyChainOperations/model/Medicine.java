@@ -91,30 +91,30 @@ public class Medicine {
     // --- СВЯЗИ СО СПРАВОЧНИКАМИ ---
 
     @Column(name = "pharmacological_group_id")
-    private Long pharmacologicalGroupId;
+    private BigDecimal pharmacologicalGroupId;
 
     @Column(name = "therapeutic_group_id")
-    private Long therapeuticGroupId;
+    private BigDecimal therapeuticGroupId;
 
     @Column(name = "manufacturer_id")
-    private Long manufacturerId;
+    private BigDecimal manufacturerId;
 
     @Column(name = "country_id")
-    private Long countryId;
+    private BigDecimal countryId;
 
     @Column(name = "prescription_form_id")
-    private Long prescriptionFormId;
+    private BigDecimal prescriptionFormId;
 
     @Column(name = "dosage_form_id")
-    private Long dosageFormId;
+    private BigDecimal dosageFormId;
 
     @Column(name = "brand_id")
-    private Long brandId;
+    private BigDecimal brandId;
 
     @Column(name = "atc_id")
-    private Long atcId;
+    private BigDecimal atcId;
 
     @Column(name = "package_type_id")
-    private Long packageTypeId;
+    private BigDecimal packageTypeId;
 
 }
