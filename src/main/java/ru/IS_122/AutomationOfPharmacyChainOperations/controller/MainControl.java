@@ -338,7 +338,20 @@ public class MainControl {
     }
 
     @GetMapping("/medicinePlace")
-    public String showMedicinePlacePage(Model model) {
+    public String showMedicinePlacePage(@RequestParam(defaultValue = "0") int pagin,
+                                        @RequestParam(defaultValue = "1") int page,
+                                        Model model) {
+        if (page < 1) {
+            page = 1;
+            pagin = 0;
+        }
+        List<Medicine> medicines = medicineService.getAllMedicine()
+                .stream()
+                .limit(15 + pagin)
+                .collect(Collectors.toList());
+        model.addAttribute("medicines", medicines);
+        model.addAttribute("pagin", pagin);
+        model.addAttribute("page", page);
         return "medicinePlace";
     }
 

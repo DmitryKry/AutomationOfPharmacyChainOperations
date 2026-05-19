@@ -13,12 +13,12 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION pharmacy_pkg.get_all_pharmacies_table()
-RETURNS SETOF pharmacy AS $$
+RETURNS table(name varchar, cityName varchar, address varchar, region varchar) AS $$
 BEGIN
 RETURN QUERY
-SELECT *
+SELECT p.name, c.name as cityName, p.address, p.region
 FROM pharmacy p
-ORDER BY p.id;
+join city c on c.id = p.id_city;
 END;
 $$ LANGUAGE plpgsql;
 

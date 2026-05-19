@@ -49,7 +49,24 @@
                 </div>
             </form>
             <a th:href="@{/api/pharmacy/medicineCreate}" th:id="create" th:text="#{create}"></a>
-            <a class="toggle-link"></a>
+        </div>
+    </div>
+    <div th:class="content">
+        <ul>
+            <li th:each="med : ${medicines}">
+                <a th:href="@{/api/pharmacy/pharmacy(pagin=15, page=${page})}">
+                    <div class="for-photo"></div>
+                    <div th:class="for-name" th:text="${med.getName()}"></div>
+                    <div th:class="for-content" th:text="${med.getBrandName()} + ' ' + ${med.getCountryName()}"></div>
+                    <div th:class="for-content" th:text="${med.getDosageFormName()}  + ' ' + ${med.getDosageStrength()}"></div>
+                    <div th:class="for-content" th:text="${med.getPrice()} + ' ' + #{currency}"></div>
+                </a>
+            </li>
+        </ul>
+        <div th:class="pagination">
+            <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin - 15}, page=${page - 1})}" th:class="previous"><</a>
+            <h5 th:text="${page}" />
+            <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin + 15}, page=${page + 1})}" th:class="next">></a>
         </div>
     </div>
 </body>

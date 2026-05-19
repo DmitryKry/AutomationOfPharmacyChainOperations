@@ -302,7 +302,7 @@ public class MedicineService {
 
     public String createMedicine(Medicine medicine) {
         String sql = "call medicine_pkg.create_medicine(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             int index = 1;
@@ -312,6 +312,7 @@ public class MedicineService {
 
             // Входные параметры в том же порядке, что в процедуре после OUT
             cs.setString(index++, medicine.getName());                                    // 2 - p_name
+            cs.setObject(index++, medicine.getUnitOfMeasure(), Types.VARCHAR);            // 29 - unit_of_measure
             cs.setString(index++, medicine.getInternationalName());                       // 3 - p_international_name
             cs.setString(index++, medicine.getDosageStrength());                          // 4 - p_dosage_strength
             cs.setObject(index++, medicine.getPackageQuantity(), Types.INTEGER);          // 5 - p_package_quantity
@@ -340,7 +341,7 @@ public class MedicineService {
             cs.setObject(index++, medicine.getDosageFormId(), Types.NUMERIC);             // 24 - p_dosage_form_id// 25 - p_unit_of_measure_id (ЕСТЬ В ВАШЕЙ ПРОЦЕДУРЕ)
             cs.setObject(index++, medicine.getBrandId(), Types.NUMERIC);                  // 26 - p_brand_id
             cs.setObject(index++, medicine.getAtcId(), Types.NUMERIC);                    // 27 - p_atc_id
-            cs.setObject(index++, medicine.getPackageTypeId(), Types.NUMERIC);            // 28 - p_package_type_id
+            cs.setObject(index, medicine.getPackageTypeId(), Types.NUMERIC);            // 28 - p_package_type_id
 
             cs.execute();
 
@@ -350,5 +351,10 @@ public class MedicineService {
         });
 
         return errorMessage;
+    }
+
+    public List<Medicine> getAllMedicine(){
+        String sql = "SELECT * FROM medicine_pkg.getAllMedicines()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Medicine.class));
     }
 }

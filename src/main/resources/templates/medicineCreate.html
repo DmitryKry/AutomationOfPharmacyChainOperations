@@ -219,6 +219,10 @@
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
                     addAtc=${addAtc == false ? true : false})}" th:text="#{find}"></a>
+                    <div class="form-group">
+                        <label for="unitOfMeasure" th:text="#{medicine.unit_of_measure}"></label>
+                        <input type="text" id="unitOfMeasure" name="unitOfMeasure">
+                    </div>
                 </div>
 
                 <!-- БЛОК 3 -->

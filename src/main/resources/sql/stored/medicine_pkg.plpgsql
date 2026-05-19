@@ -338,6 +338,7 @@ CREATE OR REPLACE PROCEDURE medicine_pkg.create_medicine(
     OUT p_error VARCHAR,
     -- Основная информация
     p_name VARCHAR,
+    p_unit_of_measure varchar,
     p_international_name VARCHAR DEFAULT NULL,
     p_dosage_strength VARCHAR DEFAULT NULL,
     p_package_quantity INTEGER DEFAULT NULL,
@@ -410,7 +411,8 @@ INSERT INTO public.medicine (
     dosage_form_id,
     brand_id,
     atc_id,
-    package_type_id
+    package_type_id,
+    unit_of_measure
 ) VALUES (
              p_name,
              p_international_name,
@@ -437,7 +439,8 @@ INSERT INTO public.medicine (
              p_dosage_form_id,
              p_brand_id,
              p_atc_id,
-             p_package_type_id
+             p_package_type_id,
+             p_unit_of_measure
          )
     RETURNING id INTO p_medicine_id;
 
@@ -452,3 +455,33 @@ WHEN OTHERS THEN
         p_error := concat('Ошибка при создании препарата: ', SQLERRM);
 END;
 $$ LANGUAGE plpgsql;
+
+
+create or replace function medicine_pkg.getAllMedicines()
+returns table (
+    name varchar,
+    international_name varchar,
+    dosage_strength varchar,
+    price numeric(38,2),
+    brand_name varchar,
+    country_name varchar,
+    dosageFormName varchar
+)
+ as $$
+       begin
+       return QUERY
+        select m.name, m.international_name, m.dosage_strength, m.price, b.name as brandName, c.name as countryName,
+               CASE
+                   WHEN POSITION(' ' IN df.name) > 0
+                       THEN SUBSTRING(df.name, 1, POSITION(' ' IN df.name) - 2)
+                   WHEN POSITION(',' IN df.name) > 0
+                       THEN SUBSTRING(df.name, 1, POSITION(',' IN df.name) - 2)
+                   ELSE df.name
+                   END as dosageFormName
+        from medicine m
+                 join brand b on b.id = m.brand_id
+                 join country c on c.id = m.country_id
+                 join dosage_form df on df.id = m.dosage_form_id;
+end;
+$$ language plpgsql;
+

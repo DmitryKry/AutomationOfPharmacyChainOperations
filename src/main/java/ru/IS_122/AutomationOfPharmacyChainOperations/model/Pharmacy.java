@@ -44,4 +44,7 @@ public class Pharmacy {
     @Column(name = "postal_code", nullable = false, length = 10)
     @NonNull
     private String postal_code;
+
+    @Transient
+    private String cityName;
 }

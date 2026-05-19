@@ -66,6 +66,16 @@
             <form th:action="@{/api/pharmacy/registration}" method="post">
                 <h2 align="center" th:text="#{filter}"></h2>
                 <div class="form-group">
+                    <label for="REGION" th:text="#{REGION}"></label>
+                    <br>
+                    <input type="text" id="REGION" name="REGION">
+                </div>
+                <div class="form-group">
+                    <label for="CITY" th:text="#{CITY}"></label>
+                    <br>
+                    <input type="text" id="CITY" name="CITY">
+                </div>
+                <div class="form-group">
                     <label for="adress" th:text="#{adress}"></label>
                     <br>
                     <input type="text" id="adress" name="adress">
@@ -147,7 +157,7 @@
                 <a th:href="@{/api/pharmacy/pharmacy(pagin=15, page=${page})}">
                     <div class="for-photo"></div>
                     <div th:class="for-name" th:text="${ph.getName()}"></div>
-                    <div th:class="for-content" th:text="${ph.getID_CITY()} + ' ' + ${ph.getAddress()}"></div>
+                    <div th:class="for-content" th:text="${ph.getCityName()} + ' ' + ${ph.getAddress()}"></div>
                 </a>
             </li>
         </ul>

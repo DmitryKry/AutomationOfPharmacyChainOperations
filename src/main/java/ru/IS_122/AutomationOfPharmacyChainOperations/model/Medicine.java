@@ -76,17 +76,32 @@ public class Medicine {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")                // ← ДОБАВИТЬ
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "created_by")                // ← ДОБАВИТЬ
+    @Column(name = "created_by")
     private BigDecimal createdBy;
 
-    @Column(name = "updated_by")                // ← ДОБАВИТЬ
+    @Column(name = "updated_by")
     private BigDecimal updatedBy;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
+
+    @Column(name = "price")
+    private BigDecimal price;
+
+    @Column(name = "unit_of_measure")
+    private String unitOfMeasure;
+
+    @Transient
+    private String brandName;
+
+    @Transient
+    private String countryName;
+
+    @Transient
+    private String dosageFormName;
 
     // --- СВЯЗИ СО СПРАВОЧНИКАМИ ---
 
