@@ -58,7 +58,8 @@
                     <div class="for-photo"></div>
                     <div th:class="for-name" th:text="${med.getName()}"></div>
                     <div th:class="for-content" th:text="${med.getBrandName()} + ' ' + ${med.getCountryName()}"></div>
-                    <div th:class="for-content" th:text="${med.getDosageFormName()}  + ' ' + ${med.getDosageStrength()}"></div>
+                    <div th:class="for-content" th:text="${med.getDosageFormName()}  + ' ' + ${med.getDosageStrength()}
+  + ' ' + ${med.getPackageQuantity()} + ' ' + ${med.unitOfMeasure}"></div>
                     <div th:class="for-content" th:text="${med.getPrice()} + ' ' + #{currency}"></div>
                 </a>
             </li>

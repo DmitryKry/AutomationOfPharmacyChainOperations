@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Карточка аптеки</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</HEAD>
+<body>
+<div class="AllInfo">
+    <div class="menu">
+        <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+        <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+        <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+        <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
+        <a class="medicines" th:text="#{medicines}"></a>
+    </div>
+    <div th:id="forPhoto"></div>
+    <a th:class="edit" th:text="#{edit}" th:href="@{/api/pharmacy/pharmacyCreate(pharmacyID=${pharmacy.getId()},
+    selectAdmin=${user.getFio()}, idAdmin=${user.getWorkerID()}, idCity=${pharmacy.cityID},
+    selectCityRegion=${pharmacy.region}, selectCity=${pharmacy.cityName}, edit=true)}"></a>
+
+    <div th:class="createObject" th:id="pharmacies">
+        <h3 th:text="#{pharmacy.registration.details}"></h3>
+        <div class="form-group">
+            <label for="name_pharmacy" th:text="#{name_pharmacy}"></label>
+            <br>
+            <div th:class="view-info" id="name_pharmacy" th:text="${pharmacy.getName()}"></div>
+        </div>
+        <div class="form-group">
+            <label for="legal_name_pharmacy" th:text="#{legal_name_pharmacy}"></label>
+            <br>
+            <div th:class="view-info" id="legal_name_pharmacy" th:text="${pharmacy.getLegal_name()}"></div>
+        </div>
+        <div class="form-group">
+            <label for="INN" th:text="#{INN}"></label>
+            <br>
+            <div th:class="view-info" id="INN" th:text="${pharmacy.getInn()}"></div>
+        </div>
+        <div class="form-group">
+            <label for="KPP" th:text="#{KPP}"></label>
+            <br>
+            <div th:class="view-info" id="KPP" th:text="${pharmacy.getKpp()}"></div>
+        </div>
+        <div class="form-group">
+            <label for="OGRN" th:text="#{OGRN}"></label>
+            <br>
+            <div th:class="view-info" id="OGRN" th:text="${pharmacy.getOgrn()}"></div>
+        </div>
+    </div>
+
+    <div th:class="createObject" th:id="pharmaciesSecond">
+        <h3 th:text="#{pharmacy.contact.info}"></h3>
+        <div class="form-group">
+            <label for="adress_pharmacy" th:text="#{adress_pharmacy}"></label>
+            <br>
+            <div th:class="view-info" id="adress_pharmacy" th:text="${pharmacy.getAddress()}"></div>
+        </div>
+        <div class="form-group">
+            <label for="CITY" th:text="#{CITY}"></label>
+            <div th:class="view-info" id="CITY" th:text="${pharmacy.getCityName()}"></div>
+        </div>
+        <div class="form-group">
+            <label for="REGION" th:text="#{REGION}"></label>
+            <br>
+            <div th:class="view-info" id="REGION" th:text="${pharmacy.getRegion()}"></div>
+        </div>
+        <div class="form-group">
+            <label for="fioInput" th:text="#{administrator}"></label>
+            <div th:class="view-info" id="fioInput" th:text="${user.getFio()}"></div>
+        </div>
+        <div class="form-group">
+            <label for="POSTAL_CODE" th:text="#{POSTAL_CODE}"></label>
+            <br>
+            <div th:class="view-info" id="POSTAL_CODE" th:text="${pharmacy.getPostal_code()}"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

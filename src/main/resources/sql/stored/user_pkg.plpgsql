@@ -158,7 +158,25 @@ end;
 $$ language plpgsql;
 
 
+create or replace function user_pkg.get_admin_pharmacy(id_pharmacy numeric(38,2))
+       returns table (id numeric(38,2), fio varchar, workerID numeric(38,2)) as $$
+       begin
+       return query
+        select u.id, u.fio, w.id workerID from userofpharmacy u
+                            join workers w on w.id_of_user = u.id
+                            join pharmacy_manage pm on pm.id_of_worker = w.id
+                            where pm.id_of_pharmacy = id_pharmacy;
+end;
+$$ language plpgsql;
 
+create or replace function user_pkg.get_worker(id_user numeric(38,2))
+       returns setof workers as $$
+       begin
+       return query
+       select * from workers
+       where id_of_user = id_user;
+end;
+$$ language plpgsql;
 
 
 

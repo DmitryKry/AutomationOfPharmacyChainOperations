@@ -167,7 +167,10 @@ public class MainControl {
                                          @RequestParam(defaultValue = "") String selectCityRegion,
                                          @RequestParam(defaultValue = "") String selectCity,
                                          @RequestParam(required = false) BigDecimal idAdmin,
-                                         @RequestParam(required = false) BigDecimal idCity,Model model) {
+                                         @RequestParam(required = false) BigDecimal idCity,
+                                         @RequestParam(required = false) BigDecimal pharmacyID,
+                                         @RequestParam(defaultValue = "false") boolean edit,
+                                         Model model) {
         model.addAttribute("addAdministrator", addAdministrator);
         model.addAttribute("addCity", addCity);
         model.addAttribute("createCity", createCity);
@@ -176,6 +179,8 @@ public class MainControl {
         model.addAttribute("selectAdmin", selectAdmin);
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
+        model.addAttribute("edit", edit);
+        model.addAttribute("pharmacy", pharmacyService.getPharmacyById(pharmacyID).get(0));
         model.addAttribute("addAdministrators", userService.getAdministrators());
         model.addAttribute("cities", pharmacyService.getAllCities());
         return "pharmacyCreate";
@@ -268,6 +273,15 @@ public class MainControl {
         model.addAttribute("addAdministrator", addCity);
         return "pharmacyCreate";
     }
+
+    @GetMapping("/pharmacyView")
+    public String pharmacyView(@RequestParam BigDecimal idPharmacy,
+                               Model model) {
+        model.addAttribute("pharmacy", pharmacyService.getPharmacyById(idPharmacy).get(0));
+        model.addAttribute("user", userService.getAdminPharmacy(idPharmacy).get(0));
+        return "pharmacyView";
+    }
+
 
     @GetMapping("/workerCreate")
     public String showWorkerCreatePage(@RequestParam(defaultValue = "false") boolean addRole,

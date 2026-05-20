@@ -49,4 +49,7 @@ public class UserOfPharmacy {
     @NonNull
     private BigDecimal role;
 
+    @Transient
+    private BigDecimal workerID;
+
 }

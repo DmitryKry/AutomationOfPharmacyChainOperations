@@ -80,4 +80,9 @@ public class PharmacyService {
 
         return null;
     }
+
+    public List<Pharmacy> getPharmacyById(BigDecimal id) {
+        String sql = "SELECT * FROM pharmacy_pkg.get_pharmacies(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pharmacy.class), id);
+    }
 }

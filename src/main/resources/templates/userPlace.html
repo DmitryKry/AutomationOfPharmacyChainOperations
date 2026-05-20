@@ -154,7 +154,7 @@
     <div th:class="content">
         <ul>
             <li th:each="ph : ${pharmacies}">
-                <a th:href="@{/api/pharmacy/pharmacy(pagin=15, page=${page})}">
+                <a th:href="@{/api/pharmacy/pharmacyView(idPharmacy=${ph.getId()})}">
                     <div class="for-photo"></div>
                     <div th:class="for-name" th:text="${ph.getName()}"></div>
                     <div th:class="for-content" th:text="${ph.getCityName()} + ' ' + ${ph.getAddress()}"></div>

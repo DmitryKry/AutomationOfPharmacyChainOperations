@@ -13,10 +13,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION pharmacy_pkg.get_all_pharmacies_table()
-RETURNS table(name varchar, cityName varchar, address varchar, region varchar) AS $$
+RETURNS table(id numeric(38,2), name varchar, cityName varchar, address varchar, region varchar) AS $$
 BEGIN
 RETURN QUERY
-SELECT p.name, c.name as cityName, p.address, p.region
+SELECT p.id, p.name, c.name as cityName, p.address, p.region
 FROM pharmacy p
 join city c on c.id = p.id_city;
 END;
@@ -142,3 +142,30 @@ WHEN OTHERS THEN
         p_error := 'ERROR: Неизвестная ошибка - ' || SQLERRM;
 end;
 $$ LANGUAGE plpgsql;
+
+
+create or replace function pharmacy_pkg.get_pharmacies(idPharmacy numeric(38,2))
+       returns table(id numeric(38,2),
+       name character varying(200),
+       legal_name character varying(200),
+       inn character varying(12),
+       kpp character varying(9),
+       ogrn character varying(13),
+       address character varying(255),
+       region character varying(100),
+       postal_code character varying(10),
+       opening_date date,
+       closing_date date,
+       status character varying(20),
+       id_city numeric(38,2),
+       cityName varchar,
+       cityID numeric(38,2)
+       ) as $$
+begin
+return query
+select p.*, c.name cityName, c.id cityID
+from pharmacy p
+         join city c on c.id = p.id_city
+         where p.id = idPharmacy;
+end;
+$$ language plpgsql;

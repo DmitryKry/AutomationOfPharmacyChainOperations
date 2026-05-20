@@ -47,4 +47,7 @@ public class Pharmacy {
 
     @Transient
     private String cityName;
+
+    @Transient
+    private BigDecimal cityID;
 }
