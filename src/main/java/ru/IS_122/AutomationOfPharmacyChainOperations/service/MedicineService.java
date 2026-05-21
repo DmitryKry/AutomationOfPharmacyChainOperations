@@ -303,7 +303,7 @@ public class MedicineService {
 
     public String createMedicine(Medicine medicine) {
         String sql = "call medicine_pkg.create_medicine(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             int index = 1;
@@ -314,6 +314,7 @@ public class MedicineService {
             // Входные параметры в том же порядке, что в процедуре после OUT
             cs.setString(index++, medicine.getName());                                    // 2 - p_name
             cs.setObject(index++, medicine.getUnitOfMeasure(), Types.VARCHAR);            // 29 - unit_of_measure
+            cs.setObject(index++, medicine.getPrice(), Types.NUMERIC);                    // 30 - unit_of_measure
             cs.setString(index++, medicine.getInternationalName());                       // 3 - p_international_name
             cs.setString(index++, medicine.getDosageStrength());                          // 4 - p_dosage_strength
             cs.setObject(index++, medicine.getPackageQuantity(), Types.INTEGER);          // 5 - p_package_quantity
@@ -362,5 +363,10 @@ public class MedicineService {
     public List<Medicine> getMedicineByID(BigDecimal medicineID){
         String sql = "SELECT * FROM medicine_pkg.get_medicine(?)";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Medicine.class), medicineID);
+    }
+
+    public void updatePhotoUrl(BigDecimal medicineId, String photoUrl){
+        String sql = "UPDATE medicine_pkg.set_photo_medicine(?, ?)";
+        jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Medicine.class), medicineId, photoUrl);
     }
 }

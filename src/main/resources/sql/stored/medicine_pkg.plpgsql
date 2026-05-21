@@ -339,6 +339,7 @@ CREATE OR REPLACE PROCEDURE medicine_pkg.create_medicine(
     -- Основная информация
     p_name VARCHAR,
     p_unit_of_measure varchar,
+    p_price numeric(38,2),
     p_international_name VARCHAR DEFAULT NULL,
     p_dosage_strength VARCHAR DEFAULT NULL,
     p_package_quantity INTEGER DEFAULT NULL,
@@ -412,7 +413,8 @@ INSERT INTO public.medicine (
     brand_id,
     atc_id,
     package_type_id,
-    unit_of_measure
+    unit_of_measure,
+    price
 ) VALUES (
              p_name,
              p_international_name,
@@ -440,7 +442,8 @@ INSERT INTO public.medicine (
              p_brand_id,
              p_atc_id,
              p_package_type_id,
-             p_unit_of_measure
+             p_unit_of_measure,
+             p_price
          )
     RETURNING id INTO p_medicine_id;
 
@@ -585,6 +588,26 @@ from medicine m
          join atc_classification a on a.id = m.atc_id
          join type_packaging pt on pt.id = m.package_type_id
 where m.id = idMedicine;
+end;
+$$ language plpgsql;
+
+
+create or replace procedure medicine_pkg.set_photo_medicine(id_medicine numeric(38,2), url_photo varchar)
+as $$
+declare
+t_id numeric default 0;
+begin
+select 1
+into t_id
+where exist = (select 1 from photos where entity_type = 'M' and entity_id = id_medicine);
+if t_id = 1 then
+   update photos
+   set photo_path = url_photo
+   where entity_id = id_medicine and entity_type = 'M';
+else
+    insert into photos (entity_id, entity_type, photo_path)
+    values (id_medicine, 'M', url_photo);
+end if;
 end;
 $$ language plpgsql;
 

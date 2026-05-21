@@ -443,7 +443,11 @@
             </div>
 
             <!-- Кнопка отправки -->
-            <button type="submit" th:id="createMedicine" th:text="#{create}"></button>
+            <button type="submit" th:id="createMedicine" th:text="#{create}" th:if="${!edit}"></button>
+            <div th:class="edDel" th:if="${edit}">
+                <button type="submit" th:class="ButtonPost" th:id="createMedicine" th:text="#{edit}"></button>
+                <button type="submit" th:class="ButtonPost" th:id="createMedicine" th:text="#{delete}" ></button>
+            </div>
         </div>
     </form>
 </div>

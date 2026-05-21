@@ -14,7 +14,18 @@
         <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
         <a class="medicines" th:text="#{medicines}"></a>
     </div>
-    <div th:id="forPhoto"></div>
+    <div th:id="forPhoto">
+        <form th:action="@{/api/pharmacy/uploadPhoto}" method="post" enctype="multipart/form-data">
+            <input type="file" name="photo" accept="image/*" />
+            <input type="hidden" name="medicineId" th:value="${medicine != null ? medicine.getId() : ''}" />
+            <button type="submit" th:text="#{upload}"></button>
+        </form>
+
+        <!-- Отображение загруженного фото -->
+        <div th:if="${medicine != null && medicine.photoUrl != null}">
+            <img th:src="${medicine.photoUrl}" alt="Medicine photo" style="max-width: 200px;"/>
+        </div>
+    </div>
 
     <form th:action="@{/api/pharmacy/pharmacyCreate}" method="post">
 
@@ -86,8 +97,8 @@
         </div>
         <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{create}" th:if="${!edit}"></button>
         <div th:class="edDel" th:if="${edit}">
-            <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{edit}"></button>
-            <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{delete}" style="margin-left: 13%;"></button>
+            <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{edit}" style="left: 52%;"></button>
+            <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{delete}" style="left: 65%;"></button>
         </div>
 
     </form>

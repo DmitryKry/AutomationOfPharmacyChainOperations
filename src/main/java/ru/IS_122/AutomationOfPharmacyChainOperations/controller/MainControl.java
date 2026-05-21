@@ -14,6 +14,7 @@ import ru.IS_122.AutomationOfPharmacyChainOperations.service.MedicineService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.PharmacyService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -820,6 +821,22 @@ public class MainControl {
         return "medicineView";
     }
 
+    @PostMapping("/uploadPhoto")
+    public String uploadPhoto(@RequestParam("photo") MultipartFile file,
+                              @RequestParam("medicineId") BigDecimal medicineId,
+                              HttpSession session) {
+        try {
+            // Сохраняем файл на сервер или в облачное хранилище
+            String photoUrl = saveFile(file, medicineId);
 
+            // Обновляем запись в БД
+            medicineService.updatePhotoUrl(medicineId, photoUrl);
+
+        } catch (Exception e) {
+            // Обработка ошибки
+        }
+
+        return "redirect:/api/pharmacy/medicineCreate?idMedicine=" + medicineId;
+    }
 
 }
