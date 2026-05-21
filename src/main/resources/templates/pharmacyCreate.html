@@ -23,27 +23,28 @@
             <div class="form-group">
                 <label for="name_pharmacy" th:text="#{name_pharmacy}"></label>
                 <br>
-                <input type="text" id="name_pharmacy" name="name" th:value="${pharmacy.getName()}">
+                <input type="text" id="name_pharmacy" name="name" th:value="${pharmacy != null ? pharmacy.getName() : ''}">
             </div>
             <div class="form-group">
                 <label for="legal_name_pharmacy" th:text="#{legal_name_pharmacy}"></label>
                 <br>
-                <input type="text" id="legal_name_pharmacy" name="legal_name" th:value="${pharmacy.getLegal_name()}">
+                <input type="text" id="legal_name_pharmacy" name="legal_name"
+                       th:value="${pharmacy != null ? pharmacy.getLegal_name() : ''}">
             </div>
             <div class="form-group">
                 <label for="INN" th:text="#{INN}"></label>
                 <br>
-                <input type="text" id="INN" name="inn" th:value="${pharmacy.getInn()}">
+                <input type="text" id="INN" name="inn" th:value="${pharmacy != null ? pharmacy.getInn() : ''}">
             </div>
             <div class="form-group">
                 <label for="KPP" th:text="#{KPP}"></label>
                 <br>
-                <input type="text" id="KPP" name="kpp" th:value="${pharmacy.getKpp()}">
+                <input type="text" id="KPP" name="kpp" th:value="${pharmacy != null ? pharmacy.getKpp() : ''}">
             </div>
             <div class="form-group">
                 <label for="OGRN" th:text="#{OGRN}"></label>
                 <br>
-                <input type="text" id="OGRN" name="ogrn" th:value="${pharmacy.getOgrn()}">
+                <input type="text" id="OGRN" name="ogrn" th:value="${pharmacy != null ? pharmacy.getOgrn() : ''}">
             </div>
 
         </div>
@@ -52,7 +53,7 @@
             <div class="form-group">
                 <label for="adress_pharmacy" th:text="#{adress_pharmacy}"></label>
                 <br>
-                <input type="text" id="adress_pharmacy" name="address" th:value="${pharmacy.getAddress()}">
+                <input type="text" id="adress_pharmacy" name="address" th:value="${pharmacy != null ? pharmacy.getAddress() : ''}">
             </div>
             <div class="form-group">
                 <label for="CITY" th:text="#{CITY}"></label>
@@ -60,7 +61,7 @@
                 <input type="text" id="CITY"  th:value="${selectCity}" readonly >
             </div>
             <a th:href="@{/api/pharmacy/pharmacyCreate(addCity=${addCity == false ? true : false},
-            selectAdmin=${selectAdmin}, idAdmin=${idAdmin})}"
+            selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy.getId()})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="REGION" th:text="#{REGION}"></label>
@@ -74,12 +75,13 @@
             </div>
             <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${addAdministrator == false ? true : false},
             idCity=${idCity}, selectCity=${selectCity},
-            selectCityRegion=${selectCityRegion})}"
+            selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy.getId()})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="POSTAL_CODE" th:text="#{POSTAL_CODE}"></label>
                 <br>
-                <input type="text" id="POSTAL_CODE" name="postal_code" th:value="${pharmacy.getPostal_code()}">
+                <input type="text" id="POSTAL_CODE" name="postal_code"
+                       th:value="${pharmacy != null ? pharmacy.getPostal_code() : ''}">
             </div>
         </div>
         <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{create}" th:if="${!edit}"></button>
@@ -104,7 +106,7 @@
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(idAdmin=${a.getId()},
                         selectAdmin=${a.userFio}, idCity=${idCity}, selectCity=${selectCity},
-                        selectCityRegion=${selectCityRegion})}">
+                        selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy.getId()})}">
                             <span th:text="${a.userFio} + ' id: ' + ${a.getId()}"></span>
                         </a>
                     </div>
@@ -130,7 +132,7 @@
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(
                         selectCity=${c.getName()}, selectCityRegion=${c.getRegion()}, idCity=${c.id},
-                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin})}">
+                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy.getId()})}">
                             <span th:text="${c.getName()}"></span>
                         </a>
                     </div>

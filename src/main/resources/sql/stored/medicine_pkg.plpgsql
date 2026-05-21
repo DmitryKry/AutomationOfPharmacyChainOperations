@@ -464,8 +464,8 @@ returns table (
     international_name varchar,
     dosage_strength varchar,
     price numeric(38,2),
-    brand_name varchar,
-    country_name varchar,
+    brandName varchar,
+    countryName varchar,
     dosageFormName varchar,
     unit_of_measure varchar,
     package_quantity integer
@@ -497,15 +497,15 @@ create or replace function medicine_pkg.get_medicine(idMedicine numeric(38,2))
        international_name character varying(200),
        dosage_strength character varying(50),
        package_quantity integer,
-       prescription_required boolean,
+       prescriptionRequiredWord varchar,
        registration_number character varying(50),
        registration_date date,
        shelf_life_months integer,
        storage_temperature_min integer,
        storage_temperature_max integer,
-       requires_refrigeration boolean,
-       light_sensitive boolean,
-       requires_dark_storage boolean,
+       requiresRefrigerationWord varchar,
+       lightSensitiveWord varchar,
+       requiresDarkStorageWord varchar,
        is_active boolean,
        is_vital boolean,
        is_available boolean,
@@ -516,25 +516,65 @@ create or replace function medicine_pkg.get_medicine(idMedicine numeric(38,2))
        manufacturer_id numeric(38,2),
        manufacturer_name varchar,
        country_id numeric(38,2),
-       country_name varchar,
+       countryName varchar,
        prescription_form_id numeric(38,2),
        prescription_form_name varchar,
        dosage_form_id numeric(38,2),
-       dosage_form_name varchar,
+       dosageFormName varchar,
        brand_id numeric(38,2),
-       brand_name varchar,
+       brandName varchar,
        atc_id numeric(38,2),
        atc_code varchar,
        package_type_id numeric(38,2),
        package_type_name varchar,
-       price numeric(38,2)
+       price numeric(38,2),
+       unit_of_measure character varying(255)
        ) as $$
-       begin
-       return query
-        select m.*, pg.name as pharmacological_group_name, tg.name as therapeutic_group_name,
-               mf.name as manufacturer_name, c.name as country_name, pf.name as prescription_form_name,
-               df.name as dosage_form_name, b.name as brand_name, a.code as atc_code, pt.name as package_type_name
-        from medicine m
+begin
+return query
+select
+    m.id,
+    m.name,
+    m.international_name,
+    m.dosage_strength,
+    m.package_quantity,
+    case when m.prescription_required = false
+        then 'Нет'::varchar else 'Да'::varchar end prescriptionRequiredWord,
+    m.registration_number,
+    m.registration_date,
+    m.shelf_life_months,
+    m.storage_temperature_min,
+    m.storage_temperature_max,
+    case when m.requires_refrigeration = false
+        then 'Нет'::varchar else 'Да'::varchar end requiresRefrigerationWord,
+    case when m.light_sensitive = false
+             then 'Нет'::varchar else 'Да'::varchar end lightSensitiveWord,
+    case when m.requires_dark_storage = false
+             then 'Нет'::varchar else 'Да'::varchar end requiresDarkStorageWord,
+    m.is_active,
+    m.is_vital,
+    m.is_available,
+    m.pharmacological_group_id,
+    pg.name as pharmacological_group_name,
+    m.therapeutic_group_id,
+    tg.name as therapeutic_group_name,
+    m.manufacturer_id,
+    mf.name as manufacturer_name,
+    m.country_id,
+    c.name as countryName,
+    m.prescription_form_id,
+    pf.name as prescription_form_name,
+    m.dosage_form_id,
+    df.name as dosage_form_name,
+    m.brand_id,
+    b.name as brandName,
+    m.atc_id,
+    a.code as atc_code,
+    m.package_type_id,
+    pt.name as package_type_name,
+    m.price,
+    m.unit_of_measure
+from medicine m
          join pharmacological_group pg on pg.id = m.pharmacological_group_id
          join therapeutic_group tg on tg.id = m.therapeutic_group_id
          join manufacturer mf on mf.id = m.manufacturer_id
@@ -543,7 +583,8 @@ create or replace function medicine_pkg.get_medicine(idMedicine numeric(38,2))
          join dosage_form df on df.id = m.dosage_form_id
          join brand b on b.id = m.brand_id
          join atc_classification a on a.id = m.atc_id
-         join type_packaging pt on pt.id = m.package_type_id;
+         join type_packaging pt on pt.id = m.package_type_id
+where m.id = idMedicine;
 end;
 $$ language plpgsql;
 

@@ -103,6 +103,40 @@ public class Medicine {
     @Transient
     private String dosageFormName;
 
+    @Transient
+    private String atc_code;
+
+    @Transient
+    private String prescription_form_name;
+
+    @Transient
+    private String manufacturer_name;
+
+    @Transient
+    private String dosage_form_name;
+
+    @Transient
+    private String package_type_name;
+
+    @Transient
+    private String pharmacological_group_name;
+
+    @Transient
+    private String therapeutic_group_name;
+
+    @Transient
+    private String prescriptionRequiredWord;
+
+    @Transient
+    private String requiresRefrigerationWord;
+
+    @Transient
+    private String lightSensitiveWord;
+
+    @Transient
+    private String requiresDarkStorageWord;
+
+
     // --- СВЯЗИ СО СПРАВОЧНИКАМИ ---
 
     @Column(name = "pharmacological_group_id")

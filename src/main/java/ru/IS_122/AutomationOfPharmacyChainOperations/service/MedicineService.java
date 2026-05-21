@@ -8,6 +8,7 @@ import ru.IS_122.AutomationOfPharmacyChainOperations.model.*;
 
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.CallableStatement;
 import java.sql.Date;
 import java.sql.Types;
@@ -356,5 +357,10 @@ public class MedicineService {
     public List<Medicine> getAllMedicine(){
         String sql = "SELECT * FROM medicine_pkg.getAllMedicines()";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Medicine.class));
+    }
+
+    public List<Medicine> getMedicineByID(BigDecimal medicineID){
+        String sql = "SELECT * FROM medicine_pkg.get_medicine(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Medicine.class), medicineID);
     }
 }

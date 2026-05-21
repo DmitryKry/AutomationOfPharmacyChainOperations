@@ -745,3 +745,14 @@ input:focus, select:focus {
 }
 
 
+#editMedicine{
+    position: fixed;
+    top: 60%;
+    left: 13%;
+}
+
+#editPharmacy{
+    position: fixed;
+    top: 60%;
+    left: 13%;
+}

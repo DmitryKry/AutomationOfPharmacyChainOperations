@@ -180,7 +180,9 @@ public class MainControl {
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
         model.addAttribute("edit", edit);
-        model.addAttribute("pharmacy", pharmacyService.getPharmacyById(pharmacyID).get(0));
+        if (pharmacyID != null && pharmacyID.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("pharmacy", pharmacyService.getPharmacyById(pharmacyID).get(0));
+        }
         model.addAttribute("addAdministrators", userService.getAdministrators());
         model.addAttribute("cities", pharmacyService.getAllCities());
         return "pharmacyCreate";
@@ -400,6 +402,8 @@ public class MainControl {
                                          @RequestParam(defaultValue = "") String selectPackageType,
                                          @RequestParam(required = false) BigDecimal dosage_form_id,
                                          @RequestParam(defaultValue = "") String selectDosageForm,
+                                         @RequestParam(defaultValue = "false") boolean edit,
+                                         @RequestParam(required = false) BigDecimal idMedicine,
                                          Model model, Session session) {
         // Логирование для отладки
         System.out.println("Received brand_id: " + brand_id);
@@ -435,7 +439,10 @@ public class MainControl {
         model.addAttribute("package_type_id", package_type_id);
         model.addAttribute("selectDosageForm", selectDosageForm);
         model.addAttribute("dosage_form_id", dosage_form_id);
-
+        model.addAttribute("edit", edit);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
         if (addBrand){
             model.addAttribute("brands", medicineService.getBrands());
         }
@@ -805,6 +812,12 @@ public class MainControl {
         model.addAttribute("countries", medicineService.findCountry(countryName));
         model.addAttribute("addCountry", addCountry);
         return "medicineCreate";
+    }
+
+    @GetMapping("medicineView")
+    public String showMedicineView(BigDecimal idMedicine ,Model model) {
+        model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        return "medicineView";
     }
 
 

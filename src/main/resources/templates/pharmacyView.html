@@ -15,7 +15,7 @@
         <a class="medicines" th:text="#{medicines}"></a>
     </div>
     <div th:id="forPhoto"></div>
-    <a th:class="edit" th:text="#{edit}" th:href="@{/api/pharmacy/pharmacyCreate(pharmacyID=${pharmacy.getId()},
+    <a th:class="edit" th:id="editPharmacy" th:text="#{edit}" th:href="@{/api/pharmacy/pharmacyCreate(pharmacyID=${pharmacy.getId()},
     selectAdmin=${user.getFio()}, idAdmin=${user.getWorkerID()}, idCity=${pharmacy.cityID},
     selectCityRegion=${pharmacy.region}, selectCity=${pharmacy.cityName}, edit=true)}"></a>
 

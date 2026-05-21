@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Создание лекарственного препарата</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <style>
+        /* --- ОБНУЛЕНИЕ --- */
+        * {
+            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;  /* IE/Edge */
+        }
+
+        *::-webkit-scrollbar {
+            display: none;  /* Chrome/Safari/Opera */
+        }
+
+        /* --- КОНТЕЙНЕР С ОТСТУПОМ ПОД МЕНЮ --- */
+        .AllInfo {
+            top: 7%;
+            width: 95%;
+            height: calc(100vh - 9%);
+            left: 2.5%;
+            margin: 0 auto;
+            position: fixed;
+            overflow-y: auto !important;
+            background-color: white;
+        }
+
+        /* --- ФОРМА - FLEX для фото слева и блоков справа --- */
+        /* --- ССЫЛКИ "НАЙТИ" ПО ЦЕНТРУ --- */
+        .createObject > a {
+            display: block !important;
+            text-align: center !important;
+            margin: 10px auto !important;
+            width: fit-content !important;
+        }
+
+        form {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        /* --- ЛЕВАЯ КОЛОНКА С ФОТО --- */
+        .form-left {
+            flex: 0 0 30%;
+            position: sticky;
+            top: 15%;
+            height: 35%;
+        }
+
+        /* --- ПРАВАЯ КОЛОНКА --- */
+        .form-right {
+            flex: 1;
+        }
+
+        /* --- ФОТО --- */
+
+
+        /* --- СЕТКА ДЛЯ БЛОКОВ (2 колонки) --- */
+        .objects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        /* --- ВСЕ БЛОКИ ФОРМЫ --- */
+        .createObject {
+            background: white;
+            border: 1px solid red;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 90% !important;
+            position: static !important;
+            left: auto !important;
+            top: auto !important;
+        }
+
+
+
+        /* --- ПОЛЯ ВВОДА --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+
+    </style>
+</HEAD>
+<body>
+<div class="menu">
+    <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+    <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+    <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+    <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
+    <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicine}"></a>
+</div>
+
+<div class="AllInfo">
+    <form th:action="@{/api/pharmacy/medicineCreate}" method="post">
+        <!-- ЛЕВАЯ КОЛОНКА: ФОТО -->
+        <div class="form-left">
+            <div th:id="forPhoto1"></div>
+        </div>
+
+        <a th:class="edit" th:id="editMedicine" th:text="#{edit}" th:href="@{/api/pharmacy/medicineCreate(
+    edit=true,
+    idMedicine=${medicine.getId()},
+    brand_id=${medicine.getBrandId()},
+    selectBrand=${medicine.getBrandName()},
+    atc_id=${medicine.getAtcId()},
+    selectAtc=${medicine.getAtc_code()},
+    manufacturer_id=${medicine.getManufacturerId()},
+    selectManufacturer=${medicine.getManufacturer_name()},
+    country_id=${medicine.getCountryId()},
+    selectCountry=${medicine.getCountryName()},
+    pharmacological_group_id=${medicine.getPharmacologicalGroupId()},
+    selectPharmacologicalGroup=${medicine.getPharmacological_group_name()},
+    therapeutic_group_id=${medicine.getTherapeuticGroupId()},
+    selectTherapeuticGroup=${medicine.getTherapeutic_group_name()},
+    prescription_form_id=${medicine.getPrescriptionFormId()},
+    selectPrescriptionForm=${medicine.getPrescription_form_name()},
+    package_type_id=${medicine.getPackageTypeId()},
+    selectPackageType=${medicine.getPackage_type_name()},
+    dosage_form_id=${medicine.getDosageFormId()},
+    selectDosageForm=${medicine.getDosageFormName()}
+)}"></a>
+
+        <!-- ПРАВАЯ КОЛОНКА: ВСЕ БЛОКИ -->
+        <div class="form-right">
+            <div class="objects-grid">
+                <!-- БЛОК 1 -->
+                <div th:class="createObject" th:id="medicineMainInfo">
+                    <h3 th:text="#{medicine.main.info}"></h3>
+                    <div class="form-group">
+                        <label for="name" th:text="#{medicine.name}"></label>
+                        <div th:class="view-info" id="name" th:text="${medicine.getName()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="international_name" th:text="#{medicine.international_name}"></label>
+                        <div th:class="view-info" id="international_name" th:text="${medicine.getInternationalName()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dosage_strength" th:text="#{medicine.dosage_strength}"></label>
+                        <div th:class="view-info" id="dosage_strength" th:text="${medicine.getDosageStrength()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="package_quantity" th:text="#{medicine.package_quantity}"></label>
+                        <div th:class="view-info" id="package_quantity" th:text="${medicine.getPackageQuantity()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="prescription_required" th:text="#{medicine.prescription_required}"></label>
+                        <div th:class="view-info" id="prescription_required" th:text="${medicine.getPrescriptionRequiredWord()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="brand_id" th:text="#{medicine.brand}"></label>
+                        <div th:class="view-info" id="brand_id" th:text="${medicine.getBrandName()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dosage_form_id" th:text="#{medicine.dosage_form}"></label>
+                        <div th:class="view-info" id="dosage_form_id" th:text="${medicine.getDosageFormName()}"></div>
+                    </div>
+
+                </div>
+
+                <!-- БЛОК 2 -->
+                <div th:class="createObject" th:id="medicineRegistrationInfo">
+                    <h3 th:text="#{medicine.registration.info}"></h3>
+                    <div class="form-group">
+                        <label for="registration_number" th:text="#{medicine.registration_number}"></label>
+                        <div th:class="view-info" id="registration_number" th:text="${medicine.getRegistrationNumber()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="registration_date" th:text="#{medicine.registration_date}"></label>
+                        <div th:class="view-info" id="registration_date" th:text="${medicine.getRegistrationDate()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="atc_id" th:text="#{medicine.atc_code}"></label>
+                        <div th:class="view-info" id="atc_id" th:text="${medicine.getAtc_code()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitOfMeasure" th:text="#{medicine.unit_of_measure}"></label>
+                        <div th:class="view-info" id="unitOfMeasure" th:text="${medicine.getUnitOfMeasure()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="price" th:text="#{price}"></label>
+                        <div th:class="view-info" id="price" th:text="${medicine.getPrice()}"></div>
+                    </div>
+                </div>
+
+                <!-- БЛОК 3 -->
+                <div th:class="createObject" th:id="medicineStorageInfo">
+                    <h3 th:text="#{medicine.storage.info}"></h3>
+                    <div class="form-group">
+                        <label for="shelf_life_months" th:text="#{medicine.shelf_life}"></label>
+                        <div th:class="view-info" id="shelf_life_months" th:text="${medicine.getShelfLifeMonths()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="storage_temperature_min" th:text="#{medicine.temp_min}"></label>
+                        <div th:class="view-info" id="storage_temperature_min" th:text="${medicine.getStorageTemperatureMin()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="storage_temperature_max" th:text="#{medicine.temp_max}"></label>
+                        <div th:class="view-info" id="storage_temperature_max" th:text="${medicine.getStorageTemperatureMax()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="requires_refrigeration" th:text="#{medicine.refrigeration}"></label>
+                        <div th:class="view-info" id="requires_refrigeration" th:text="${medicine.getRequiresRefrigerationWord()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="light_sensitive" th:text="#{medicine.light_sensitive}"></label>
+                        <div th:class="view-info" id="light_sensitive" th:text="${medicine.getLightSensitiveWord()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="requires_dark_storage" th:text="#{medicine.dark_storage}"></label>
+                        <div th:class="view-info" id="requires_dark_storage" th:text="${medicine.getRequiresDarkStorageWord()}"></div>
+                    </div>
+                </div>
+
+                <!-- БЛОК 4 -->
+                <div th:class="createObject" th:id="medicineManufacturerInfo">
+                    <h3 th:text="#{medicine.manufacturer.info}"></h3>
+                    <div class="form-group">
+                        <label for="manufacturer_id" th:text="#{medicine.manufacturer}"></label>
+                        <div th:class="view-info" id="manufacturer_id" th:text="${medicine.getManufacturer_name()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="country_id" th:text="#{medicine.country}"></label>
+                        <div th:class="view-info" id="country_id" th:text="${medicine.getCountryName()}"></div>
+                    </div>
+                </div>
+
+                <!-- БЛОК 5 -->
+                <div th:class="createObject" th:id="medicineClassificationInfo">
+                    <h3 th:text="#{medicine.classification.info}"></h3>
+                    <div class="form-group">
+                        <label for="pharmacological_group_id" th:text="#{medicine.pharma_group}"></label>
+                        <div th:class="view-info" id="pharmacological_group_id" th:text="${medicine.getPharmacological_group_name()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="therapeutic_group_id" th:text="#{medicine.therapeutic_group}"></label>
+                        <div th:class="view-info" id="therapeutic_group_id" th:text="${medicine.getTherapeutic_group_name()}"></div>
+                    </div>
+                </div>
+
+                <!-- БЛОК 6 -->
+                <div th:class="createObject" th:id="medicinePackageInfo">
+                    <h3 th:text="#{medicine.package.info}"></h3>
+                    <div class="form-group">
+                        <label for="prescription_form_id" th:text="#{medicine.prescription_form}"></label>
+                        <div th:class="view-info" id="prescription_form_id" th:text="${medicine.getPrescription_form_name()}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="package_type_id" th:text="#{medicine.package_type}"></label>
+                        <div th:class="view-info" id="package_type_id" th:text="${medicine.getPackage_type_name()}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

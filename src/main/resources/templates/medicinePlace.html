@@ -54,7 +54,7 @@
     <div th:class="content">
         <ul>
             <li th:each="med : ${medicines}">
-                <a th:href="@{/api/pharmacy/pharmacy(pagin=15, page=${page})}">
+                <a th:href="@{/api/pharmacy/medicineView(idMedicine=${med.getId()})}">
                     <div class="for-photo"></div>
                     <div th:class="for-name" th:text="${med.getName()}"></div>
                     <div th:class="for-content" th:text="${med.getBrandName()} + ' ' + ${med.getCountryName()}"></div>
