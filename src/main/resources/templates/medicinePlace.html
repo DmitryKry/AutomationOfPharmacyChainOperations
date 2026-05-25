@@ -55,7 +55,14 @@
         <ul>
             <li th:each="med : ${medicines}">
                 <a th:href="@{/api/pharmacy/medicineView(idMedicine=${med.getId()})}">
-                    <div class="for-photo"></div>
+                    <div class="for-photo">
+                        <ul th:if="${!photos.isEmpty()}">
+                            <li th:each="ph : ${photos}">
+                                <img th:if="${ph.getEntityId() == med.getId()}"
+                                     th:src="${ph.getPhotoPath()}">
+                            </li>
+                        </ul>
+                    </div>
                     <div th:class="for-name" th:text="${med.getName()}"></div>
                     <div th:class="for-content" th:text="${med.getBrandName()} + ' ' + ${med.getCountryName()}"></div>
                     <div th:class="for-content" th:text="${med.getDosageFormName()}  + ' ' + ${med.getDosageStrength()}

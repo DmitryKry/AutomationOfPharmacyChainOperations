@@ -1,6 +1,6 @@
 package ru.IS_122.AutomationOfPharmacyChainOperations.controller;
 
-
+import org.springframework.web.util.UriComponentsBuilder;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.apache.catalina.Session;
@@ -16,6 +16,8 @@ import ru.IS_122.AutomationOfPharmacyChainOperations.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
@@ -155,6 +157,7 @@ public class MainControl {
                 .limit(15 + pagin)
                 .collect(Collectors.toList());
         model.addAttribute("pharmacies", pharmacies);
+        model.addAttribute("photos", pharmacyService.getPhotosPharmacy());
         model.addAttribute("pagin", pagin);
         model.addAttribute("page", page);
         return "userPlace";
@@ -181,8 +184,11 @@ public class MainControl {
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
         model.addAttribute("edit", edit);
+
         if (pharmacyID != null && pharmacyID.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = pharmacyService.getPhotoPharmacy(pharmacyID);
             model.addAttribute("pharmacy", pharmacyService.getPharmacyById(pharmacyID).get(0));
+            model.addAttribute("photos", photos);
         }
         model.addAttribute("addAdministrators", userService.getAdministrators());
         model.addAttribute("cities", pharmacyService.getAllCities());
@@ -281,6 +287,7 @@ public class MainControl {
     public String pharmacyView(@RequestParam BigDecimal idPharmacy,
                                Model model) {
         model.addAttribute("pharmacy", pharmacyService.getPharmacyById(idPharmacy).get(0));
+        model.addAttribute("photos", pharmacyService.getPhotoPharmacy(idPharmacy));
         model.addAttribute("user", userService.getAdminPharmacy(idPharmacy).get(0));
         return "pharmacyView";
     }
@@ -366,8 +373,10 @@ public class MainControl {
                 .stream()
                 .limit(15 + pagin)
                 .collect(Collectors.toList());
+        List<Photos> photos = medicineService.getPhotosMed();
         model.addAttribute("medicines", medicines);
         model.addAttribute("pagin", pagin);
+        model.addAttribute("photos", photos);
         model.addAttribute("page", page);
         return "medicinePlace";
     }
@@ -441,6 +450,9 @@ public class MainControl {
         model.addAttribute("selectDosageForm", selectDosageForm);
         model.addAttribute("dosage_form_id", dosage_form_id);
         model.addAttribute("edit", edit);
+        if (idMedicine != null) {
+            model.addAttribute("photos", medicineService.getPhotoMed(idMedicine));
+        }
         if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
             model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
         }
@@ -818,25 +830,83 @@ public class MainControl {
     @GetMapping("medicineView")
     public String showMedicineView(BigDecimal idMedicine ,Model model) {
         model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        model.addAttribute("photos", medicineService.getPhotoMed(idMedicine));
         return "medicineView";
     }
 
-    @PostMapping("/uploadPhoto")
+    @PostMapping("/medicineCreate/uploadPhoto")
     public String uploadPhoto(@RequestParam("photo") MultipartFile file,
                               @RequestParam("medicineId") BigDecimal medicineId,
                               HttpSession session) {
+        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
+        String fileName = file.getOriginalFilename();
+
         try {
-            // Сохраняем файл на сервер или в облачное хранилище
-            String photoUrl = saveFile(file, medicineId);
-
-            // Обновляем запись в БД
-            medicineService.updatePhotoUrl(medicineId, photoUrl);
-
-        } catch (Exception e) {
-            // Обработка ошибки
+            File destination = new File(uploadDir + fileName);
+            file.transferTo(destination);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        return "redirect:/api/pharmacy/medicineCreate?idMedicine=" + medicineId;
+        String photoUrl = "/images/" + fileName;
+
+        String message = medicineService.setPhotoMed(medicineId, photoUrl);
+
+        Medicine medicine = medicineService.getMedicineByID(medicineId).get(0);
+
+        String redirectUrl = UriComponentsBuilder.fromPath("/api/pharmacy/medicineCreate")
+                .queryParam("edit", true)
+                .queryParam("idMedicine", medicine.getId())
+                .queryParam("brand_id", medicine.getBrandId())
+                .queryParam("selectBrand", medicine.getBrandName())
+                .queryParam("atc_id", medicine.getAtcId())
+                .queryParam("selectAtc", medicine.getAtc_code())
+                .queryParam("manufacturer_id", medicine.getManufacturerId())
+                .queryParam("selectManufacturer", medicine.getManufacturer_name())
+                .queryParam("country_id", medicine.getCountryId())
+                .queryParam("selectCountry", medicine.getCountryName())
+                .queryParam("pharmacological_group_id", medicine.getPharmacologicalGroupId())
+                .queryParam("selectPharmacologicalGroup", medicine.getPharmacological_group_name())
+                .queryParam("therapeutic_group_id", medicine.getTherapeuticGroupId())
+                .queryParam("selectTherapeuticGroup", medicine.getTherapeutic_group_name())
+                .queryParam("prescription_form_id", medicine.getPrescriptionFormId())
+                .queryParam("selectPrescriptionForm", medicine.getPrescription_form_name())
+                .queryParam("package_type_id", medicine.getPackageTypeId())
+                .queryParam("selectPackageType", medicine.getPackage_type_name())
+                .queryParam("dosage_form_id", medicine.getDosageFormId())
+                .queryParam("selectDosageForm", medicine.getDosageFormName())
+                .toUriString();
+        return "redirect:" + redirectUrl;
     }
 
+    @PostMapping("/pharmacyCreate/uploadPhoto")
+    public String uploadPhotoPharmacy(@RequestParam("photo") MultipartFile file,
+                              @RequestParam("pharmacyID") BigDecimal pharmacyID,
+                              HttpSession session) {
+        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
+        String fileName = file.getOriginalFilename();
+
+        try {
+            File destination = new File(uploadDir + fileName);
+            file.transferTo(destination);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String photoUrl = "/images/" + fileName;
+
+        String message = pharmacyService.setPhotoPharmacy(pharmacyID, photoUrl);
+
+        Pharmacy pharmacy = pharmacyService.getPharmacyById(pharmacyID).get(0);
+        String redirectUrl = UriComponentsBuilder.fromPath("/api/pharmacy/pharmacyCreate")
+                .queryParam("edit", true)
+                .queryParam("idPharmacy", pharmacy.getId())
+                .queryParam("idAdmin", userService.getAdminPharmacy(pharmacyID).get(0).getId())
+                .queryParam("idCity", pharmacy.getID_CITY())
+                .queryParam("selectAdmin", userService.getAdminPharmacy(pharmacyID).get(0).getFio())
+                .queryParam("selectCityRegion", pharmacy.getRegion())
+                .queryParam("selectCity", pharmacy.getCityName())
+                .toUriString();
+        return "redirect:" + redirectUrl;
+    }
 }

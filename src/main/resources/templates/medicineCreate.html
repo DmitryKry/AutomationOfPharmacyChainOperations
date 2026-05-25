@@ -88,6 +88,28 @@
 
 
     </style>
+    <script th:inline="javascript">
+        function uploadPhoto(input) {
+            let formData = new FormData();
+            formData.append('photo', input.files[0]);
+            formData.append('medicineId', document.getElementById('medicineId').value);
+
+            fetch('/api/pharmacy/medicineCreate/uploadPhoto', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('preview').src = data.photoUrl + '?t=' + new Date().getTime();
+                        document.getElementById('status').innerHTML = '✓ Загружено';
+                        setTimeout(() => document.getElementById('status').innerHTML = '', 2000);
+                    }
+                })
+                .catch(() => document.getElementById('status').innerHTML = '✗ Ошибка');
+        }
+    </script>
+
 </HEAD>
 <body>
 <div class="menu">
@@ -100,13 +122,18 @@
 
 <div class="AllInfo">
     <form th:action="@{/api/pharmacy/medicineCreate}" method="post">
-        <!-- ЛЕВАЯ КОЛОНКА: ФОТО -->
-        <div class="form-left">
-            <div th:id="forPhoto1"></div>
+    <div class="form-left">
+        <div id="forPhoto1">
+            <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this)">
+            <input type="hidden" id="medicineId" th:value="${medicine != null ? medicine.getId() : ''}">
+            <img th:if="${photos != null && photos.getPhotoPath() != null}"
+                 th:src="${photos.getPhotoPath()}">
         </div>
+    </div>
 
-        <!-- ПРАВАЯ КОЛОНКА: ВСЕ БЛОКИ -->
-        <div class="form-right">
+
+
+    <div class="form-right">
             <div class="objects-grid">
                 <!-- БЛОК 1 -->
                 <div th:class="createObject" th:id="medicineMainInfo">
@@ -162,7 +189,7 @@
                             selectDosageForm=${selectDosageForm},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
-                    addBrand=${addBrand == false ? true : false}, idMedicine=${medicine.getId()})}" th:text="#{find}"></a>
+                    addBrand=${addBrand == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
                     <div class="form-group">
                         <label for="dosage_form_id" th:text="#{medicine.dosage_form}"></label>
                         <input type="hidden" th:name="dosageFormId" th:value="${dosage_form_id}">
@@ -186,7 +213,7 @@
                             selectDosageForm=${selectDosageForm},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
-                            addDosageForm=${addDosageForm == false ? true : false}, idMedicine=${medicine.getId()})}" th:text="#{find}"></a>
+                            addDosageForm=${addDosageForm == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
                 </div>
 
                 <!-- БЛОК 2 -->
@@ -225,7 +252,7 @@
                             selectDosageForm=${selectDosageForm},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
-                    addAtc=${addAtc == false ? true : false}, idMedicine=${medicine.getId()})}" th:text="#{find}"></a>
+                    addAtc=${addAtc == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
                     <div class="form-group">
                         <label for="unitOfMeasure" th:text="#{medicine.unit_of_measure}"></label>
                         <input type="text" id="unitOfMeasure" name="unitOfMeasure"
@@ -308,7 +335,7 @@
                             selectDosageForm=${selectDosageForm},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
-                    addManufacturer=${addManufacturer == false ? true : false}, idMedicine=${medicine.getId()})}" th:text="#{find}"></a>
+                    addManufacturer=${addManufacturer == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
                     <div class="form-group">
                         <label for="country_id" th:text="#{medicine.country}"></label>
                         <input type="hidden" th:name="countryId" th:value="${country_id}">
@@ -332,7 +359,7 @@
                             selectDosageForm=${selectDosageForm},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
-                    addCountry=${addCountry == false ? true : false}, idMedicine=${medicine.getId()})}" th:text="#{find}"></a>
+                    addCountry=${addCountry == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
                 </div>
 
                 <!-- БЛОК 5 -->
@@ -361,7 +388,8 @@
                             selectDosageForm=${selectDosageForm},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
-                    addPharmacologicalGroup=${addPharmacologicalGroup == false ? true : false}, idMedicine=${medicine.getId()})}" th:text="#{find}"></a>
+                    addPharmacologicalGroup=${addPharmacologicalGroup == false ? true : false},
+                    idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
                     <div class="form-group">
                         <label for="therapeutic_group_id" th:text="#{medicine.therapeutic_group}"></label>
                         <input type="hidden" th:name="therapeuticGroupId" th:value="${therapeutic_group_id}">
@@ -385,7 +413,7 @@
                             selectDosageForm=${selectDosageForm},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
-                    addTherapeuticGroup=${addTherapeuticGroup == false ? true : false}, idMedicine=${medicine.getId()})}" th:text="#{find}"></a>
+                    addTherapeuticGroup=${addTherapeuticGroup == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
                 </div>
 
                 <!-- БЛОК 6 -->
@@ -414,7 +442,7 @@
                             selectDosageForm=${selectDosageForm},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
-                    addPrescriptionForm=${addPrescriptionForm == false ? true : false}, idMedicine=${medicine.getId()})}" th:text="#{find}"></a>
+                    addPrescriptionForm=${addPrescriptionForm == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
                     <div class="form-group">
                         <label for="package_type_id" th:text="#{medicine.package_type}"></label>
                         <input type="hidden" th:name="packageTypeId" th:value="${package_type_id}">
@@ -438,7 +466,7 @@
                             selectDosageForm=${selectDosageForm},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
-                    addPackageType=${addPackageType == false ? true : false}, idMedicine=${medicine.getId()})}" th:text="#{find}"></a>
+                    addPackageType=${addPackageType == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
                 </div>
             </div>
 
@@ -483,7 +511,7 @@
                             package_type_id=${package_type_id},
                             selectPackageType=${selectPackageType},
                             dosage_form_id=${dosage_form_id},
-                            selectDosageForm=${selectDosageForm}, idMedicine=${medicine.getId()})}">
+                            selectDosageForm=${selectDosageForm}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${b.getName()}"></span>
                     </a>
                 </div>
@@ -526,7 +554,7 @@
                             selectBrand=${selectBrand},
                             dosage_form_id=${df.getId()},
                             selectDosageForm=${df.getName()},
-                            addDosageForm=${false}, idMedicine=${medicine.getId()})}">
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${df.getName()}"></span>
                     </a>
                 </div>
@@ -569,7 +597,7 @@
                             selectBrand=${selectBrand},
                             manufacturer_id=${m.getId()},
                             selectManufacturer=${m.getName()},
-                            addManufacturer=${false}, idMedicine=${medicine.getId()})}">
+                            addManufacturer=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${m.getName()}"></span>
                     </a>
                 </div>
@@ -612,7 +640,7 @@
                             selectBrand=${selectBrand},
                             country_id=${c.getId()},
                             selectCountry=${c.getName()},
-                            addCountry=${false}, idMedicine=${medicine.getId()})}">
+                            addCountry=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${c.getName()}"></span>
                     </a>
                 </div>
@@ -656,7 +684,7 @@
                             selectBrand=${selectBrand},
                             atc_id=${a.getId()},
                             selectAtc=${a.getCode()},
-                            addAtc=${false}, idMedicine=${medicine.getId()})}">
+                            addAtc=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${a.getCode() + ': ' + a.getDescription()}"></span>
                     </a>
                 </div>
@@ -700,7 +728,7 @@
                             selectBrand=${selectBrand},
                             pharmacological_group_id=${pg.getId()},
                             selectPharmacologicalGroup=${pg.getName()},
-                            addPharmacologicalGroup=${false}, idMedicine=${medicine.getId()})}">
+                            addPharmacologicalGroup=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${pg.getName()}"></span>
                     </a>
                 </div>
@@ -744,7 +772,7 @@
                             selectBrand=${selectBrand},
                             therapeutic_group_id=${tg.getId()},
                             selectTherapeuticGroup=${tg.getName()},
-                            addTherapeuticGroup=${false}, idMedicine=${medicine.getId()})}">
+                            addTherapeuticGroup=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${tg.getName()}"></span>
                     </a>
                 </div>
@@ -788,7 +816,7 @@
                             selectBrand=${selectBrand},
                             prescription_form_id=${pf.getId()},
                             selectPrescriptionForm=${pf.getName()},
-                            addPrescriptionForm=${false}, idMedicine=${medicine.getId()})}">
+                            addPrescriptionForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${pf.getName()}"></span>
                     </a>
                 </div>
@@ -832,7 +860,7 @@
                             selectBrand=${selectBrand},
                             package_type_id=${pt.getId()},
                             selectPackageType=${pt.getName()},
-                            addPackageType=${false}, idMedicine=${medicine.getId()})}">
+                            addPackageType=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${pt.getName()} + ': ' + ${pt.getDescription()}"></span>
                     </a>
                 </div>
@@ -904,7 +932,7 @@
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
                             InjectionMethods_id=${inm.getId()},
-                            selectInjectionMethods=${inm.getName()}, idMedicine=${medicine.getId()})}">
+                            selectInjectionMethods=${inm.getName()}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
                         <span th:text="${inm.getName()} + ': ' + ${inm.getDescription()}"></span>
                     </a>
                 </div>

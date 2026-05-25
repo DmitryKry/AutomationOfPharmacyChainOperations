@@ -365,8 +365,33 @@ public class MedicineService {
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Medicine.class), medicineID);
     }
 
-    public void updatePhotoUrl(BigDecimal medicineId, String photoUrl){
-        String sql = "UPDATE medicine_pkg.set_photo_medicine(?, ?)";
-        jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Medicine.class), medicineId, photoUrl);
+    public Photos getPhotoMed(BigDecimal medicineId){
+        String sql = "select * from medicine_pkg.get_photo_medicine(?)";
+        List<Photos> photos = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Photos.class), medicineId);
+        if (photos.isEmpty())
+            return null;
+        else
+            return photos.get(0);
+    }
+
+    public String setPhotoMed(BigDecimal medicineId, String photoUrl){
+        String sql = "call medicine_pkg.set_photo_medicine(?, ?, ?)";
+        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setBigDecimal(1, medicineId);
+            cs.setString(2, photoUrl);
+            cs.registerOutParameter(3, Types.VARCHAR);
+            cs.execute();
+            return cs.getString(3);
+        });
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            return errorMessage;
+        }
+        return null;
+    }
+
+    public List<Photos> getPhotosMed(){
+        String sql = "select * from medicine_pkg.get_photos_med()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Photos.class));
     }
 }

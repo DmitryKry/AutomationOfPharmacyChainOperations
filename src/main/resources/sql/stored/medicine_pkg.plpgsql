@@ -592,22 +592,64 @@ end;
 $$ language plpgsql;
 
 
-create or replace procedure medicine_pkg.set_photo_medicine(id_medicine numeric(38,2), url_photo varchar)
+create or replace procedure medicine_pkg.set_photo_medicine(id_medicine numeric(38,2), url_photo varchar, p_error out varchar)
 as $$
-declare
-t_id numeric default 0;
 begin
-select 1
-into t_id
-where exist = (select 1 from photos where entity_type = 'M' and entity_id = id_medicine);
-if t_id = 1 then
-   update photos
-   set photo_path = url_photo
-   where entity_id = id_medicine and entity_type = 'M';
-else
-    insert into photos (entity_id, entity_type, photo_path)
-    values (id_medicine, 'M', url_photo);
-end if;
+    if exists (select 1 from photos where entity_type = 'M' and entity_id = id_medicine) then
+        update photos
+        set photo_path = url_photo, updated_at = CURRENT_TIMESTAMP
+        where entity_id = id_medicine and entity_type = 'M';
+    elsif id_medicine is not null then
+        insert into photos (entity_id, entity_type, photo_path)
+        values (id_medicine, 'M', url_photo);
+    else
+        insert into photos (entity_type, photo_path)
+        values ('M', url_photo);
+    end if;
+EXCEPTION
+    WHEN unique_violation THEN
+        p_error := 'Фото с таким названием или регистрационным номером уже существует';
+WHEN foreign_key_violation THEN
+        p_error := 'Один из внешних ключей ссылается на несуществующую запись в справочнике';
+WHEN not_null_violation THEN
+        p_error := 'Обязательное поле не может быть NULL';
+WHEN OTHERS THEN
+        p_error := concat('Ошибка при создании фото: ', SQLERRM);
+END;
+$$ language plpgsql;
+
+create or replace function medicine_pkg.get_photo_medicine(id_medicine numeric(38,2))
+returns table (
+    id numeric,
+    entity_id numeric,
+    entity_type varchar,
+    photo_path varchar,
+    file_name varchar
+) as $$
+begin
+return query
+select
+    p.id, p.entity_id, p.entity_type::varchar, p.photo_path,
+    p.file_name
+from photos p
+where p.entity_id = id_medicine and p.entity_type = 'M';
 end;
 $$ language plpgsql;
+
+create or replace function medicine_pkg.get_photos_med()
+returns table (
+    id numeric,
+    entity_id numeric,
+    entity_type varchar,
+    photo_path varchar
+) as $$
+       begin
+       return query
+select
+    p.id, p.entity_id, p.entity_type::varchar, p.photo_path
+from photos p
+where p.entity_type = 'M';
+end;
+$$ language plpgsql;
+
 

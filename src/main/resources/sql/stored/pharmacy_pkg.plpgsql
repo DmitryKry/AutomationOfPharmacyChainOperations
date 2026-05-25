@@ -169,3 +169,65 @@ from pharmacy p
          where p.id = idPharmacy;
 end;
 $$ language plpgsql;
+
+
+
+create or replace procedure pharmacy_pkg.set_photo_pharmacy(id_pharmacy numeric(38,2), url_photo varchar, p_error out varchar)
+as $$
+begin
+    if exists (select 1 from photos where entity_type = 'P' and entity_id = id_pharmacy) then
+update photos
+set photo_path = url_photo, updated_at = CURRENT_TIMESTAMP
+where entity_id = id_pharmacy and entity_type = 'P';
+elsif id_pharmacy is not null then
+        insert into photos (entity_id, entity_type, photo_path)
+        values (id_pharmacy, 'P', url_photo);
+else
+        insert into photos (entity_type, photo_path)
+        values ('P', url_photo);
+end if;
+EXCEPTION
+    WHEN unique_violation THEN
+        p_error := 'Фото с таким названием или регистрационным номером уже существует';
+WHEN foreign_key_violation THEN
+        p_error := 'Один из внешних ключей ссылается на несуществующую запись в справочнике';
+WHEN not_null_violation THEN
+        p_error := 'Обязательное поле не может быть NULL';
+WHEN OTHERS THEN
+        p_error := concat('Ошибка при создании фото: ', SQLERRM);
+END;
+$$ language plpgsql;
+
+create or replace function pharmacy_pkg.get_photo_pharmacy(id_pharmacy numeric(38,2))
+returns table (
+    id numeric,
+    entity_id numeric,
+    entity_type varchar,
+    photo_path varchar,
+    file_name varchar
+) as $$
+begin
+return query
+select
+    p.id, p.entity_id, p.entity_type::varchar, p.photo_path,
+    p.file_name
+from photos p
+where p.entity_id = id_pharmacy and p.entity_type = 'P';
+end;
+$$ language plpgsql;
+
+create or replace function pharmacy_pkg.get_photos_pharmacy()
+returns table (
+    id numeric,
+    entity_id numeric,
+    entity_type varchar,
+    photo_path varchar
+) as $$
+begin
+return query
+select
+    p.id, p.entity_id, p.entity_type::varchar, p.photo_path
+from photos p
+where p.entity_type = 'P';
+end;
+$$ language plpgsql;

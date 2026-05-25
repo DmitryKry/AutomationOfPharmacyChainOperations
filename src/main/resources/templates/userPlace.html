@@ -155,7 +155,14 @@
         <ul>
             <li th:each="ph : ${pharmacies}">
                 <a th:href="@{/api/pharmacy/pharmacyView(idPharmacy=${ph.getId()})}">
-                    <div class="for-photo"></div>
+                    <div class="for-photo">
+                        <ul th:if="${!photos.isEmpty()}">
+                            <li th:each="photo : ${photos}">
+                                <img th:if="${photo.getEntityId() == ph.getId()}"
+                                     th:src="${photo.getPhotoPath()}">
+                            </li>
+                        </ul>
+                    </div>
                     <div th:class="for-name" th:text="${ph.getName()}"></div>
                     <div th:class="for-content" th:text="${ph.getCityName()} + ' ' + ${ph.getAddress()}"></div>
                 </a>

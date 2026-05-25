@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <title>Вход</title>
     <link rel="stylesheet" th:href="@{/style.css}">
+    <script th:inline="javascript">
+        function uploadPhoto(input) {
+            let formData = new FormData();
+            formData.append('photo', input.files[0]);
+            formData.append('pharmacyID', document.getElementById('pharmacyID').value);
+
+            fetch('/api/pharmacy/pharmacyCreate/uploadPhoto', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('preview').src = data.photoUrl + '?t=' + new Date().getTime();
+                        document.getElementById('status').innerHTML = '✓ Загружено';
+                        setTimeout(() => document.getElementById('status').innerHTML = '', 2000);
+                    }
+                })
+                .catch(() => document.getElementById('status').innerHTML = '✗ Ошибка');
+        }
+    </script>
 </HEAD>
 <body>
 <div class="AllInfo">
@@ -15,16 +36,10 @@
         <a class="medicines" th:text="#{medicines}"></a>
     </div>
     <div th:id="forPhoto">
-        <form th:action="@{/api/pharmacy/uploadPhoto}" method="post" enctype="multipart/form-data">
-            <input type="file" name="photo" accept="image/*" />
-            <input type="hidden" name="medicineId" th:value="${medicine != null ? medicine.getId() : ''}" />
-            <button type="submit" th:text="#{upload}"></button>
-        </form>
-
-        <!-- Отображение загруженного фото -->
-        <div th:if="${medicine != null && medicine.photoUrl != null}">
-            <img th:src="${medicine.photoUrl}" alt="Medicine photo" style="max-width: 200px;"/>
-        </div>
+        <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this)">
+        <input type="hidden" id="pharmacyID" th:value="${pharmacy != null ? pharmacy.getId() : ''}">
+        <img th:if="${photos != null && photos.getPhotoPath() != null}"
+             th:src="${photos.getPhotoPath()}">
     </div>
 
     <form th:action="@{/api/pharmacy/pharmacyCreate}" method="post">
@@ -72,7 +87,7 @@
                 <input type="text" id="CITY"  th:value="${selectCity}" readonly >
             </div>
             <a th:href="@{/api/pharmacy/pharmacyCreate(addCity=${addCity == false ? true : false},
-            selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy.getId()})}"
+            selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="REGION" th:text="#{REGION}"></label>
@@ -86,7 +101,7 @@
             </div>
             <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${addAdministrator == false ? true : false},
             idCity=${idCity}, selectCity=${selectCity},
-            selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy.getId()})}"
+            selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="POSTAL_CODE" th:text="#{POSTAL_CODE}"></label>
@@ -117,7 +132,7 @@
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(idAdmin=${a.getId()},
                         selectAdmin=${a.userFio}, idCity=${idCity}, selectCity=${selectCity},
-                        selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy.getId()})}">
+                        selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}">
                             <span th:text="${a.userFio} + ' id: ' + ${a.getId()}"></span>
                         </a>
                     </div>
@@ -143,7 +158,7 @@
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(
                         selectCity=${c.getName()}, selectCityRegion=${c.getRegion()}, idCity=${c.id},
-                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy.getId()})}">
+                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}">
                             <span th:text="${c.getName()}"></span>
                         </a>
                     </div>

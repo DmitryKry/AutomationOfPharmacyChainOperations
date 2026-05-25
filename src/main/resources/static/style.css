@@ -22,6 +22,12 @@ ul {
     list-style: none;
 }
 
+img {
+    max-width: 100%;    /* Запрещает картинке быть шире блока */
+    max-height: 100%;   /* Запрещает картинке быть выше блока */
+    object-fit: contain; /* Сохраняет пропорции без искажений */
+}
+
 a{
     text-decoration: none;
     display: inline-block;
@@ -230,7 +236,6 @@ input:focus, select:focus {
     display: flex;
     position: relative;
     flex-direction: column;
-    /* Чтобы группа не сжималась в точку, задаем ширину */
     width: 100%;
     margin-bottom: 3%;
 }
@@ -385,20 +390,20 @@ input:focus, select:focus {
     background: #fafafa;
     border: 2px dashed red;
     border-radius: 10px;
-    height: 40%;
-    width: 30%;
+    height: 350px;
+    width: 600px;
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    aspect-ratio: 1 / 1;  /* квадрат */
     color: red;
     font-weight: bold;
     font-size: 16px;
-    position: fixed;
+    position: relative;
     left: 1%;
-    top: 15%;
+    margin-top: 10%;
+    transition: 0.5s;
 }
 
 .findPerconal {
@@ -549,21 +554,65 @@ input:focus, select:focus {
     background: #fafafa;
     border: 2px dashed red;
     border-radius: 10px;
-    height: 50%;
-    width: 100%;
+    width: 450px;
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    aspect-ratio: 1 / 1;  /* квадрат */
     color: red;
     font-weight: bold;
     font-size: 16px;
     height: 300px;
+    transition: 0.5s;
 }
 
 
+
+#forPhoto1:hover {
+    background: red;
+    border-color: darkred;
+}
+
+#forPhoto1:hover::after {
+    content: "ЗАГРУЗИТЬ";
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    position: absolute;
+    z-index: 2;
+}
+
+#forPhoto:hover {
+    background: red;
+    border-color: darkred;
+}
+
+#forPhoto:hover::after {
+    content: "ЗАГРУЗИТЬ";
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    position: absolute;
+    z-index: 2;
+}
+
+#fileInput {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 3;
+}
+
+#fileInput::file-selector-button {
+    display: none;
+}
+
+#fileInput {
+    color: transparent;
+}
 
 /* --- КНОПКА ОТПРАВКИ --- */
 #createMedicine {
@@ -719,8 +768,45 @@ input:focus, select:focus {
 
 .content ul li a .for-photo{
     width: 100%;
-    height: 70%
+    height: 300px;
 }
+
+.for-photo ul, .for-photo li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.content ul li a .for-photo ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+.content ul li a .for-photo li {
+    width: 100%;
+    height: 100%;
+}
+
+.content ul li a .for-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.content ul li a .for-photo li:not(:has(img)) {
+    display: none !important;
+}
+
 
 .content ul li a .for-name{
     width: 100%;
@@ -748,7 +834,7 @@ input:focus, select:focus {
 #editMedicine{
     position: fixed;
     top: 60%;
-    left: 13%;
+    left: 11%;
 }
 
 #editPharmacy{

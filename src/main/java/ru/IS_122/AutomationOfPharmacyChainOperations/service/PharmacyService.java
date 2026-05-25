@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.City;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.Pharmacy;
+import ru.IS_122.AutomationOfPharmacyChainOperations.model.Photos;
 
 
 import java.math.BigDecimal;
@@ -84,5 +85,35 @@ public class PharmacyService {
     public List<Pharmacy> getPharmacyById(BigDecimal id) {
         String sql = "SELECT * FROM pharmacy_pkg.get_pharmacies(?)";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pharmacy.class), id);
+    }
+
+    public Photos getPhotoPharmacy(BigDecimal pharmacyId){
+        String sql = "select * from pharmacy_pkg.get_photo_pharmacy(?)";
+        List<Photos> photos = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Photos.class), pharmacyId);
+        if (photos.isEmpty())
+            return null;
+        else
+            return photos.get(0);
+    }
+
+    public String setPhotoPharmacy(BigDecimal pharmacyId, String photoUrl){
+        String sql = "call pharmacy_pkg.set_photo_pharmacy(?, ?, ?)";
+        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setBigDecimal(1, pharmacyId);
+            cs.setString(2, photoUrl);
+            cs.registerOutParameter(3, Types.VARCHAR);
+            cs.execute();
+            return cs.getString(3);
+        });
+
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            return errorMessage;
+        }
+        return null;
+    }
+
+    public List<Photos> getPhotosPharmacy(){
+        String sql = "select * from pharmacy_pkg.get_photos_pharmacy()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Photos.class));
     }
 }

@@ -102,7 +102,10 @@
     <form th:action="@{/api/pharmacy/medicineCreate}" method="post">
         <!-- ЛЕВАЯ КОЛОНКА: ФОТО -->
         <div class="form-left">
-            <div th:id="forPhoto1"></div>
+            <div th:id="forPhoto1">
+                <img th:if="${photos != null && photos.getPhotoPath() != null}"
+                     th:src="${photos.getPhotoPath()}">
+            </div>
         </div>
 
         <a th:class="edit" th:id="editMedicine" th:text="#{edit}" th:href="@{/api/pharmacy/medicineCreate(
