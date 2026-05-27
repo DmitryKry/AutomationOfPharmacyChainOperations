@@ -46,7 +46,6 @@ public class UserOfPharmacy {
     private String phone;
 
     @Column(name = "role", nullable = false, length = 0)
-    @NonNull
     private BigDecimal role;
 
     @Transient

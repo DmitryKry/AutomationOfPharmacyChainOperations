@@ -12,6 +12,7 @@ import ru.IS_122.AutomationOfPharmacyChainOperations.model.Photos;
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.Types;
 import java.util.List;
 @Service
@@ -27,7 +28,7 @@ public class PharmacyService {
     }
 
     public Pharmacy createPharmacy(Pharmacy pharmacy, BigDecimal idAdmin) {
-        String sql = "CALL pharmacy_pkg.create_new_pharmacy(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "CALL pharmacy_pkg.create_new_pharmacy(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             cs.setString(1, pharmacy.getName());
@@ -118,7 +119,41 @@ public class PharmacyService {
     }
 
     public void updatePhoto(BigDecimal pharmacyId, BigDecimal photoID){
-        String sql = "update pharmacy_pkg.update_photo(?, ?)";
-        jdbcTemplate.update(sql, pharmacyId, photoID);
+        String sql = "call pharmacy_pkg.update_photo(?, ?)";
+        jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setBigDecimal(1, photoID);      // первый параметр - photo_id
+            cs.setBigDecimal(2, pharmacyId);   // второй параметр - pharmacyId
+            cs.execute();
+            return null;
+        });
     }
+
+    public Pharmacy updatePharmacy(Pharmacy pharmacy, BigDecimal idAdmin) {
+        String sql = "CALL pharmacy_pkg.update_pharmacy(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setString(1, pharmacy.getName());
+            cs.setString(2, pharmacy.getLegal_name());
+            cs.setString(3, pharmacy.getInn());
+            cs.setString(4, pharmacy.getKpp());
+            cs.setString(5, pharmacy.getOgrn());
+            cs.setString(6, pharmacy.getAddress());
+            cs.setObject(7, pharmacy.getID_CITY());
+            cs.setString(8, pharmacy.getRegion());
+            cs.setString(9, pharmacy.getPostal_code());
+            cs.setObject(10, idAdmin);
+
+            cs.registerOutParameter(11, Types.VARCHAR);
+            cs.registerOutParameter(12, Types.NUMERIC);
+
+            cs.execute();
+
+            String error = cs.getString(11);
+            BigDecimal id = cs.getBigDecimal(12);
+            Pharmacy p = new Pharmacy();
+            p.setPharmacyResult(error, id);
+            return p;
+        });
+    }
+
 }

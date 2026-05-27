@@ -93,6 +93,7 @@
             let formData = new FormData();
             formData.append('photo', input.files[0]);
             formData.append('medicineId', document.getElementById('medicineId').value);
+            document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
 
             fetch('/api/pharmacy/medicineCreate/uploadPhoto', {
                 method: 'POST',
@@ -124,10 +125,9 @@
     <form th:action="@{/api/pharmacy/medicineCreate}" method="post">
     <div class="form-left">
         <div id="forPhoto1">
-            <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this)">
+            <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
             <input type="hidden" id="medicineId" th:value="${medicine != null ? medicine.getId() : ''}">
-            <img th:if="${photos != null && photos.getPhotoPath() != null}"
-                 th:src="${photos.getPhotoPath()}">
+            <img id="preview" th:src="${photos != null && photos.getPhotoPath() != null ? photos.getPhotoPath() : ''}">
         </div>
     </div>
 
@@ -516,7 +516,27 @@
     </div>
     <div>
         <a th:href="@{/api/pharmacy/medicineCreate/brandCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addBrand=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineCreate(addBrand=${false},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            addBrand=${false},
+                            atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+           th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Форма выпуска -->
@@ -661,7 +681,7 @@
         <ul>
             <li th:each="a : ${atcList}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:title="${a.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
                             country_id=${country_id},
@@ -681,7 +701,7 @@
                             atc_id=${a.getId()},
                             selectAtc=${a.getCode()},
                             addAtc=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
-                        <span th:text="${a.getCode() + ': ' + a.getDescription()}"></span>
+                        <span th:text="${a.getCode()}"></span>
                     </a>
                 </div>
             </li>
@@ -705,7 +725,7 @@
         <ul>
             <li th:each="pg : ${pharmacologicalGroups}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:title="${pg.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -749,7 +769,7 @@
         <ul>
             <li th:each="tg : ${therapeuticGroups}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:title="${tg.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -793,7 +813,7 @@
         <ul>
             <li th:each="pf : ${prescriptionForms}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:title="${pf.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},

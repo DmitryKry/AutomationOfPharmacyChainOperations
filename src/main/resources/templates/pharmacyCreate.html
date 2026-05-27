@@ -9,6 +9,7 @@
             let formData = new FormData();
             formData.append('photo', input.files[0]);
             formData.append('pharmacyID', document.getElementById('pharmacyID').value);
+            document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
 
             fetch('/api/pharmacy/pharmacyCreate/uploadPhoto', {
                 method: 'POST',
@@ -36,10 +37,9 @@
         <a class="medicines" th:text="#{medicines}"></a>
     </div>
     <div th:id="forPhoto">
-        <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this)">
+        <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
         <input type="hidden" id="pharmacyID" th:value="${pharmacy != null ? pharmacy.getId() : ''}">
-        <img th:if="${photos != null && photos.getPhotoPath() != null}"
-             th:src="${photos.getPhotoPath()}">
+        <img id="preview" th:src="${photos != null && photos.getPhotoPath() != null ? photos.getPhotoPath() : ''}">
     </div>
 
     <form th:action="@{/api/pharmacy/pharmacyCreate}" method="post">
@@ -188,6 +188,11 @@
         </div>
     </div>
 </div>
-
+<div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
+    <H3 th:text="${InfoError}"></H3>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineCreate(InfoErrorShow = false)}" th:text="#{Ok}"></a>
+    </div>
+</div>
 </body>
 </HTML>

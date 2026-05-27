@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.CallableStatement;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.Types;
 import java.util.List;
 @Service
@@ -301,15 +302,16 @@ public class MedicineService {
         return null;
     }
 
-    public String createMedicine(Medicine medicine) {
+    public Medicine createMedicine(Medicine medicine) {
         String sql = "call medicine_pkg.create_medicine(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             int index = 1;
 
             // ВЫХОДНОЙ ПАРАМЕТР ПЕРВЫЙ (p_error)
             cs.registerOutParameter(index++, Types.VARCHAR);  // 1 - p_error (OUT)
+            cs.registerOutParameter(index++, Types.NUMERIC);  // 2 - id_medicine (OUT)
 
             // Входные параметры в том же порядке, что в процедуре после OUT
             cs.setString(index++, medicine.getName());                                    // 2 - p_name
@@ -349,10 +351,11 @@ public class MedicineService {
 
             // Получаем результат из первого (и единственного) выходного параметра
             String error = cs.getString(1);
-            return error;
+            BigDecimal idMedicine = cs.getBigDecimal(2);
+            Medicine medicine1 = new Medicine();
+            medicine1.setResult(error, idMedicine);
+            return medicine1;
         });
-
-        return errorMessage;
     }
 
     public List<Medicine> getAllMedicine(){
@@ -374,24 +377,33 @@ public class MedicineService {
             return photos.get(0);
     }
 
-    public String setPhotoMed(BigDecimal medicineId, String photoUrl){
-        String sql = "call medicine_pkg.set_photo_medicine(?, ?, ?)";
-        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+    public Photos setPhotoMed(BigDecimal medicineId, String photoUrl){
+        String sql = "call medicine_pkg.set_photo_medicine(?, ?, ?, ?)";
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             cs.setBigDecimal(1, medicineId);
             cs.setString(2, photoUrl);
             cs.registerOutParameter(3, Types.VARCHAR);
+            cs.registerOutParameter(4, Types.NUMERIC);
             cs.execute();
-            return cs.getString(3);
+            Photos photos = new Photos();
+            photos.setPhotosResult(cs.getString(3), cs.getBigDecimal(4), photoUrl);
+            return photos;
         });
-
-        if (errorMessage != null && !errorMessage.isEmpty()) {
-            return errorMessage;
-        }
-        return null;
     }
 
     public List<Photos> getPhotosMed(){
         String sql = "select * from medicine_pkg.get_photos_med()";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Photos.class));
+    }
+
+    public void updatePhoto(BigDecimal medicineId, BigDecimal photoID) {
+        String sql = "CALL medicine_pkg.update_photo(?, ?)";
+
+        jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setBigDecimal(1, photoID);      // первый параметр - photo_id
+            cs.setBigDecimal(2, medicineId);   // второй параметр - medicine_id
+            cs.execute();
+            return null;
+        });
     }
 }

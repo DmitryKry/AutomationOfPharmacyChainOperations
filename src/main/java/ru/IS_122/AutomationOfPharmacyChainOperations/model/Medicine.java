@@ -166,4 +166,11 @@ public class Medicine {
     @Column(name = "package_type_id")
     private BigDecimal packageTypeId;
 
+    public String errorMessage;
+
+    public void setResult(String errorMessage, BigDecimal id) {
+        this.errorMessage = errorMessage;
+        this.id = id;
+    }
+
 }

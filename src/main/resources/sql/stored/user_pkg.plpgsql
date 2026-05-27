@@ -150,10 +150,17 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
-create or replace procedure user_pkg.set_role(p_name character varying(200))
+create or replace procedure user_pkg.set_role(p_name character varying(200), p_error varchar)
 as $$
 begin
 insert into role (name) values (p_name);
+exception
+WHEN unique_violation THEN
+        p_error := 'Роль с таким названием уже существует';
+WHEN not_null_violation THEN
+        p_error := 'Обязательное поле не может быть NULL';
+WHEN OTHERS THEN
+        p_error := concat('Ошибка при создании роли: ', SQLERRM);
 end;
 $$ language plpgsql;
 

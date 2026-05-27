@@ -13,7 +13,6 @@
         <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
         <a class="medicines" th:text="#{medicines}"></a>
     </div>
-    <div th:id="forPhoto"></div>
     <form th:action="@{/api/pharmacy/workerCreate}" method="post">
 
         <div th:class="createObject" th:id="worker">
@@ -114,5 +113,11 @@
         </div>
     </div>
 
+    <div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
+        <H3 th:text="${InfoError}"></H3>
+        <div>
+            <a th:href="@{/api/pharmacy/medicineCreate(InfoErrorShow = false)}" th:text="#{Ok}"></a>
+        </div>
+    </div>
 </body>
 </HTML>

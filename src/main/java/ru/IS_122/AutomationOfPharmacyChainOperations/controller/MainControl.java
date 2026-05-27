@@ -1,5 +1,6 @@
 package ru.IS_122.AutomationOfPharmacyChainOperations.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.util.UriComponentsBuilder;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -175,7 +176,7 @@ public class MainControl {
                                          @RequestParam(required = false) BigDecimal pharmacyID,
                                          @RequestParam(required = false) BigDecimal photoID,
                                          @RequestParam(defaultValue = "false") boolean edit,
-                                         HttpSession session,
+                                         HttpSession session, HttpServletResponse response,
                                          Model model) {
         model.addAttribute("addAdministrator", addAdministrator);
         model.addAttribute("addCity", addCity);
@@ -192,7 +193,7 @@ public class MainControl {
             photoID = null;
         }
         else {
-            photoID = p_ID;
+            photoID = p_ID == null ? photoID : p_ID;
         }
         //pharmacyID = BigDecimal.valueOf(70);
         //photoID = BigDecimal.valueOf(83);
@@ -204,7 +205,7 @@ public class MainControl {
                 model.addAttribute("photos", photos);
         }
         if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0){
-            Photos photos = userService.getPhoto(photoID);
+            Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
             model.addAttribute("photos", photos);
         }
         model.addAttribute("addAdministrators", userService.getAdministrators());
@@ -246,6 +247,13 @@ public class MainControl {
         model.addAttribute("selectAdmin", selectAdmin);
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
+        if (pharmacy1.getErrorMessage() != null){
+            model.addAttribute("InfoError", pharmacy1.getErrorMessage());
+        }
+        else{
+            model.addAttribute("InfoError", "Объект создан успешно");
+        }
+        model.addAttribute("InfoErrorShow", true);
         return "pharmacyCreate";
     }
 
@@ -299,10 +307,17 @@ public class MainControl {
                                                @RequestParam(defaultValue = "false") boolean createCity,
                                                @RequestParam(defaultValue = "false") boolean addCity,
                                                @RequestParam(defaultValue = "false") boolean addAdministrator, Model model) {
-        pharmacyService.createCity(city);
+        String error = pharmacyService.createCity(city);
         model.addAttribute("addAdministrator", createCity);
         model.addAttribute("addAdministrator", addAdministrator);
         model.addAttribute("addAdministrator", addCity);
+        if (error != null){
+            model.addAttribute("InfoError", error);
+        }
+        else{
+            model.addAttribute("InfoError", "Объект создан успешно");
+        }
+        model.addAttribute("InfoErrorShow", true);
         return "pharmacyCreate";
     }
 
@@ -437,7 +452,8 @@ public class MainControl {
                                          @RequestParam(defaultValue = "") String selectDosageForm,
                                          @RequestParam(defaultValue = "false") boolean edit,
                                          @RequestParam(required = false) BigDecimal idMedicine,
-                                         Model model, Session session) {
+                                         @RequestParam(required = false) BigDecimal photoID,
+                                         Model model, HttpSession session) {
         // Логирование для отладки
         System.out.println("Received brand_id: " + brand_id);
         System.out.println("Received selectBrand: " + selectBrand);
@@ -473,6 +489,23 @@ public class MainControl {
         model.addAttribute("selectDosageForm", selectDosageForm);
         model.addAttribute("dosage_form_id", dosage_form_id);
         model.addAttribute("edit", edit);
+        BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+        if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                .findFirst().orElse(null) != null) {
+            photoID = null;
+        }
+        else {
+            photoID = p_ID == null ? photoID : p_ID;
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+            model.addAttribute("photos", photos);
+        }
         if (idMedicine != null) {
             model.addAttribute("photos", medicineService.getPhotoMed(idMedicine));
         }
@@ -512,11 +545,16 @@ public class MainControl {
     }
 
     @PostMapping("/medicineCreate")
-    public String medicineCreatePage(@ModelAttribute Medicine medicine, Model model) {
-        String error = medicineService.createMedicine(medicine);
+    public String medicineCreatePage(@ModelAttribute Medicine medicine,
+                                     @RequestParam(required = false) BigDecimal photoID, HttpSession session, Model model) {
+        Medicine medicine1 = medicineService.createMedicine(medicine);
         model.addAttribute("InfoErrorShow", true);
-        if (error != null) {
-            model.addAttribute("InfoError", error);
+        photoID = (BigDecimal) session.getAttribute("photoID");
+        if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0){
+            medicineService.updatePhoto(medicine1.getId(), photoID);
+        }
+        if (medicine1.getErrorMessage() != null) {
+            model.addAttribute("InfoError", medicine1.getErrorMessage());
         }
         else {
             model.addAttribute("InfoError", "Объект успешно создан!");
@@ -861,7 +899,7 @@ public class MainControl {
 
     @PostMapping("/medicineCreate/uploadPhoto")
     public String uploadPhoto(@RequestParam("photo") MultipartFile file,
-                              @RequestParam("medicineId") BigDecimal medicineId,
+                              @RequestParam(required = false) BigDecimal medicineId,
                               HttpSession session) {
         String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
         String fileName = file.getOriginalFilename();
@@ -875,9 +913,12 @@ public class MainControl {
 
         String photoUrl = "/images/" + fileName;
 
-        String message = medicineService.setPhotoMed(medicineId, photoUrl);
+        Photos photos = medicineService.setPhotoMed(medicineId, photoUrl);
+        session.setAttribute("photoID", photos.getId());
 
-        Medicine medicine = medicineService.getMedicineByID(medicineId).get(0);
+        Medicine medicine = new Medicine();
+        if (medicineId != null)
+            medicine = medicineService.getMedicineByID(medicineId).get(0);
 
         String redirectUrl = UriComponentsBuilder.fromPath("/api/pharmacy/medicineCreate")
                 .queryParam("edit", true)

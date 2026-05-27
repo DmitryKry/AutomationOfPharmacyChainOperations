@@ -336,6 +336,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE PROCEDURE medicine_pkg.create_medicine(
     OUT p_error VARCHAR,
+    out id_medicine numeric(38,2),
     -- Основная информация
     p_name VARCHAR,
     p_unit_of_measure varchar,
@@ -374,8 +375,6 @@ CREATE OR REPLACE PROCEDURE medicine_pkg.create_medicine(
     p_atc_id NUMERIC DEFAULT NULL,
     p_package_type_id NUMERIC DEFAULT NULL)
 AS $$
-declare
-p_medicine_id numeric;
 BEGIN
     p_error := NULL;
 
@@ -445,7 +444,7 @@ INSERT INTO public.medicine (
              p_unit_of_measure,
              p_price
          )
-    RETURNING id INTO p_medicine_id;
+    RETURNING id INTO id_medicine;
 
 EXCEPTION
     WHEN unique_violation THEN
@@ -592,19 +591,23 @@ end;
 $$ language plpgsql;
 
 
-create or replace procedure medicine_pkg.set_photo_medicine(id_medicine numeric(38,2), url_photo varchar, p_error out varchar)
+create or replace procedure medicine_pkg.set_photo_medicine(id_medicine numeric(38,2), url_photo varchar,
+       p_error out varchar, med_id out numeric(38,2))
 as $$
 begin
     if exists (select 1 from photos where entity_type = 'M' and entity_id = id_medicine) then
         update photos
         set photo_path = url_photo, updated_at = CURRENT_TIMESTAMP
         where entity_id = id_medicine and entity_type = 'M';
+        med_id := id_medicine;
     elsif id_medicine is not null then
         insert into photos (entity_id, entity_type, photo_path)
-        values (id_medicine, 'M', url_photo);
+        values (id_medicine, 'M', url_photo)
+        returning id into med_id;
     else
         insert into photos (entity_type, photo_path)
-        values ('M', url_photo);
+        values ('M', url_photo)
+        returning id into med_id;
     end if;
 EXCEPTION
     WHEN unique_violation THEN
@@ -756,11 +759,18 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-create or replace procedure medicine_pkg.delete_medicine(id_medicine)
+create or replace procedure medicine_pkg.delete_medicine(id_medicine numeric(38,2))
     as $$
        begin
        delete from medicine where id = id_medicine;
 end;
+$$ language plpgsql;
 
-
-
+create or replace procedure medicine_pkg.update_photo(photo_id numeric(38,2), medicine_id numeric(38,2))
+       as $$
+begin
+update photos
+set entity_id = medicine_id
+where id = photo_id;
+end;
+$$ language plpgsql;
