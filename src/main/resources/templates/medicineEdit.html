@@ -122,18 +122,18 @@
 
 <div class="AllInfo">
     <form th:action="@{/api/pharmacy/medicineCreate}" method="post">
-    <div class="form-left">
-        <div id="forPhoto1">
-            <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this)">
-            <input type="hidden" id="medicineId" th:value="${medicine != null ? medicine.getId() : ''}">
-            <img th:if="${photos != null && photos.getPhotoPath() != null}"
-                 th:src="${photos.getPhotoPath()}">
+        <div class="form-left">
+            <div id="forPhoto1">
+                <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this)">
+                <input type="hidden" id="medicineId" th:value="${medicine != null ? medicine.getId() : ''}">
+                <img th:if="${photos != null && photos.getPhotoPath() != null}"
+                     th:src="${photos.getPhotoPath()}">
+            </div>
         </div>
-    </div>
 
 
 
-    <div class="form-right">
+        <div class="form-right">
             <div class="objects-grid">
                 <!-- БЛОК 1 -->
                 <div th:class="createObject" th:id="medicineMainInfo">
@@ -271,17 +271,17 @@
                     <div class="form-group">
                         <label for="shelf_life_months" th:text="#{medicine.shelf_life}"></label>
                         <input type="number" id="shelf_life_months" name="shelfLifeMonths" min="1" max="120"
-                        th:value="${medicine != null ? medicine.getShelfLifeMonths() : 0}">
+                               th:value="${medicine != null ? medicine.getShelfLifeMonths() : 0}">
                     </div>
                     <div class="form-group">
                         <label for="storage_temperature_min" th:text="#{medicine.temp_min}"></label>
                         <input type="number" id="storage_temperature_min" name="storageTemperatureMin" step="0.1"
-                        th:value="${medicine != null ? medicine.getStorageTemperatureMin() : 0}">
+                               th:value="${medicine != null ? medicine.getStorageTemperatureMin() : 0}">
                     </div>
                     <div class="form-group">
                         <label for="storage_temperature_max" th:text="#{medicine.temp_max}"></label>
                         <input type="number" id="storage_temperature_max" name="storageTemperatureMax" step="0.1"
-                        th:value="${medicine != null ? medicine.getStorageTemperatureMax() : 0}">
+                               th:value="${medicine != null ? medicine.getStorageTemperatureMax() : 0}">
                     </div>
                     <div class="form-group">
                         <label for="requires_refrigeration" th:text="#{medicine.refrigeration}"></label>
@@ -302,7 +302,7 @@
                     <div class="form-group">
                         <label for="requires_dark_storage" th:text="#{medicine.dark_storage}"></label>
                         <select id="requires_dark_storage" name="requiresDarkStorage"
-                        th:value="${medicine != null ? medicine.getRequiresDarkStorage() : false}">
+                                th:value="${medicine != null ? medicine.getRequiresDarkStorage() : false}">
                             <option value="true" th:text="#{yes}">Да</option>
                             <option value="false" th:text="#{no}" selected>Нет</option>
                         </select>
@@ -471,7 +471,8 @@
             </div>
 
             <!-- Кнопка отправки -->
-            <button type="submit" th:id="createMedicine" th:text="#{create}" ></button>
+            <button type="submit" th:class="ButtonPost" th:id="createMedicine" th:text="#{edit}"></button>
+            <a type="submit" th:class="ButtonPost" th:id="createMedicine" th:text="#{delete}" ></a>
         </div>
     </form>
 </div>

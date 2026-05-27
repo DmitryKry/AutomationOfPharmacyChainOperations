@@ -60,4 +60,12 @@ public class Photos {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public String errorMessage;
+
+    public void setPhotosResult(String errorMessage, BigDecimal id, String photoPath) {
+        this.errorMessage = errorMessage;
+        this.id = id;
+        this.photoPath = photoPath;
+    }
 }

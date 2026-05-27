@@ -26,10 +26,10 @@ public class PharmacyService {
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pharmacy.class));
     }
 
-    public String createPharmacy(Pharmacy pharmacy, BigDecimal idAdmin) {
+    public Pharmacy createPharmacy(Pharmacy pharmacy, BigDecimal idAdmin) {
         String sql = "CALL pharmacy_pkg.create_new_pharmacy(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             cs.setString(1, pharmacy.getName());
             cs.setString(2, pharmacy.getLegal_name());
             cs.setString(3, pharmacy.getInn());
@@ -40,16 +40,18 @@ public class PharmacyService {
             cs.setString(8, pharmacy.getRegion());
             cs.setString(9, pharmacy.getPostal_code());
             cs.setObject(10, idAdmin);
+
             cs.registerOutParameter(11, Types.VARCHAR);
+            cs.registerOutParameter(12, Types.NUMERIC);
+
             cs.execute();
-            return cs.getString(11);
+
+            String error = cs.getString(11);
+            BigDecimal id = cs.getBigDecimal(12);
+            Pharmacy p = new Pharmacy();
+            p.setPharmacyResult(error, id);
+            return p;
         });
-
-        if (errorMessage != null && !errorMessage.isEmpty()) {
-            return errorMessage;
-        }
-
-        return null;
     }
 
     public List<City> getAllCities() {
@@ -96,24 +98,27 @@ public class PharmacyService {
             return photos.get(0);
     }
 
-    public String setPhotoPharmacy(BigDecimal pharmacyId, String photoUrl){
-        String sql = "call pharmacy_pkg.set_photo_pharmacy(?, ?, ?)";
-        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+    public Photos setPhotoPharmacy(BigDecimal pharmacyId, String photoUrl){
+        String sql = "call pharmacy_pkg.set_photo_pharmacy(?, ?, ?, ?)";
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             cs.setBigDecimal(1, pharmacyId);
             cs.setString(2, photoUrl);
             cs.registerOutParameter(3, Types.VARCHAR);
+            cs.registerOutParameter(4, Types.NUMERIC);
             cs.execute();
-            return cs.getString(3);
+            Photos photos = new Photos();
+            photos.setPhotosResult(cs.getString(3), cs.getBigDecimal(4), photoUrl);
+            return photos;
         });
-
-        if (errorMessage != null && !errorMessage.isEmpty()) {
-            return errorMessage;
-        }
-        return null;
     }
 
     public List<Photos> getPhotosPharmacy(){
         String sql = "select * from pharmacy_pkg.get_photos_pharmacy()";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Photos.class));
+    }
+
+    public void updatePhoto(BigDecimal pharmacyId, BigDecimal photoID){
+        String sql = "update pharmacy_pkg.update_photo(?, ?)";
+        jdbcTemplate.update(sql, pharmacyId, photoID);
     }
 }

@@ -50,4 +50,11 @@ public class Pharmacy {
 
     @Transient
     private BigDecimal cityID;
+
+    private String errorMessage;
+
+    public void setPharmacyResult(String errorMessage, BigDecimal id) {
+        this.errorMessage = errorMessage;
+        this.id = id;
+    }
 }

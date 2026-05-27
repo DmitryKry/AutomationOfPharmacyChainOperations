@@ -178,6 +178,22 @@ create or replace function user_pkg.get_worker(id_user numeric(38,2))
 end;
 $$ language plpgsql;
 
+create or replace function user_pkg.get_photo(photo_id numeric(38,2))
+       returns setof photos as $$
+       begin
+       return query
+       select * from photos where id = photo_id;
+end;
+$$ language plpgsql;
+
+create or replace function user_pkg.find_photo_path(p_path varchar)
+       returns setof photos as $$
+       begin
+       return query
+       select * from photos where photo_path = p_path;
+end;
+$$ language plpgsql;
+
 
 
 

@@ -652,4 +652,115 @@ where p.entity_type = 'M';
 end;
 $$ language plpgsql;
 
+CREATE OR REPLACE PROCEDURE medicine_pkg.update_medicine(
+    OUT p_error VARCHAR,
+    p_id NUMERIC,
+
+    -- Основная информация
+    p_name VARCHAR,
+    p_unit_of_measure VARCHAR,
+    p_price NUMERIC(38,2),
+    p_international_name VARCHAR DEFAULT NULL,
+    p_dosage_strength VARCHAR DEFAULT NULL,
+    p_package_quantity INTEGER DEFAULT NULL,
+    p_prescription_required BOOLEAN DEFAULT TRUE,
+
+    -- Регистрационные данные
+    p_registration_number VARCHAR DEFAULT NULL,
+    p_registration_date DATE DEFAULT NULL,
+
+    -- Условия хранения
+    p_shelf_life_months INTEGER DEFAULT NULL,
+    p_storage_temperature_min INTEGER DEFAULT NULL,
+    p_storage_temperature_max INTEGER DEFAULT NULL,
+    p_requires_refrigeration BOOLEAN DEFAULT FALSE,
+    p_light_sensitive BOOLEAN DEFAULT FALSE,
+    p_requires_dark_storage BOOLEAN DEFAULT FALSE,
+
+    -- Статусные флаги
+    p_is_active BOOLEAN DEFAULT TRUE,
+    p_is_vital BOOLEAN DEFAULT FALSE,
+    p_is_available BOOLEAN DEFAULT TRUE,
+
+    -- Внешние ключи (ID из справочников)
+    p_pharmacological_group_id NUMERIC DEFAULT NULL,
+    p_therapeutic_group_id NUMERIC DEFAULT NULL,
+    p_manufacturer_id NUMERIC DEFAULT NULL,
+    p_country_id NUMERIC DEFAULT NULL,
+    p_prescription_form_id NUMERIC DEFAULT NULL,
+    p_dosage_form_id NUMERIC DEFAULT NULL,
+    p_brand_id NUMERIC DEFAULT NULL,
+    p_atc_id NUMERIC DEFAULT NULL,
+    p_package_type_id NUMERIC DEFAULT NULL)
+AS $$
+BEGIN
+    p_error := NULL;
+
+    -- Валидация входных данных
+    IF p_id IS NULL THEN
+        p_error := 'Идентификатор препарата (ID) не может быть пустым';
+        RETURN;
+END IF;
+
+    IF p_name IS NULL OR trim(p_name) = '' THEN
+        p_error := 'Название препарата не может быть пустым';
+        RETURN;
+END IF;
+
+    -- Обновление данных одной командой без лишних проверок
+UPDATE public.medicine
+SET
+    name = p_name,
+    international_name = p_international_name,
+    dosage_strength = p_dosage_strength,
+    package_quantity = p_package_quantity,
+    prescription_required = p_prescription_required,
+    registration_number = p_registration_number,
+    registration_date = p_registration_date,
+    shelf_life_months = p_shelf_life_months,
+    storage_temperature_min = p_storage_temperature_min,
+    storage_temperature_max = p_storage_temperature_max,
+    requires_refrigeration = p_requires_refrigeration,
+    light_sensitive = p_light_sensitive,
+    requires_dark_storage = p_requires_dark_storage,
+    is_active = p_is_active,
+    is_vital = p_is_vital,
+    is_available = p_is_available,
+    pharmacological_group_id = p_pharmacological_group_id,
+    therapeutic_group_id = p_therapeutic_group_id,
+    manufacturer_id = p_manufacturer_id,
+    country_id = p_country_id,
+    prescription_form_id = p_prescription_form_id,
+    dosage_form_id = p_dosage_form_id,
+    brand_id = p_brand_id,
+    atc_id = p_atc_id,
+    package_type_id = p_package_type_id,
+    unit_of_measure = p_unit_of_measure,
+    price = p_price
+WHERE id = p_id;
+
+IF NOT FOUND THEN
+        p_error := 'Препарат с указанным ID не найден в базе данных';
+END IF;
+
+EXCEPTION
+    WHEN unique_violation THEN
+        p_error := 'Препарат с таким названием или регистрационным номером уже существует';
+WHEN foreign_key_violation THEN
+        p_error := 'Один из внешних ключей ссылается на несуществующую запись в справочнике';
+WHEN not_null_violation THEN
+        p_error := 'Обязательное поле не может быть NULL';
+WHEN OTHERS THEN
+        p_error := concat('Ошибка при обновлении препарата: ', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+
+create or replace procedure medicine_pkg.delete_medicine(id_medicine)
+    as $$
+       begin
+       delete from medicine where id = id_medicine;
+end;
+
+
 

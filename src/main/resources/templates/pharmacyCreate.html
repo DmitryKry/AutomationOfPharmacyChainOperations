@@ -72,6 +72,7 @@
                 <br>
                 <input type="text" id="OGRN" name="ogrn" th:value="${pharmacy != null ? pharmacy.getOgrn() : ''}">
             </div>
+            <input type="hidden" name="photoID" th:value="${photos != null ? photos.getId() : ''}">
 
         </div>
         <div th:class="createObject" th:id="pharmaciesSecond">
@@ -87,7 +88,8 @@
                 <input type="text" id="CITY"  th:value="${selectCity}" readonly >
             </div>
             <a th:href="@{/api/pharmacy/pharmacyCreate(addCity=${addCity == false ? true : false},
-            selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}"
+            selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
+            photoID=${photos != null ? photos.getId() : ''})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="REGION" th:text="#{REGION}"></label>
@@ -101,7 +103,8 @@
             </div>
             <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${addAdministrator == false ? true : false},
             idCity=${idCity}, selectCity=${selectCity},
-            selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}"
+            selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
+            photoID=${photos != null ? photos.getId() : ''})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="POSTAL_CODE" th:text="#{POSTAL_CODE}"></label>
@@ -110,12 +113,7 @@
                        th:value="${pharmacy != null ? pharmacy.getPostal_code() : ''}">
             </div>
         </div>
-        <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{create}" th:if="${!edit}"></button>
-        <div th:class="edDel" th:if="${edit}">
-            <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{edit}" style="left: 52%;"></button>
-            <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{delete}" style="left: 65%;"></button>
-        </div>
-
+        <button type="submit" th:class="ButtonPost" th:id="createPharmacy" th:text="#{create}"></button>
     </form>
     <div th:class="findPerconal" th:if="${addAdministrator == true}">
         <div>
@@ -132,7 +130,8 @@
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(idAdmin=${a.getId()},
                         selectAdmin=${a.userFio}, idCity=${idCity}, selectCity=${selectCity},
-                        selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}">
+                        selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
+            photoID=${photos != null ? photos.getId() : ''})}">
                             <span th:text="${a.userFio} + ' id: ' + ${a.getId()}"></span>
                         </a>
                     </div>
@@ -158,7 +157,8 @@
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/pharmacyCreate(
                         selectCity=${c.getName()}, selectCityRegion=${c.getRegion()}, idCity=${c.id},
-                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}">
+                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
+            photoID=${photos != null ? photos.getId() : ''})}">
                             <span th:text="${c.getName()}"></span>
                         </a>
                     </div>

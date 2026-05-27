@@ -3,11 +3,8 @@ package ru.IS_122.AutomationOfPharmacyChainOperations.service;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.IS_122.AutomationOfPharmacyChainOperations.model.Pharmacy;
-import ru.IS_122.AutomationOfPharmacyChainOperations.model.Role;
-import ru.IS_122.AutomationOfPharmacyChainOperations.model.UserOfPharmacy;
+import ru.IS_122.AutomationOfPharmacyChainOperations.model.*;
 import org.springframework.jdbc.core.JdbcTemplate;
-import ru.IS_122.AutomationOfPharmacyChainOperations.model.Workers;
 
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
@@ -116,5 +113,15 @@ public class UserService {
     public List<UserOfPharmacy> getAdminPharmacy(BigDecimal idPharmacy) {
         String sql = "SELECT * FROM user_pkg.get_admin_pharmacy(?)";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(UserOfPharmacy.class), idPharmacy);
+    }
+
+    public Photos getPhoto(BigDecimal photoID){
+        String sql = "SELECT * FROM user_pkg.get_photo(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Photos.class), photoID).get(0);
+    }
+
+    public Photos findPhotoPath(String photoPath){
+        String sql = "SELECT * FROM user_pkg.find_photo_path(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Photos.class), photoPath).get(0);
     }
 }

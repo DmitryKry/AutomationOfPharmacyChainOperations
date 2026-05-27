@@ -35,10 +35,9 @@ create or replace procedure pharmacy_pkg.create_new_pharmacy(p_name character va
                                                                     p_inn character varying(12), p_kpp character varying(9),
                                                                     p_ogrn character varying(13), p_address character varying(255),
                                                                     p_ID_CITY numeric, p_region character varying(100),
-                                                                    p_postal_code character varying(10), id_of_worker NUMERIC, p_error out varchar)
+                                                                    p_postal_code character varying(10), id_of_worker NUMERIC,
+       p_error out varchar,  id_pharmacy out numeric)
 as $$
-declare
-id_pharmacy numeric;
 begin
 insert into pharmacy (name, legal_name, inn, kpp, ogrn, address, ID_CITY, region, postal_code)
 values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_ID_CITY, p_region, p_postal_code)
@@ -46,7 +45,6 @@ values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_ID_CITY, p_regi
 insert into pharmacy_manage(id_of_pharmacy, id_of_worker)
 values (id_pharmacy, id_of_worker);
 EXCEPTION
-    -- Нарушение уникальности имени
     WHEN unique_violation THEN
         IF EXISTS (SELECT 1 FROM pharmacy WHERE name = p_name) THEN
             p_error := 'ERROR: Аптека с названием "' || p_name || '" уже существует';
@@ -60,23 +58,18 @@ ELSE
             p_error := 'ERROR: Нарушение уникальности при создании аптеки';
 END IF;
 
-    -- Нарушение NOT NULL constraint
 WHEN not_null_violation THEN
         p_error := 'ERROR: Обязательное поле не может быть NULL';
 
-    -- Нарушение foreign key (если будут)
 WHEN foreign_key_violation THEN
         p_error := 'ERROR: Нарушение внешнего ключа';
 
-    -- Превышение длины строки
 WHEN string_data_right_truncation THEN
         p_error := 'ERROR: Превышена допустимая длина одного из полей';
 
-    -- Неверный формат данных
 WHEN invalid_parameter_value THEN
         p_error := 'ERROR: Неверный формат данных';
 
-    -- Другая ошибка
 WHEN OTHERS THEN
         p_error := 'ERROR: Неизвестная ошибка - ' || SQLERRM;
 end;
@@ -145,34 +138,51 @@ $$ LANGUAGE plpgsql;
 
 
 create or replace function pharmacy_pkg.get_pharmacies(idPharmacy numeric(38,2))
-       returns table(id numeric(38,2),
-       name character varying(200),
-       legal_name character varying(200),
-       inn character varying(12),
-       kpp character varying(9),
-       ogrn character varying(13),
-       address character varying(255),
-       region character varying(100),
-       postal_code character varying(10),
-       opening_date date,
-       closing_date date,
-       status character varying(20),
-       id_city numeric(38,2),
-       cityName varchar,
-       cityID numeric(38,2)
-       ) as $$
+    returns table(
+        id numeric(38,2),
+        name character varying(200),
+        legal_name character varying(200),
+        inn character varying(12),
+        kpp character varying(9),
+        ogrn character varying(13),
+        address character varying(255),
+        region character varying(100),
+        postal_code character varying(10),
+        opening_date date,
+        closing_date date,
+        status character varying(20),
+        id_city numeric(38,2),
+        cityName varchar,
+        cityID numeric(38,2)
+    ) as $$
 begin
 return query
-select p.*, c.name cityName, c.id cityID
+select
+    p.id,
+    p.name,
+    p.legal_name,
+    p.inn,
+    p.kpp,
+    p.ogrn,
+    p.address,
+    p.region,
+    p.postal_code,
+    p.opening_date,
+    p.closing_date,
+    p.status::character varying(20),  -- явное приведение
+        p.id_city,
+        c.name::varchar as cityName,       -- приводим к varchar
+        c.id::numeric(38,2) as cityID      -- приводим к numeric
 from pharmacy p
-         join city c on c.id = p.id_city
-         where p.id = idPharmacy;
+    join city c on c.id = p.id_city
+where p.id = idPharmacy;
 end;
 $$ language plpgsql;
 
 
 
-create or replace procedure pharmacy_pkg.set_photo_pharmacy(id_pharmacy numeric(38,2), url_photo varchar, p_error out varchar)
+create or replace procedure pharmacy_pkg.set_photo_pharmacy(id_pharmacy numeric(38,2), url_photo varchar,
+       p_error out varchar, photo_id out numeric(38,2))
 as $$
 begin
     if exists (select 1 from photos where entity_type = 'P' and entity_id = id_pharmacy) then
@@ -181,10 +191,12 @@ set photo_path = url_photo, updated_at = CURRENT_TIMESTAMP
 where entity_id = id_pharmacy and entity_type = 'P';
 elsif id_pharmacy is not null then
         insert into photos (entity_id, entity_type, photo_path)
-        values (id_pharmacy, 'P', url_photo);
+        values (id_pharmacy, 'P', url_photo)
+        returning id into photo_id;
 else
         insert into photos (entity_type, photo_path)
-        values ('P', url_photo);
+        values ('P', url_photo)
+        returning id into photo_id;
 end if;
 EXCEPTION
     WHEN unique_violation THEN
@@ -229,5 +241,97 @@ select
     p.id, p.entity_id, p.entity_type::varchar, p.photo_path
 from photos p
 where p.entity_type = 'P';
+end;
+$$ language plpgsql;
+
+
+CREATE OR REPLACE PROCEDURE pharmacy_pkg.update_pharmacy(
+    p_id NUMERIC,
+    p_name CHARACTER VARYING(200),
+    p_legal_name CHARACTER VARYING(200),
+    p_inn CHARACTER VARYING(12),
+    p_kpp CHARACTER VARYING(9),
+    p_ogrn CHARACTER VARYING(13),
+    p_address CHARACTER VARYING(255),
+    p_ID_CITY NUMERIC,
+    p_region CHARACTER VARYING(100),
+    p_postal_code CHARACTER VARYING(10),
+    id_of_worker NUMERIC,
+    p_error OUT VARCHAR
+)
+AS $$
+BEGIN
+    p_error := NULL;
+
+    IF p_id IS NULL THEN
+        p_error := 'ERROR: Идентификатор аптеки (ID) не может быть пустым';
+        RETURN;
+END IF;
+
+UPDATE pharmacy
+SET
+    name = p_name,
+    legal_name = p_legal_name,
+    inn = p_inn,
+    kpp = p_kpp,
+    ogrn = p_ogrn,
+    address = p_address,
+    ID_CITY = p_ID_CITY,
+    region = p_region,
+    postal_code = p_postal_code
+WHERE id = p_id;
+
+IF NOT FOUND THEN
+        p_error := 'ERROR: Аптека с указанным ID не найдена';
+        RETURN;
+END IF;
+
+UPDATE pharmacy_manage
+SET id_of_worker = id_of_worker
+WHERE id_of_pharmacy = p_id;
+
+IF NOT FOUND THEN
+        INSERT INTO pharmacy_manage (id_of_pharmacy, id_of_worker)
+        VALUES (p_id, id_of_worker);
+END IF;
+
+EXCEPTION
+    WHEN unique_violation THEN
+        IF EXISTS (SELECT 1 FROM pharmacy WHERE name = p_name AND id != p_id) THEN
+            p_error := 'ERROR: Другая аптека с названием "' || p_name || '" уже существует';
+        ELSIF EXISTS (SELECT 1 FROM pharmacy WHERE inn = p_inn AND id != p_id) THEN
+            p_error := 'ERROR: Другая аптека с ИНН "' || p_inn || '" уже существует';
+        ELSIF EXISTS (SELECT 1 FROM pharmacy WHERE ogrn = p_ogrn AND id != p_id) THEN
+            p_error := 'ERROR: Другая аптека с ОГРН "' || p_ogrn || '" уже существует';
+        ELSIF EXISTS (SELECT 1 FROM pharmacy WHERE address = p_address AND id != p_id) THEN
+            p_error := 'ERROR: Другая аптека с адресом "' || p_address || '" уже существует';
+ELSE
+            p_error := 'ERROR: Нарушение уникальности при обновлении аптеки';
+END IF;
+
+WHEN not_null_violation THEN
+        p_error := 'ERROR: Обязательное поле не может быть NULL';
+
+WHEN foreign_key_violation THEN
+        p_error := 'ERROR: Указан несуществующий ID города или сотрудника';
+
+WHEN string_data_right_truncation THEN
+        p_error := 'ERROR: Превышена допустимая длина одного из полей';
+
+WHEN invalid_parameter_value THEN
+        p_error := 'ERROR: Неверный формат данных';
+
+WHEN OTHERS THEN
+        p_error := 'ERROR: Неизвестная ошибка - ' || SQLERRM;
+END;
+$$ LANGUAGE plpgsql;
+
+
+create or replace procedure pharmacy_pkg.update_photo(photo_id numeric(38,2), pharmacy_id numeric(38,2))
+       as $$
+       begin
+       update photos
+       set entity_id = pharmacy_id
+       where id = photo_id;
 end;
 $$ language plpgsql;

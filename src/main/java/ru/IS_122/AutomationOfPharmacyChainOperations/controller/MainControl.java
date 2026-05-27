@@ -173,7 +173,9 @@ public class MainControl {
                                          @RequestParam(required = false) BigDecimal idAdmin,
                                          @RequestParam(required = false) BigDecimal idCity,
                                          @RequestParam(required = false) BigDecimal pharmacyID,
+                                         @RequestParam(required = false) BigDecimal photoID,
                                          @RequestParam(defaultValue = "false") boolean edit,
+                                         HttpSession session,
                                          Model model) {
         model.addAttribute("addAdministrator", addAdministrator);
         model.addAttribute("addCity", addCity);
@@ -184,10 +186,25 @@ public class MainControl {
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
         model.addAttribute("edit", edit);
-
+        BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+        if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                .findFirst().orElse(null) != null) {
+            photoID = null;
+        }
+        else {
+            photoID = p_ID;
+        }
+        //pharmacyID = BigDecimal.valueOf(70);
+        //photoID = BigDecimal.valueOf(83);
         if (pharmacyID != null && pharmacyID.compareTo(BigDecimal.ZERO) > 0){
             Photos photos = pharmacyService.getPhotoPharmacy(pharmacyID);
+            //Photos photos = userService.getPhoto(photoID);
             model.addAttribute("pharmacy", pharmacyService.getPharmacyById(pharmacyID).get(0));
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = userService.getPhoto(photoID);
             model.addAttribute("photos", photos);
         }
         model.addAttribute("addAdministrators", userService.getAdministrators());
@@ -201,8 +218,10 @@ public class MainControl {
                                      @RequestParam(defaultValue = "") String selectAdmin,
                                      @RequestParam(defaultValue = "") String selectCityRegion,
                                      @RequestParam(defaultValue = "") String selectCity,
+                                     @RequestParam(required = false) BigDecimal photoID,
                                      @RequestParam(required = false) BigDecimal idCity,
-                                     @RequestParam(required = false) BigDecimal idAdmin, Model model) {
+                                     @RequestParam(required = false) BigDecimal idAdmin,
+            HttpSession session, Model model) {
         Pharmacy pharmacy = Pharmacy.builder()
                 .name(form.getName())
                 .legal_name(form.getLegal_name())
@@ -214,7 +233,11 @@ public class MainControl {
                 .region(form.getRegion())
                 .postal_code(form.getPostal_code())
                 .build();
-        pharmacyService.createPharmacy(pharmacy, idAdmin);
+        Pharmacy pharmacy1 = pharmacyService.createPharmacy(pharmacy, idAdmin);
+        photoID = (BigDecimal) session.getAttribute("photoID");
+        if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0){
+            pharmacyService.updatePhoto(pharmacy1.getId(), photoID);
+        }
         model.addAttribute("addAdministrator", addAdministrator);
         model.addAttribute("idAdmin", idAdmin);
         model.addAttribute("selectAdmin", selectAdmin);
@@ -519,8 +542,10 @@ public class MainControl {
     }
 
     @GetMapping("medicineCreate/brandCreate")
-    public String showBrandCreatePage(@RequestParam(defaultValue = "true") boolean brandCreate, Model model) {
+    public String showBrandCreatePage(@RequestParam(defaultValue = "true") boolean brandCreate,
+                                      @RequestParam(defaultValue = "false") boolean edit, Model model) {
         model.addAttribute("brandCreate", brandCreate);
+        model.addAttribute("edit", edit);
         return "medicineCreate";
     }
 
@@ -881,7 +906,7 @@ public class MainControl {
 
     @PostMapping("/pharmacyCreate/uploadPhoto")
     public String uploadPhotoPharmacy(@RequestParam("photo") MultipartFile file,
-                              @RequestParam("pharmacyID") BigDecimal pharmacyID,
+                                      @RequestParam(required = false) BigDecimal pharmacyID,
                               HttpSession session) {
         String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
         String fileName = file.getOriginalFilename();
@@ -895,17 +920,22 @@ public class MainControl {
 
         String photoUrl = "/images/" + fileName;
 
-        String message = pharmacyService.setPhotoPharmacy(pharmacyID, photoUrl);
-
-        Pharmacy pharmacy = pharmacyService.getPharmacyById(pharmacyID).get(0);
+        Photos photos = pharmacyService.setPhotoPharmacy(pharmacyID, photoUrl);
+        session.setAttribute("photoID", photos.getId());
+        Pharmacy pharmacy = new Pharmacy();
+        if (pharmacyID != null)
+            pharmacy = pharmacyService.getPharmacyById(pharmacyID).get(0);
         String redirectUrl = UriComponentsBuilder.fromPath("/api/pharmacy/pharmacyCreate")
                 .queryParam("edit", true)
                 .queryParam("idPharmacy", pharmacy.getId())
-                .queryParam("idAdmin", userService.getAdminPharmacy(pharmacyID).get(0).getId())
+                .queryParam("idAdmin", pharmacyID != null ?
+                        userService.getAdminPharmacy(pharmacyID).get(0).getId() : null)
                 .queryParam("idCity", pharmacy.getID_CITY())
-                .queryParam("selectAdmin", userService.getAdminPharmacy(pharmacyID).get(0).getFio())
+                .queryParam("selectAdmin", pharmacyID != null ?
+                        userService.getAdminPharmacy(pharmacyID).get(0).getFio() : null)
                 .queryParam("selectCityRegion", pharmacy.getRegion())
                 .queryParam("selectCity", pharmacy.getCityName())
+                .queryParam("photoID", photos.getId())
                 .toUriString();
         return "redirect:" + redirectUrl;
     }
