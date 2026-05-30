@@ -18,7 +18,7 @@
         <img th:if="${photos != null && photos.getPhotoPath() != null}"
              th:src="${photos.getPhotoPath()}">
     </div>
-    <a th:class="edit" th:id="editPharmacy" th:text="#{edit}" th:href="@{/api/pharmacy/pharmacyCreate(pharmacyID=${pharmacy.getId()},
+    <a th:class="edit" th:id="editPharmacy" th:text="#{edit}" th:href="@{/api/pharmacy/pharmacyEdit(pharmacyID=${pharmacy.getId()},
     selectAdmin=${user.getFio()}, idAdmin=${user.getWorkerID()}, idCity=${pharmacy.cityID},
     selectCityRegion=${pharmacy.region}, selectCity=${pharmacy.cityName}, edit=true)}"></a>
 

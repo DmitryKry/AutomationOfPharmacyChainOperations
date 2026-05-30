@@ -406,4 +406,73 @@ public class MedicineService {
             return null;
         });
     }
+
+    public Medicine editMedicine(Medicine medicine) {
+        String sql = "call medicine_pkg.update_medicine(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            int index = 1;
+
+            // ВЫХОДНОЙ ПАРАМЕТР ПЕРВЫЙ (p_error)
+            cs.registerOutParameter(index++, Types.VARCHAR);  // 1 - p_error (OUT)
+
+            // Входные параметры в том же порядке, что в процедуре после OUT
+            cs.setString(index++, medicine.getName());                                    // 2 - p_name
+            cs.setObject(index++, medicine.getUnitOfMeasure(), Types.VARCHAR);            // 29 - unit_of_measure
+            cs.setObject(index++, medicine.getPrice(), Types.NUMERIC);                    // 30 - unit_of_measure
+            cs.setString(index++, medicine.getInternationalName());                       // 3 - p_international_name
+            cs.setString(index++, medicine.getDosageStrength());                          // 4 - p_dosage_strength
+            cs.setObject(index++, medicine.getPackageQuantity(), Types.INTEGER);          // 5 - p_package_quantity
+            cs.setObject(index++, medicine.getPrescriptionRequired(), Types.BOOLEAN);     // 6 - p_prescription_required
+
+            cs.setString(index++, medicine.getRegistrationNumber());                      // 7 - p_registration_number
+            cs.setObject(index++, medicine.getRegistrationDate(), Types.DATE);            // 8 - p_registration_date
+
+            cs.setObject(index++, medicine.getShelfLifeMonths(), Types.INTEGER);          // 9 - p_shelf_life_months
+            cs.setObject(index++, medicine.getStorageTemperatureMin(), Types.INTEGER);    // 10 - p_storage_temperature_min
+            cs.setObject(index++, medicine.getStorageTemperatureMax(), Types.INTEGER);    // 11 - p_storage_temperature_max
+            cs.setObject(index++, medicine.getRequiresRefrigeration(), Types.BOOLEAN);    // 12 - p_requires_refrigeration
+            cs.setObject(index++, medicine.getLightSensitive(), Types.BOOLEAN);           // 13 - p_light_sensitive
+            cs.setObject(index++, medicine.getRequiresDarkStorage(), Types.BOOLEAN);      // 14 - p_requires_dark_storage
+
+            cs.setObject(index++, medicine.getIsActive(), Types.BOOLEAN);                 // 15 - p_is_active
+            cs.setObject(index++, medicine.getIsVital(), Types.BOOLEAN);                  // 16 - p_is_vital
+            cs.setObject(index++, medicine.getIsAvailable(), Types.BOOLEAN);              // 17 - p_is_available
+
+
+            cs.setObject(index++, medicine.getPharmacologicalGroupId(), Types.NUMERIC);   // 19 - p_pharmacological_group_id
+            cs.setObject(index++, medicine.getTherapeuticGroupId(), Types.NUMERIC);       // 20 - p_therapeutic_group_id
+            cs.setObject(index++, medicine.getManufacturerId(), Types.NUMERIC);           // 21 - p_manufacturer_id
+            cs.setObject(index++, medicine.getCountryId(), Types.NUMERIC);                // 22 - p_country_id
+            cs.setObject(index++, medicine.getPrescriptionFormId(), Types.NUMERIC);       // 23 - p_prescription_form_id
+            cs.setObject(index++, medicine.getDosageFormId(), Types.NUMERIC);             // 24 - p_dosage_form_id// 25 - p_unit_of_measure_id (ЕСТЬ В ВАШЕЙ ПРОЦЕДУРЕ)
+            cs.setObject(index++, medicine.getBrandId(), Types.NUMERIC);                  // 26 - p_brand_id
+            cs.setObject(index++, medicine.getAtcId(), Types.NUMERIC);                    // 27 - p_atc_id
+            cs.setObject(index, medicine.getPackageTypeId(), Types.NUMERIC);            // 28 - p_package_type_id
+
+            cs.execute();
+
+            // Получаем результат из первого (и единственного) выходного параметра
+            String error = cs.getString(1);
+            BigDecimal idMedicine = medicine.getId();
+            Medicine medicine1 = new Medicine();
+            medicine1.setResult(error, idMedicine);
+            return medicine1;
+        });
+    }
+
+    public Medicine deleteMedicine(BigDecimal medicineId) {
+        String sql = "call medicine_pkg.delete_medicine(?)";
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setBigDecimal(1, medicineId);
+            cs.execute();
+
+            BigDecimal idMedicine = BigDecimal.ZERO;
+            String error = "Объект успешно удалён";
+            Medicine medicine1 = new Medicine();
+            medicine1.setResult(error, idMedicine);
+            return medicine1;
+        });
+    }
 }

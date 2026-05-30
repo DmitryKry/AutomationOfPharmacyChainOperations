@@ -149,11 +149,30 @@ public class PharmacyService {
             cs.execute();
 
             String error = cs.getString(11);
-            BigDecimal id = cs.getBigDecimal(12);
+            BigDecimal id = pharmacy.getId();
             Pharmacy p = new Pharmacy();
             p.setPharmacyResult(error, id);
             return p;
         });
     }
 
+    public Pharmacy deletePharmacy(BigDecimal pharmacyId) {
+        String sql = "CALL pharmacy_pkg.delete_pharmacy(?)";
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setBigDecimal(1, pharmacyId);
+
+            cs.execute();
+
+            String error = "Объект успешно удалён";
+            BigDecimal id = BigDecimal.ZERO;
+            Pharmacy p = new Pharmacy();
+            p.setPharmacyResult(error, id);
+            return p;
+        });
+    }
+
+    public List<Pharmacy> sortPharmacies(String name,String region, String city, String adress){
+        String sql = "select * from pharmacy_pkg.sort_pharmacy(?, ?, ?, ?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pharmacy.class), name, city, adress, region);
+    }
 }

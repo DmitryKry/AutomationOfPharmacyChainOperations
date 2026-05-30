@@ -335,3 +335,26 @@ create or replace procedure pharmacy_pkg.update_photo(photo_id numeric(38,2), ph
        where id = photo_id;
 end;
 $$ language plpgsql;
+
+
+create or replace procedure pharmacy_pkg.delete_pharmacy(idPharmacy numeric(38, 2))
+       as $$
+       begin
+       delete from pharmacy where pharmacy.id = idPharmacy;
+end;
+$$ language plpgsql;
+
+create or replace function pharmacy_pkg.sort_pharmacy(p_name varchar default null, p_city_name varchar default null,
+       p_address varchar default null, p_region varchar default null)
+       returns table(id numeric(38,2), name varchar, cityName varchar, address varchar, region varchar) as $$
+       begin
+       return query
+        SELECT p.id, p.name, c.name AS cityName, p.address, p.region
+        FROM pharmacy p
+                 JOIN city c ON c.id = p.id_city
+        WHERE (p_name IS NULL OR p.name ILIKE '%' || p_name || '%')
+          AND (p_city_name IS NULL OR c.name ILIKE '%' || p_city_name || '%')
+          AND (p_address IS NULL OR p.address ILIKE '%' || p_address || '%')
+          AND (p_region IS NULL OR p.region ILIKE '%' || p_region || '%');
+end;
+$$ language plpgsql;

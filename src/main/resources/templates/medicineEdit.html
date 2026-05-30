@@ -65,8 +65,6 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 25px;
         }
-
-        /* --- ВСЕ БЛОКИ ФОРМЫ --- */
         .createObject {
             background: white;
             border: 1px solid red;
@@ -93,8 +91,9 @@
             let formData = new FormData();
             formData.append('photo', input.files[0]);
             formData.append('medicineId', document.getElementById('medicineId').value);
+            document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
 
-            fetch('/api/pharmacy/medicineCreate/uploadPhoto', {
+            fetch('/api/pharmacy/medicineEdit/uploadPhoto', {
                 method: 'POST',
                 body: formData
             })
@@ -121,18 +120,14 @@
 </div>
 
 <div class="AllInfo">
-    <form th:action="@{/api/pharmacy/medicineCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit}" method="post">
         <div class="form-left">
             <div id="forPhoto1">
-                <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this)">
+                <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
                 <input type="hidden" id="medicineId" th:value="${medicine != null ? medicine.getId() : ''}">
-                <img th:if="${photos != null && photos.getPhotoPath() != null}"
-                     th:src="${photos.getPhotoPath()}">
+                <img id="preview" th:src="${photos != null && photos.getPhotoPath() != null ? photos.getPhotoPath() : ''}">
             </div>
         </div>
-
-
-
         <div class="form-right">
             <div class="objects-grid">
                 <!-- БЛОК 1 -->
@@ -171,7 +166,7 @@
                         <input type="hidden" th:name="brandId" th:value="${brand_id}">
                         <input type="text" id="brand_id" th:value="${selectBrand}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -195,7 +190,7 @@
                         <input type="hidden" th:name="dosageFormId" th:value="${dosage_form_id}">
                         <input type="text" id="dosage_form_id" th:value="${selectDosageForm}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -234,7 +229,7 @@
                         <input type="hidden" th:name="atcId" th:value="${atc_id}">
                         <input type="text" id="atc_id" th:value="${selectAtc}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -317,7 +312,7 @@
                         <input type="hidden" th:name="manufacturerId" th:value="${manufacturer_id}">
                         <input type="text" id="manufacturer_id" th:value="${selectManufacturer}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -341,7 +336,7 @@
                         <input type="hidden" th:name="countryId" th:value="${country_id}">
                         <input type="text" id="country_id" th:value="${selectCountry}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -370,7 +365,7 @@
                         <input type="hidden" th:name="pharmacologicalGroupId" th:value="${pharmacological_group_id}">
                         <input type="text" id="pharmacological_group_id" th:value="${selectPharmacologicalGroup}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -395,7 +390,7 @@
                         <input type="hidden" th:name="therapeuticGroupId" th:value="${therapeutic_group_id}">
                         <input type="text" id="therapeutic_group_id" th:value="${selectTherapeuticGroup}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -424,7 +419,7 @@
                         <input type="hidden" th:name="prescriptionFormId" th:value="${prescription_form_id}">
                         <input type="text" id="prescription_form_id" th:value="${selectPrescriptionForm}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -448,7 +443,7 @@
                         <input type="hidden" th:name="packageTypeId" th:value="${package_type_id}">
                         <input type="text" id="package_type_id" th:value="${selectPackageType}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineCreate(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -470,9 +465,30 @@
                 </div>
             </div>
 
-            <!-- Кнопка отправки -->
-            <button type="submit" th:class="ButtonPost" th:id="createMedicine" th:text="#{edit}"></button>
-            <a type="submit" th:class="ButtonPost" th:id="createMedicine" th:text="#{delete}" ></a>
+            <div id="medicineIdit">
+                <button type="submit" th:class="ButtonPost" th:id="createMedicine" th:text="#{edit}"></button>
+                <a th:href="@{/api/pharmacy/pharmacyEdit(delete=true, addBrand=${false},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            addBrand=${false},
+                            atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm}, idMedicine=${medicine != null ? medicine.getId() : ''})}" type="submit" th:class="ButtonPost" th:id="deleteMedicine"
+                   th:text="#{delete}" ></a>
+            </div>
         </div>
     </form>
 </div>
@@ -480,7 +496,7 @@
 <!-- МОДАЛЬНЫЕ ОКНА -->
 <div th:class="findPerconal" th:if="${addBrand == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addBrand}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addBrand}" method="post">
             <input type="text" name="brandName" th:placeholder="#{medicine.brand}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -489,7 +505,7 @@
         <ul>
             <li th:each="b : ${brands}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                             brand_id=${b.getId()},
                             selectBrand=${b.getName()},
                             addBrand=${false},
@@ -516,14 +532,34 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/brandCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addBrand=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/brandCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addBrand=${false},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            addBrand=${false},
+                            atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+           th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Форма выпуска -->
 <div th:class="findPerconal" th:if="${addDosageForm == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addDosageForm}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addDosageForm}" method="post">
             <input type="text" name="dosageFormName" th:placeholder="#{medicine.dosage_form}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -532,7 +568,7 @@
         <ul>
             <li th:each="df : ${dosageForms}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -559,14 +595,33 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/dosageFormCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addDosageForm=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/dosageFormCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addDosageForm=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <div th:class="findPerconal" th:if="${addManufacturer == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addManufacturer}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addManufacturer}" method="post">
             <input type="text" name="manufacturerName" th:placeholder="#{medicine.manufacturer}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -575,7 +630,7 @@
         <ul>
             <li th:each="m : ${manufacturers}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             country_id=${country_id},
@@ -602,14 +657,33 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/manufacturerCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addManufacturer=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/manufacturerCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addManufacturer=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Добавление страны -->
 <div th:class="findPerconal" th:if="${addCountry == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addCountry}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addCountry}" method="post">
             <input type="text" name="countryName" th:placeholder="#{medicine.country}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -618,7 +692,7 @@
         <ul>
             <li th:each="c : ${countries}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -645,15 +719,34 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/createCountry}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addCountry=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/createCountry}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addCountry=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <!-- Добавление АТХ кода -->
 <div th:class="findPerconal" th:if="${addAtc == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addAtc}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addAtc}" method="post">
             <input type="text" name="atcCode" th:placeholder="#{medicine.atc_code}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -662,7 +755,7 @@
         <ul>
             <li th:each="a : ${atcList}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:title="${a.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
                             country_id=${country_id},
@@ -682,22 +775,41 @@
                             atc_id=${a.getId()},
                             selectAtc=${a.getCode()},
                             addAtc=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
-                        <span th:text="${a.getCode() + ': ' + a.getDescription()}"></span>
+                        <span th:text="${a.getCode()}"></span>
                     </a>
                 </div>
             </li>
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/atcCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addAtc=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/atcCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addAtc=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <!-- Добавление фармакологической группы -->
 <div th:class="findPerconal" th:if="${addPharmacologicalGroup == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addPharmacologicalGroup}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addPharmacologicalGroup}" method="post">
             <input type="text" name="groupName" th:placeholder="#{medicine.pharma_group}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -706,7 +818,7 @@
         <ul>
             <li th:each="pg : ${pharmacologicalGroups}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:title="${pg.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -733,15 +845,34 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/pharmacologicalGroupCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addPharmacologicalGroup=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/pharmacologicalGroupCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addPharmacologicalGroup=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <!-- Добавление терапевтической группы -->
 <div th:class="findPerconal" th:if="${addTherapeuticGroup == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addTherapeuticGroup}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addTherapeuticGroup}" method="post">
             <input type="text" name="groupName" th:placeholder="#{medicine.therapeutic_group}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -750,7 +881,7 @@
         <ul>
             <li th:each="tg : ${therapeuticGroups}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:title="${tg.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -777,15 +908,34 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/therapeuticGroupCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(therapeuticGroupCreate=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/therapeuticGroupCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(therapeuticGroupCreate=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <!-- Добавление формы рецепта -->
 <div th:class="findPerconal" th:if="${addPrescriptionForm == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addPrescriptionForm}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addPrescriptionForm}" method="post">
             <input type="text" name="formName" th:placeholder="#{medicine.prescription_form}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -794,7 +944,7 @@
         <ul>
             <li th:each="pf : ${prescriptionForms}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:title="${pf.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -821,15 +971,34 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/prescriptionFormCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addPrescriptionForm=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/prescriptionFormCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addPrescriptionForm=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <!-- Добавление типа упаковки -->
 <div th:class="findPerconal" th:if="${addPackageType == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addPackageType}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addPackageType}" method="post">
             <input type="text" name="packageTypeName" th:placeholder="#{medicine.package_type}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -838,7 +1007,7 @@
         <ul>
             <li th:each="pt : ${packageTypes}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -865,15 +1034,34 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/packageTypeCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addPackageType=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/packageTypeCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addPackageType=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <!-- Добавление единицы измерения -->
 <div th:class="findPerconal" th:if="${addUnitOfMeasure == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addUnitOfMeasure}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/addUnitOfMeasure}" method="post">
             <input type="text" name="unitName" th:placeholder="#{medicine.unit_of_measure}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -882,7 +1070,7 @@
         <ul>
             <li th:each="uom : ${unitOfMeasures}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
                             unit_of_measure_id=${uom.getId()},
                             selectUnitOfMeasure=${uom.getName()},
                             addUnitOfMeasure=${false})}">
@@ -894,13 +1082,13 @@
     </div>
     <div>
         <a th:href="@{/api/pharmacy/unitOfMeasureCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate(addUnitOfMeasure=${false})}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addUnitOfMeasure=${false})}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Список способов введения -->
 <div th:class="findPerconal" th:if="${addInjectionMethods == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/dosageFormCreate/addInjectionMethods}" method="post">
+        <form th:action="@{/api/pharmacy/medicineEdit/dosageFormCreate/addInjectionMethods}" method="post">
             <input type="text" name="name" th:placeholder="#{medicine.unit_of_measure}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -909,7 +1097,7 @@
         <ul>
             <li th:each="inm : ${InjectionMethods}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate/dosageFormCreate(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit/dosageFormCreate(
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -937,41 +1125,41 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/dosageFormCreate/methodOfAdministrationCreate}" th:text="#{add}"></a>
-        <a th:href="@{/api/pharmacy/medicineCreate/dosageFormCreate}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/dosageFormCreate/methodOfAdministrationCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/dosageFormCreate}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${createCountry == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/createCountry}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/createCountry}" method="post">
         <label for="countryName" th:text="#{medicine.country}"></label>
         <input th:name="countryName" id="countryName" th:type="text" th:placeholder="#{medicine.country}">
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(createCountry=false)}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(createCountry=false)}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Бренд -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${brandCreate == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/brandCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/brandCreate}" method="post">
         <label for="BrandName" th:text="#{name}"></label>
         <input th:name="name" id="BrandName" th:type="text" th:placeholder="#{medicine.brand}">
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(brandCreate=false)}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(brandCreate=false)}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Форма выпуска -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${dosageFormCreate == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/dosageFormCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/dosageFormCreate}" method="post">
         <label for="DosageFormName" th:text="#{name}"></label>
         <input th:name="name" id="DosageFormName" th:type="text" th:placeholder="#{medicine.dosage_form}" required>
         <label for="administration_route_id" th:text="#{medicine.MethodOfAdministration}"></label>
         <input type="hidden" th:name="administration_route_id" th:value="${InjectionMethods_id}">
         <input type="text" id="administration_route_id"  th:value="${selectInjectionMethods}" readonly >
-        <a th:href="@{/api/pharmacy/medicineCreate/dosageFormCreate(addInjectionMethods = true, dosageFormCreate = false)}" th:text="#{find}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/dosageFormCreate(addInjectionMethods = true, dosageFormCreate = false)}" th:text="#{find}"></a>
         <label for="solid" th:text="#{medicine.is_solid}"></label>
         <select name="is_solid" id="solid">
             <option value="true" selected th:text="#{yes}"></option>
@@ -985,12 +1173,12 @@
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(createDosageForm=false)}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(createDosageForm=false)}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Производитель -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${manufacturerCreate == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/manufacturerCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/manufacturerCreate}" method="post">
         <label for="ManufacturerName" th:text="#{name}"></label>
         <input th:name="name" id="ManufacturerName" th:type="text" >
         <label for="ManufacturerAddress" th:text="#{adress}"></label>
@@ -1002,12 +1190,12 @@
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(createManufacturer=false)}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(createManufacturer=false)}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Создание окна с АТХ-код -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${atcCreate == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/atcCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/atcCreate}" method="post">
         <label for="ManufacturerCode" th:text="#{medicine.atc_code}"></label>
         <input th:name="code" id="ManufacturerCode" th:type="text" th:placeholder="#{medicine.atc_code}">
         <label for="ManufacturerInfo" th:text="#{aboutInfo}"></label>
@@ -1015,12 +1203,12 @@
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(createAtc=false)}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(createAtc=false)}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Создание окна с Фармакологическая группа -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${pharmacologicalGroupCreate == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/pharmacologicalGroupCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/pharmacologicalGroupCreate}" method="post">
         <label for="PharmacologicalGroup" th:text="#{name}"></label>
         <input th:name="name" ID="PharmacologicalGroup" th:type="text">
         <label for="PharmacologicalGroupInfo" th:text="#{aboutInfo}"></label>
@@ -1028,12 +1216,12 @@
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(createPharmacologicalGroup=false)}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(createPharmacologicalGroup=false)}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Создание окна с Терапевтическая группа -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${therapeuticGroupCreate == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/therapeuticGroupCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/therapeuticGroupCreate}" method="post">
         <label for="TherapeuticGroup" th:text="#{medicine.prescription_form}"></label>
         <input th:name="name" id="TherapeuticGroup" th:type="text" th:placeholder="#{medicine.therapeutic_group}">
         <label for="TherapeuticGroupInfo" th:text="#{medicine.prescription_form}"></label>
@@ -1041,12 +1229,12 @@
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(createTherapeuticGroup=false)}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(createTherapeuticGroup=false)}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Создание окна с Форма рецептурного бланка -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${createPrescriptionForm == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/prescriptionFormCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/prescriptionFormCreate}" method="post">
         <label for="PrescriptionForm" th:text="#{medicine.prescription_form}"></label>
         <input th:name="name" id="PrescriptionForm" th:type="text" th:placeholder="#{medicine.prescription_form}">
         <label for="descriptionPrescriptionForm" th:text="#{aboutInfo}"></label>
@@ -1063,12 +1251,12 @@
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(createPrescriptionForm=false)}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(createPrescriptionForm=false)}" th:text="#{cancel}"></a>
     </div>
 </div>
 <!-- Создание окна с Тип упаковки -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${createPackageType == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/packageTypeCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/packageTypeCreate}" method="post">
         <label for="PackageTypeName" th:text="#{medicine.package_type}"></label>
         <input th:name="name" id="PackageTypeName" th:type="text">
         <label for="PackageTypeDescription" th:text="#{aboutInfo}"></label>
@@ -1076,12 +1264,12 @@
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(createPackageType=false)}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(createPackageType=false)}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${methodOfAdministrationCreate == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/dosageFormCreate/methodOfAdministrationCreate}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit/dosageFormCreate/methodOfAdministrationCreate}" method="post">
         <label for="methodOfAdministrationCreateName" th:text="#{medicine.administration_route.name}"></label>
         <input th:name="name" id="methodOfAdministrationCreateName" th:type="text" required>
         <label for="methodOfAdministrationCreateInfo" th:text="#{medicine.administration_route.info}"></label>
@@ -1089,14 +1277,43 @@
         <button th:text="#{create}"></button>
     </form>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/dosageFormCreate}" th:text="#{cancel}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit/dosageFormCreate}" th:text="#{cancel}"></a>
     </div>
 </div>
 
 <div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
     <H3 th:text="${InfoError}"></H3>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate(InfoErrorShow = false)}" th:text="#{Ok}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(InfoErrorShow = false)}" th:text="#{Ok}"></a>
+    </div>
+</div>
+
+<div th:class="findPerconal" th:id="okForm" th:if="${delete == true}">
+    <H3 th:text="#{deleteTrue} + ${medicine.getName()}"></H3>
+    <div>
+        <a class="forDeleteObject" th:href="@{/api/pharmacy/medicineEdit(deletePharmacy = true,
+        idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{yes}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(delete=false, addBrand=${false},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            addBrand=${false},
+                            atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+           th:text="#{no}" class="forDeleteObject"></a>
     </div>
 </div>
 </body>

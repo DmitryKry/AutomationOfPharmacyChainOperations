@@ -52,6 +52,39 @@
             color: #555;
         }
     </style>
+    <script>
+        const radioButtons = document.querySelectorAll('.star-rating input[name="grade"]');
+        const ratingDisplay = document.getElementById('ratingDisplay');
+        const hiddenInput = document.getElementById('gradeHidden');
+
+        function updateRating(value) {
+            if (value) {
+                ratingDisplay.textContent = `Выбрано звёзд: ${value}`;
+                if (hiddenInput) hiddenInput.value = value;
+            } else {
+                ratingDisplay.textContent = `Не выбрано`;
+                if (hiddenInput) hiddenInput.value = '';
+            }
+        }
+
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    updateRating(this.value);
+                }
+            });
+        });
+        const checkedRadio = document.querySelector('.star-rating input[name="grade"]:checked');
+        if (checkedRadio) {
+            updateRating(checkedRadio.value);
+        }
+        document.getElementById('checkValueBtn').addEventListener('click', function() {
+            const selected = document.querySelector('.star-rating input[name="grade"]:checked');
+            const val = selected ? selected.value : 'не выбран';
+            document.getElementById('demoResult').innerHTML = `Текущий рейтинг: ${val}`;
+            console.log('Рейтинг для отправки:', val);
+        });
+    </script>
 </HEAD>
 <body>
     <div class="menu">
@@ -63,8 +96,13 @@
     </div>
     <div th:id="openFilter">
         <div th:id="filter">
-            <form th:action="@{/api/pharmacy/registration}" method="post">
+            <form th:action="@{/api/pharmacy/pharmacy}" method="post">
                 <h2 align="center" th:text="#{filter}"></h2>
+                <div class="form-group">
+                    <label for="name" th:text="#{name}"></label>
+                    <br>
+                    <input type="text" id="name" name="name">
+                </div>
                 <div class="form-group">
                     <label for="REGION" th:text="#{REGION}"></label>
                     <br>
@@ -103,44 +141,6 @@
                     <input type="hidden" id="gradeHidden" name="grade_hidden">
 
                 </div>
-
-                <script>
-                    const radioButtons = document.querySelectorAll('.star-rating input[name="grade"]');
-                    const ratingDisplay = document.getElementById('ratingDisplay');
-                    const hiddenInput = document.getElementById('gradeHidden');
-
-                    function updateRating(value) {
-                        if (value) {
-                            ratingDisplay.textContent = `Выбрано звёзд: ${value}`;
-                            if (hiddenInput) hiddenInput.value = value;
-                        } else {
-                            ratingDisplay.textContent = `Не выбрано`;
-                            if (hiddenInput) hiddenInput.value = '';
-                        }
-                    }
-
-                    radioButtons.forEach(radio => {
-                        radio.addEventListener('change', function() {
-                            if (this.checked) {
-                                updateRating(this.value);
-                            }
-                        });
-                    });
-                    const checkedRadio = document.querySelector('.star-rating input[name="grade"]:checked');
-                    if (checkedRadio) {
-                        updateRating(checkedRadio.value);
-                    }
-                </script>
-
-
-                <script>
-                    document.getElementById('checkValueBtn').addEventListener('click', function() {
-                        const selected = document.querySelector('.star-rating input[name="grade"]:checked');
-                        const val = selected ? selected.value : 'не выбран';
-                        document.getElementById('demoResult').innerHTML = `Текущий рейтинг: ${val}`;
-                        console.log('Рейтинг для отправки:', val);
-                    });
-                </script>
                 <div class="form-group">
                     <label for="coverage" th:text="#{coverage}"></label>
                     <br>
@@ -172,6 +172,13 @@
             <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin - 15}, page=${page - 1})}" th:class="previous"><</a>
             <h5 th:text="${page}" />
             <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin + 15}, page=${page + 1})}" th:class="next">></a>
+        </div>
+    </div>
+    <div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
+        <H3 th:text="${InfoError}"></H3>
+        <div>
+            <a th:href="@{/api/pharmacy/pharmacy(InfoErrorShow = false,
+            pagin=${pagin}, page=${page})}" th:text="#{Ok}"></a>
         </div>
     </div>
 </body>

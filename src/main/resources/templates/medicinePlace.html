@@ -55,7 +55,7 @@
         <ul>
             <li th:each="med : ${medicines}">
                 <a th:href="@{/api/pharmacy/medicineView(idMedicine=${med.getId()})}">
-                    <div class="for-photo">
+                    <div class="for-photo" id="medPlace">
                         <ul th:if="${!photos.isEmpty()}">
                             <li th:each="ph : ${photos}">
                                 <img th:if="${ph.getEntityId() == med.getId()}"
