@@ -5,7 +5,6 @@
     <title>Вход</title>
     <link rel="stylesheet" th:href="@{/style.css}">
     <script>
-        // Скрипт в head, но обёрнут в событие загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
             var toggleBtn = document.querySelector('.toggle-link');
             var openFilter = document.getElementById('openFilter');
@@ -20,62 +19,843 @@
     </script>
 </HEAD>
 <body>
-    <div class="menu">
-        <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
-        <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
-        <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
-        <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
-        <a class="medicines" th:text="#{medicines}"></a>
-    </div>
-    <div th:id="openFilter">
-        <div th:id="filter">
-            <form th:action="@{/api/pharmacy/registration}" method="post">
-                <h2 align="center" th:text="#{filterMedicine}"></h2>
-                <div class="form-group">
-                    <label for="adress" th:text="#{adress}"></label>
-                    <br>
-                    <input type="text" id="adress" name="adress">
-                </div>
-                <div class="form-group">
-                    <label for="grade" th:text="#{grade}"></label>
-                    <br>
-                    <input type="text" id="grade" name="grade">
-                </div>
-                <div class="form-group">
-                    <label for="coverage" th:text="#{coverage}"></label>
-                    <br>
-                    <input type="password" id="coverage" name="coverage">
-                    <button type="submit" th:class="ButtonPost" th:text="#{find}"></button>
-                </div>
-            </form>
-            <a th:href="@{/api/pharmacy/medicineCreate}" th:id="create" th:text="#{create}"></a>
-        </div>
-    </div>
-    <div th:class="content">
-        <ul>
-            <li th:each="med : ${medicines}">
-                <a th:href="@{/api/pharmacy/medicineView(idMedicine=${med.getId()})}">
-                    <div class="for-photo" id="medPlace">
-                        <ul th:if="${!photos.isEmpty()}">
-                            <li th:each="ph : ${photos}">
-                                <img th:if="${ph.getEntityId() == med.getId()}"
-                                     th:src="${ph.getPhotoPath()}">
-                            </li>
-                        </ul>
+<div class="menu">
+    <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+    <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+    <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+    <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
+    <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace}"></a>
+</div>
+<div th:id="openFilter">
+    <div th:id="filter">
+        <form th:action="@{/api/pharmacy/medicinePlace}" method="get" th:object="${filter}">
+            <h2 align="center" th:text="#{filterMedicine}"></h2>
+
+            <div class="filter-grid">
+                <div class="filter-section">
+                    <div class="form-group">
+                        <label for="filter-name" th:text="#{name}"></label>
+                        <input type="text" id="filter-name">
                     </div>
-                    <div th:class="for-name" th:text="${med.getName()}"></div>
-                    <div th:class="for-content" th:text="${med.getBrandName()} + ' ' + ${med.getCountryName()}"></div>
-                    <div th:class="for-content" th:text="${med.getDosageFormName()}  + ' ' + ${med.getDosageStrength()}
+                    <div class="form-group">
+                        <label for="filter-international-name" th:text="#{medicine.international_name}"></label>
+                        <input type="text" id="filter-international-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-dosage-strength" th:text="#{medicine.dosage_strength}"></label>
+                        <input type="text" id="filter-dosage-strength">
+                        <label for="filter-package-quantity-min" th:text="#{medicine.package_quantity}"></label>
+                    </div>
+                    <div class="form-group_row">
+                        <div class="form-group">
+                            <label for="filter-package-quantity-min" th:text="#{from}"></label>
+                            <input th:class="from" type="number" id="filter-package-quantity-min">
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-package-quantity-max" th:text="#{to}"></label>
+                            <input th:class="to" type="number" id="filter-package-quantity-max">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-prescription-required" th:text="#{medicine.prescription_required}"></label>
+                        <select id="filter-prescription-required">
+                            <option value="" th:text="#{all}"></option>
+                            <option value="true" th:text="#{yes}"></option>
+                            <option value="false" th:text="#{no}"></option>
+                        </select>
+                        <label for="filter-prescription-required" th:text="#{price}"></label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="form-group_row">
+                        <div class="form-group">
+                            <label for="filter-price-min" th:text="#{from}"></label>
+                            <input th:class="from" type="number" id="filter-price-min">
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-price-max" th:text="#{to}"></label>
+                            <input th:class="to" type="number" id="filter-price-max">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="form-group">
+                        <label for="manufacturer_id" th:text="#{medicine.manufacturer}"></label>
+                        <input type="hidden" th:name="manufacturerId" th:value="${manufacturer_id}">
+                        <input type="text" id="manufacturer_id" th:value="${selectManufacturer}">
+                    </div>
+                    <a th:href="@{/api/pharmacy/medicinePlace(atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                    addManufacturer=${addManufacturer == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+                       th:text="#{find}"></a>
+                    <div class="form-group">
+                        <label for="country_id" th:text="#{medicine.country}"></label>
+                        <input type="hidden" th:name="countryId" th:value="${country_id}">
+                        <input type="text" id="country_id" th:value="${selectCountry}">
+                    </div>
+                    <a th:href="@{/api/pharmacy/medicinePlace(atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                    addCountry=${addCountry == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+                       th:text="#{find}"></a>
+                </div>
+
+                <div class="filter-section">
+                    <div class="form-group">
+                        <label for="pharmacological_group_id" th:text="#{medicine.pharma_group}"></label>
+                        <input type="hidden" th:name="pharmacologicalGroupId" th:value="${pharmacological_group_id}">
+                        <input type="text" id="pharmacological_group_id" th:value="${selectPharmacologicalGroup}">
+                    </div>
+                    <a th:href="@{/api/pharmacy/medicinePlace(atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                    addPharmacologicalGroup=${addPharmacologicalGroup == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+                       th:text="#{find}"></a>
+                    <div class="form-group">
+                        <label for="therapeutic_group_id" th:text="#{medicine.therapeutic_group}"></label>
+                        <input type="hidden" th:name="therapeuticGroupId" th:value="${therapeutic_group_id}">
+                        <input type="text" id="therapeutic_group_id" th:value="${selectTherapeuticGroup}">
+                    </div>
+                </div>
+                <a th:href="@{/api/pharmacy/medicinePlace(atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                    addTherapeuticGroup=${addTherapeuticGroup == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+                   th:text="#{find}"></a>
+                <div class="filter-section">
+                    <div class="form-group">
+                        <label for="dosage_form_id" th:text="#{medicine.dosage_form}"></label>
+                        <input type="hidden" th:name="dosageFormId" th:value="${dosage_form_id}">
+                        <input type="text" id="dosage_form_id" th:value="${selectDosageForm}">
+                    </div>
+                    <a th:href="@{/api/pharmacy/medicinePlace(atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                    addDosageForm=${addDosageForm == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+                       th:text="#{find}"></a>
+                    <div class="form-group">
+                        <label for="package_type_id" th:text="#{medicine.package_type}"></label>
+                        <input type="hidden" th:name="packageTypeId" th:value="${package_type_id}">
+                        <input type="text" id="package_type_id" th:value="${selectPackageType}">
+                    </div>
+                    <a th:href="@{/api/pharmacy/medicinePlace(atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                    addPackageType=${addPackageType == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+                       th:text="#{find}"></a>
+                    <div class="form-group">
+                        <label for="brand_id" th:text="#{medicine.brand}"></label>
+                        <input type="hidden" th:name="brandId" th:value="${brand_id}">
+                        <input type="text" id="brand_id" th:value="${selectBrand}">
+                    </div>
+                    <a th:href="@{/api/pharmacy/medicinePlace(atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                    addBrand=${addBrand == false ? true : false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{find}"></a>
+                </div>
+            </div>
+            <button type="submit" th:class="ButtonPost" th:text="#{find}"></button>
+        </form>
+        <a th:href="@{/api/pharmacy/medicineCreate}" th:id="create" th:text="#{create}"></a>
+    </div>
+</div>
+<div th:class="content">
+    <ul>
+        <li th:each="med : ${medicines}">
+            <a th:href="@{/api/pharmacy/medicineView(idMedicine=${med.getId()})}">
+                <div class="for-photo" id="medPlace">
+                    <ul th:if="${!photos.isEmpty()}">
+                        <li th:each="ph : ${photos}">
+                            <img th:if="${ph.getEntityId() == med.getId()}"
+                                 th:src="${ph.getPhotoPath()}">
+                        </li>
+                    </ul>
+                </div>
+                <div th:class="for-name" th:text="${med.getName()}"></div>
+                <div th:class="for-content" th:text="${med.getBrandName()} + ' ' + ${med.getCountryName()}"></div>
+                <div th:class="for-content" th:text="${med.getDosageFormName()}  + ' ' + ${med.getDosageStrength()}
   + ' ' + ${med.getPackageQuantity()} + ' ' + ${med.unitOfMeasure}"></div>
-                    <div th:class="for-content" th:text="${med.getPrice()} + ' ' + #{currency}"></div>
-                </a>
+                <div th:class="for-content" th:text="${med.getPrice()} + ' ' + #{currency}"></div>
+            </a>
+        </li>
+    </ul>
+    <div th:class="pagination">
+        <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin - 15}, page=${page - 1})}" th:class="previous"><</a>
+        <h5 th:text="${page}" />
+        <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin + 15}, page=${page + 1})}" th:class="next">></a>
+    </div>
+</div>
+<div th:class="findPerconal" th:if="${addBrand == true}">
+    <div>
+        <form th:action="@{/api/pharmacy/medicineEdit/addBrand}" method="post">
+            <input type="text" name="brandName" th:placeholder="#{medicine.brand}">
+            <button th:text="#{find}">Найти</button>
+        </form>
+    </div>
+    <div th:id="contentForFindPerconal">
+        <ul>
+            <li th:each="b : ${brands}">
+                <div th:id="Transfer">
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                            brand_id=${b.getId()},
+                            selectBrand=${b.getName()},
+                            addBrand=${false},
+                            atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
+                        <span th:text="${b.getName()}"></span>
+                    </a>
+                </div>
             </li>
         </ul>
-        <div th:class="pagination">
-            <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin - 15}, page=${page - 1})}" th:class="previous"><</a>
-            <h5 th:text="${page}" />
-            <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin + 15}, page=${page + 1})}" th:class="next">></a>
-        </div>
     </div>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineEdit/brandCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addBrand=${false},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            addBrand=${false},
+                            atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm}, idMedicine=${medicine != null ? medicine.getId() : ''})}"
+           th:text="#{cancel}"></a>
+    </div>
+</div>
+<!-- Форма выпуска -->
+<div th:class="findPerconal" th:if="${addDosageForm == true}">
+    <div>
+        <form th:action="@{/api/pharmacy/medicineEdit/addDosageForm}" method="post">
+            <input type="text" name="dosageFormName" th:placeholder="#{medicine.dosage_form}">
+            <button th:text="#{find}">Найти</button>
+        </form>
+    </div>
+    <div th:id="contentForFindPerconal">
+        <ul>
+            <li th:each="df : ${dosageForms}">
+                <div th:id="Transfer">
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${df.getId()},
+                            selectDosageForm=${df.getName()},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
+                        <span th:text="${df.getName()}"></span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineEdit/dosageFormCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addDosageForm=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
+    </div>
+</div>
+
+<div th:class="findPerconal" th:if="${addManufacturer == true}">
+    <div>
+        <form th:action="@{/api/pharmacy/medicineEdit/addManufacturer}" method="post">
+            <input type="text" name="manufacturerName" th:placeholder="#{medicine.manufacturer}">
+            <button th:text="#{find}">Найти</button>
+        </form>
+    </div>
+    <div th:id="contentForFindPerconal">
+        <ul>
+            <li th:each="m : ${manufacturers}">
+                <div th:id="Transfer">
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            manufacturer_id=${m.getId()},
+                            selectManufacturer=${m.getName()},
+                            addManufacturer=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
+                        <span th:text="${m.getName()}"></span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineEdit/manufacturerCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addManufacturer=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
+    </div>
+</div>
+<!-- Добавление страны -->
+<div th:class="findPerconal" th:if="${addCountry == true}">
+    <div>
+        <form th:action="@{/api/pharmacy/medicineEdit/addCountry}" method="post">
+            <input type="text" name="countryName" th:placeholder="#{medicine.country}">
+            <button th:text="#{find}">Найти</button>
+        </form>
+    </div>
+    <div th:id="contentForFindPerconal">
+        <ul>
+            <li th:each="c : ${countries}">
+                <div th:id="Transfer">
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            country_id=${c.getId()},
+                            selectCountry=${c.getName()},
+                            addCountry=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
+                        <span th:text="${c.getName()}"></span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineEdit/createCountry}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addCountry=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
+    </div>
+</div>
+
+<!-- Добавление АТХ кода -->
+<div th:class="findPerconal" th:if="${addAtc == true}">
+    <div>
+        <form th:action="@{/api/pharmacy/medicineEdit/addAtc}" method="post">
+            <input type="text" name="atcCode" th:placeholder="#{medicine.atc_code}">
+            <button th:text="#{find}">Найти</button>
+        </form>
+    </div>
+    <div th:id="contentForFindPerconal">
+        <ul>
+            <li th:each="a : ${atcList}">
+                <div th:id="Transfer">
+                    <a th:title="${a.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            atc_id=${a.getId()},
+                            selectAtc=${a.getCode()},
+                            addAtc=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
+                        <span th:text="${a.getCode()}"></span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineEdit/atcCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addAtc=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
+    </div>
+</div>
+
+<!-- Добавление фармакологической группы -->
+<div th:class="findPerconal" th:if="${addPharmacologicalGroup == true}">
+    <div>
+        <form th:action="@{/api/pharmacy/medicineEdit/addPharmacologicalGroup}" method="post">
+            <input type="text" name="groupName" th:placeholder="#{medicine.pharma_group}">
+            <button th:text="#{find}">Найти</button>
+        </form>
+    </div>
+    <div th:id="contentForFindPerconal">
+        <ul>
+            <li th:each="pg : ${pharmacologicalGroups}">
+                <div th:id="Transfer">
+                    <a th:title="${pg.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            pharmacological_group_id=${pg.getId()},
+                            selectPharmacologicalGroup=${pg.getName()},
+                            addPharmacologicalGroup=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
+                        <span th:text="${pg.getName()}"></span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineEdit/pharmacologicalGroupCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addPharmacologicalGroup=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
+    </div>
+</div>
+
+<!-- Добавление терапевтической группы -->
+<div th:class="findPerconal" th:if="${addTherapeuticGroup == true}">
+    <div>
+        <form th:action="@{/api/pharmacy/medicineEdit/addTherapeuticGroup}" method="post">
+            <input type="text" name="groupName" th:placeholder="#{medicine.therapeutic_group}">
+            <button th:text="#{find}">Найти</button>
+        </form>
+    </div>
+    <div th:id="contentForFindPerconal">
+        <ul>
+            <li th:each="tg : ${therapeuticGroups}">
+                <div th:id="Transfer">
+                    <a th:title="${tg.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            therapeutic_group_id=${tg.getId()},
+                            selectTherapeuticGroup=${tg.getName()},
+                            addTherapeuticGroup=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
+                        <span th:text="${tg.getName()}"></span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineEdit/therapeuticGroupCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(therapeuticGroupCreate=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
+    </div>
+</div>
+
+<!-- Добавление формы рецепта -->
+<div th:class="findPerconal" th:if="${addPrescriptionForm == true}">
+    <div>
+        <form th:action="@{/api/pharmacy/medicineEdit/addPrescriptionForm}" method="post">
+            <input type="text" name="formName" th:placeholder="#{medicine.prescription_form}">
+            <button th:text="#{find}">Найти</button>
+        </form>
+    </div>
+    <div th:id="contentForFindPerconal">
+        <ul>
+            <li th:each="pf : ${prescriptionForms}">
+                <div th:id="Transfer">
+                    <a th:title="${pf.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            prescription_form_id=${pf.getId()},
+                            selectPrescriptionForm=${pf.getName()},
+                            addPrescriptionForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
+                        <span th:text="${pf.getName()}"></span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineEdit/prescriptionFormCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addPrescriptionForm=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
+    </div>
+</div>
+
+<!-- Добавление типа упаковки -->
+<div th:class="findPerconal" th:if="${addPackageType == true}">
+    <div>
+        <form th:action="@{/api/pharmacy/medicineEdit/addPackageType}" method="post">
+            <input type="text" name="packageTypeName" th:placeholder="#{medicine.package_type}">
+            <button th:text="#{find}">Найти</button>
+        </form>
+    </div>
+    <div th:id="contentForFindPerconal">
+        <ul>
+            <li th:each="pt : ${packageTypes}">
+                <div th:id="Transfer">
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            package_type_id=${pt.getId()},
+                            selectPackageType=${pt.getName()},
+                            addPackageType=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
+                        <span th:text="${pt.getName()} + ': ' + ${pt.getDescription()}"></span>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <a th:href="@{/api/pharmacy/medicineEdit/packageTypeCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(addPackageType=${false},
+        atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{cancel}"></a>
+    </div>
+</div>
+
 </body>
 </HTML>

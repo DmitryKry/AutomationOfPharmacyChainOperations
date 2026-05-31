@@ -201,6 +201,12 @@ create or replace function user_pkg.find_photo_path(p_path varchar)
 end;
 $$ language plpgsql;
 
+create or replace procedure delete_user(id_user numeric)
+       as $$
+       begin
+       delete from userofpharmacy where id = id_user;
+end;
+$$ language plpgsql;
 
 
 

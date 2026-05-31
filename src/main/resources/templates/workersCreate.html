@@ -6,13 +6,13 @@
     <link rel="stylesheet" th:href="@{/style.css}">
 </HEAD>
 <body>
-    <div class="menu">
-        <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
-        <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
-        <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
-        <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
-        <a class="medicines" th:text="#{medicines}"></a>
-    </div>
+<div class="menu">
+    <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+    <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+    <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+    <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
+    <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace}"></a>
+</div>
     <form th:action="@{/api/pharmacy/workerCreate}" method="post">
 
         <div th:class="createObject" th:id="worker">

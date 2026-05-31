@@ -763,6 +763,7 @@ create or replace procedure medicine_pkg.delete_medicine(id_medicine numeric(38,
     as $$
        begin
        delete from medicine where id = id_medicine;
+       delete from photos where photos.entity_id = id_medicine;
 end;
 $$ language plpgsql;
 
@@ -774,3 +775,189 @@ set entity_id = medicine_id
 where id = photo_id;
 end;
 $$ language plpgsql;
+
+create or replace function medicine_pkg.get_all_manufacturers()
+       returns setof manufacturer as $$
+       begin
+       return query
+       select * from manufacturer;
+end;
+$$ language plpgsql;
+
+create or replace function medicine_pkg.get_all_countries()
+       returns setof country as $$
+begin
+return query
+select * from country;
+end;
+$$ language plpgsql;
+
+create or replace function medicine_pkg.get_all_pharmacologicalGroups()
+       returns setof pharmacological_group as $$
+begin
+return query
+select * from pharmacological_group;
+end;
+$$ language plpgsql;
+
+create or replace function medicine_pkg.get_all_therapeuticGroups()
+       returns setof therapeutic_group as $$
+begin
+return query
+select * from therapeutic_group;
+end;
+$$ language plpgsql;
+
+create or replace function medicine_pkg.get_all_dosageForms()
+       returns setof dosage_form as $$
+begin
+return query
+select * from dosage_form;
+end;
+$$ language plpgsql;
+
+create or replace function medicine_pkg.get_all_packageTypes()
+       returns setof type_packaging as $$
+begin
+return query
+select * from type_packaging;
+end;
+$$ language plpgsql;
+
+create or replace function medicine_pkg.get_all_brands()
+       returns setof brand as $$
+begin
+return query
+select * from brand;
+end;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION medicine_pkg.sort_medicine(
+    p_name VARCHAR DEFAULT NULL,
+    p_international_name VARCHAR DEFAULT NULL,
+    p_dosage_strength VARCHAR DEFAULT NULL,
+    p_package_quantity_min INTEGER DEFAULT NULL,
+    p_package_quantity_max INTEGER DEFAULT NULL,
+    p_prescription_required BOOLEAN DEFAULT NULL,
+    p_price_min NUMERIC DEFAULT NULL,
+    p_price_max NUMERIC DEFAULT NULL,
+    p_manufacturer_id NUMERIC DEFAULT NULL,
+    p_country_id NUMERIC DEFAULT NULL,
+    p_pharmacological_group_id NUMERIC DEFAULT NULL,
+    p_therapeutic_group_id NUMERIC DEFAULT NULL,
+    p_atc_code VARCHAR DEFAULT NULL,
+    p_dosage_form_id NUMERIC DEFAULT NULL,
+    p_package_type_id NUMERIC DEFAULT NULL,
+    p_brand_id NUMERIC DEFAULT NULL,
+    p_is_active BOOLEAN DEFAULT TRUE
+)
+RETURNS TABLE(
+    id NUMERIC(38,2),
+    name VARCHAR,
+    international_name VARCHAR,
+    dosage_strength VARCHAR,
+    package_quantity INTEGER,
+    prescription_required BOOLEAN,
+    registration_number VARCHAR,
+    registration_date DATE,
+    shelf_life_months INTEGER,
+    storage_temperature_min INTEGER,
+    storage_temperature_max INTEGER,
+    requires_refrigeration BOOLEAN,
+    light_sensitive BOOLEAN,
+    requires_dark_storage BOOLEAN,
+    is_active BOOLEAN,
+    is_vital BOOLEAN,
+    is_available BOOLEAN,
+    price NUMERIC(38,2),
+    unit_of_measure VARCHAR,
+    pharmacological_group_id NUMERIC,
+    therapeutic_group_id NUMERIC,
+    manufacturer_id NUMERIC,
+    country_id NUMERIC,
+    prescription_form_id NUMERIC,
+    dosage_form_id NUMERIC,
+    brand_id NUMERIC,
+    atc_id NUMERIC,
+    package_type_id NUMERIC,
+    brandName VARCHAR,
+    countryName VARCHAR,
+    atc_code VARCHAR,
+    manufacturer_name VARCHAR,
+    package_type_name VARCHAR,
+    pharmacological_group_name VARCHAR,
+    therapeutic_group_name VARCHAR,
+    dosageFormName VARCHAR,
+    prescription_form_name VARCHAR
+) AS $$
+BEGIN
+RETURN QUERY
+SELECT
+    m.id,
+    m.name,
+    m.international_name,
+    m.dosage_strength,
+    m.package_quantity,
+    m.prescription_required,
+    m.registration_number,
+    m.registration_date,
+    m.shelf_life_months,
+    m.storage_temperature_min,
+    m.storage_temperature_max,
+    m.requires_refrigeration,
+    m.light_sensitive,
+    m.requires_dark_storage,
+    m.is_active,
+    m.is_vital,
+    m.is_available,
+    m.price,
+    m.unit_of_measure,
+    m.pharmacological_group_id,
+    m.therapeutic_group_id,
+    m.manufacturer_id,
+    m.country_id,
+    m.prescription_form_id,
+    m.dosage_form_id,
+    m.brand_id,
+    m.atc_id,
+    m.package_type_id,
+    b.name AS brandName,
+    c.name AS countryName,
+    atc.code AS atc_code,
+    man.name AS manufacturer_name,
+    tp.name AS package_type_name,
+    pg.name AS pharmacological_group_name,
+    tg.name AS therapeutic_group_name,
+    df.name AS dosageFormName,
+    pf.name AS prescription_form_name
+FROM medicine m
+         LEFT JOIN brand b ON b.id = m.brand_id
+         LEFT JOIN country c ON c.id = m.country_id
+         LEFT JOIN atc_classification atc ON atc.id = m.atc_id
+         LEFT JOIN manufacturer man ON man.id = m.manufacturer_id
+         LEFT JOIN type_packaging tp ON tp.id = m.package_type_id
+         LEFT JOIN pharmacological_group pg ON pg.id = m.pharmacological_group_id
+         LEFT JOIN therapeutic_group tg ON tg.id = m.therapeutic_group_id
+         LEFT JOIN dosage_form df ON df.id = m.dosage_form_id
+         LEFT JOIN prescription_form pf ON pf.id = m.prescription_form_id
+WHERE (p_name IS NULL OR m.name ILIKE '%' || p_name || '%')
+  AND (p_international_name IS NULL OR m.international_name ILIKE '%' || p_international_name || '%')
+  AND (p_dosage_strength IS NULL OR m.dosage_strength ILIKE '%' || p_dosage_strength || '%')
+  AND (p_package_quantity_min IS NULL OR m.package_quantity >= p_package_quantity_min)
+  AND (p_package_quantity_max IS NULL OR m.package_quantity <= p_package_quantity_max)
+  AND (p_prescription_required IS NULL OR m.prescription_required = p_prescription_required)
+  AND (p_price_min IS NULL OR m.price >= p_price_min)
+  AND (p_price_max IS NULL OR m.price <= p_price_max)
+  AND (p_manufacturer_id IS NULL OR m.manufacturer_id = p_manufacturer_id)
+  AND (p_country_id IS NULL OR m.country_id = p_country_id)
+  AND (p_pharmacological_group_id IS NULL OR m.pharmacological_group_id = p_pharmacological_group_id)
+  AND (p_therapeutic_group_id IS NULL OR m.therapeutic_group_id = p_therapeutic_group_id)
+  AND (p_atc_code IS NULL OR atc.code ILIKE '%' || p_atc_code || '%')
+  AND (p_dosage_form_id IS NULL OR m.dosage_form_id = p_dosage_form_id)
+  AND (p_package_type_id IS NULL OR m.package_type_id = p_package_type_id)
+  AND (p_brand_id IS NULL OR m.brand_id = p_brand_id)
+  AND (p_is_active IS NULL OR m.is_active = p_is_active)
+  AND m.is_deleted = false
+ORDER BY m.name;
+END;
+$$ LANGUAGE plpgsql;

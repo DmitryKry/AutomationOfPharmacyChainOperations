@@ -11,6 +11,15 @@
     background-color: white;
 }
 
+* {
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE/Edge */
+}
+
+*::-webkit-scrollbar {
+    display: none;  /* Chrome/Safari/Opera */
+}
+
 .menu:hover{
     box-shadow: 0px 0px 10px red;
     /*background: black;*/
@@ -270,6 +279,26 @@ input:focus, select:focus {
     left: 0.1%;
     width: 20%;
     border: red solid 1px;
+    overflow-y: auto;
+    align-items: center;
+}
+
+#filter a {
+    display: block;
+    text-align: center;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2%;
+}
+
+#filter button {
+    display: block;
+    text-align: center;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2%;
 }
 
 #filter .form-group label{
@@ -891,4 +920,20 @@ input:focus, select:focus {
 .forDeleteObject{
     padding-right: 10px;
     padding-left: 10px;
+}
+
+.form-group_row{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-end;
+
+}
+
+.form-group_row div {
+    width: 46%;
+}
+
+.ButtonPost{
+    margin-top: 3%;
 }

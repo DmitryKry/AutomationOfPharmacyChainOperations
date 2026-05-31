@@ -173,4 +173,11 @@ public class Medicine {
         this.id = id;
     }
 
+    private Integer packageQuantityMin;
+    private Integer packageQuantityMax;
+
+    private BigDecimal priceMin;
+    private BigDecimal priceMax;
+
+
 }

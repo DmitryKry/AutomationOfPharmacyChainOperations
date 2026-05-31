@@ -169,10 +169,10 @@ select
     p.postal_code,
     p.opening_date,
     p.closing_date,
-    p.status::character varying(20),  -- явное приведение
+    p.status::character varying(20),
         p.id_city,
-        c.name::varchar as cityName,       -- приводим к varchar
-        c.id::numeric(38,2) as cityID      -- приводим к numeric
+        c.name::varchar as cityName,
+        c.id::numeric(38,2) as cityID
 from pharmacy p
     join city c on c.id = p.id_city
 where p.id = idPharmacy;
@@ -256,7 +256,7 @@ CREATE OR REPLACE PROCEDURE pharmacy_pkg.update_pharmacy(
     p_ID_CITY NUMERIC,
     p_region CHARACTER VARYING(100),
     p_postal_code CHARACTER VARYING(10),
-    id_of_worker NUMERIC,
+    id_worker NUMERIC,
     p_error OUT VARCHAR
 )
 AS $$
@@ -287,12 +287,12 @@ IF NOT FOUND THEN
 END IF;
 
 UPDATE pharmacy_manage
-SET id_of_worker = id_of_worker
+SET id_of_worker = id_worker
 WHERE id_of_pharmacy = p_id;
 
 IF NOT FOUND THEN
         INSERT INTO pharmacy_manage (id_of_pharmacy, id_of_worker)
-        VALUES (p_id, id_of_worker);
+        VALUES (p_id, id_worker);
 END IF;
 
 EXCEPTION
@@ -341,6 +341,7 @@ create or replace procedure pharmacy_pkg.delete_pharmacy(idPharmacy numeric(38, 
        as $$
        begin
        delete from pharmacy where pharmacy.id = idPharmacy;
+       delete from photos where photos.entity_id = idPharmacy;
 end;
 $$ language plpgsql;
 

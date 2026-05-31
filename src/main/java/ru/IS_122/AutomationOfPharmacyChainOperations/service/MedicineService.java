@@ -9,10 +9,8 @@ import ru.IS_122.AutomationOfPharmacyChainOperations.model.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.CallableStatement;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Types;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 @Service
 public class MedicineService {
@@ -409,55 +407,104 @@ public class MedicineService {
 
     public Medicine editMedicine(Medicine medicine) {
         String sql = "call medicine_pkg.update_medicine(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             int index = 1;
 
-            // ВЫХОДНОЙ ПАРАМЕТР ПЕРВЫЙ (p_error)
-            cs.registerOutParameter(index++, Types.VARCHAR);  // 1 - p_error (OUT)
+            // 1 - p_error (OUT параметр)
+            cs.registerOutParameter(index++, Types.VARCHAR);
 
-            // Входные параметры в том же порядке, что в процедуре после OUT
-            cs.setString(index++, medicine.getName());                                    // 2 - p_name
-            cs.setObject(index++, medicine.getUnitOfMeasure(), Types.VARCHAR);            // 29 - unit_of_measure
-            cs.setObject(index++, medicine.getPrice(), Types.NUMERIC);                    // 30 - unit_of_measure
-            cs.setString(index++, medicine.getInternationalName());                       // 3 - p_international_name
-            cs.setString(index++, medicine.getDosageStrength());                          // 4 - p_dosage_strength
-            cs.setObject(index++, medicine.getPackageQuantity(), Types.INTEGER);          // 5 - p_package_quantity
-            cs.setObject(index++, medicine.getPrescriptionRequired(), Types.BOOLEAN);     // 6 - p_prescription_required
+            // 2 - p_id (входной параметр - ID обновляемого препарата)
+            cs.setObject(index++, medicine.getId(), Types.NUMERIC);
 
-            cs.setString(index++, medicine.getRegistrationNumber());                      // 7 - p_registration_number
-            cs.setObject(index++, medicine.getRegistrationDate(), Types.DATE);            // 8 - p_registration_date
+            // 3 - p_name
+            cs.setString(index++, medicine.getName());
 
-            cs.setObject(index++, medicine.getShelfLifeMonths(), Types.INTEGER);          // 9 - p_shelf_life_months
-            cs.setObject(index++, medicine.getStorageTemperatureMin(), Types.INTEGER);    // 10 - p_storage_temperature_min
-            cs.setObject(index++, medicine.getStorageTemperatureMax(), Types.INTEGER);    // 11 - p_storage_temperature_max
-            cs.setObject(index++, medicine.getRequiresRefrigeration(), Types.BOOLEAN);    // 12 - p_requires_refrigeration
-            cs.setObject(index++, medicine.getLightSensitive(), Types.BOOLEAN);           // 13 - p_light_sensitive
-            cs.setObject(index++, medicine.getRequiresDarkStorage(), Types.BOOLEAN);      // 14 - p_requires_dark_storage
+            // 4 - p_unit_of_measure
+            cs.setObject(index++, medicine.getUnitOfMeasure(), Types.VARCHAR);
 
-            cs.setObject(index++, medicine.getIsActive(), Types.BOOLEAN);                 // 15 - p_is_active
-            cs.setObject(index++, medicine.getIsVital(), Types.BOOLEAN);                  // 16 - p_is_vital
-            cs.setObject(index++, medicine.getIsAvailable(), Types.BOOLEAN);              // 17 - p_is_available
+            // 5 - p_price
+            cs.setObject(index++, medicine.getPrice(), Types.NUMERIC);
 
+            // 6 - p_international_name
+            cs.setString(index++, medicine.getInternationalName());
 
-            cs.setObject(index++, medicine.getPharmacologicalGroupId(), Types.NUMERIC);   // 19 - p_pharmacological_group_id
-            cs.setObject(index++, medicine.getTherapeuticGroupId(), Types.NUMERIC);       // 20 - p_therapeutic_group_id
-            cs.setObject(index++, medicine.getManufacturerId(), Types.NUMERIC);           // 21 - p_manufacturer_id
-            cs.setObject(index++, medicine.getCountryId(), Types.NUMERIC);                // 22 - p_country_id
-            cs.setObject(index++, medicine.getPrescriptionFormId(), Types.NUMERIC);       // 23 - p_prescription_form_id
-            cs.setObject(index++, medicine.getDosageFormId(), Types.NUMERIC);             // 24 - p_dosage_form_id// 25 - p_unit_of_measure_id (ЕСТЬ В ВАШЕЙ ПРОЦЕДУРЕ)
-            cs.setObject(index++, medicine.getBrandId(), Types.NUMERIC);                  // 26 - p_brand_id
-            cs.setObject(index++, medicine.getAtcId(), Types.NUMERIC);                    // 27 - p_atc_id
-            cs.setObject(index, medicine.getPackageTypeId(), Types.NUMERIC);            // 28 - p_package_type_id
+            // 7 - p_dosage_strength
+            cs.setString(index++, medicine.getDosageStrength());
+
+            // 8 - p_package_quantity
+            cs.setObject(index++, medicine.getPackageQuantity(), Types.INTEGER);
+
+            // 9 - p_prescription_required
+            cs.setObject(index++, medicine.getPrescriptionRequired(), Types.BOOLEAN);
+
+            // 10 - p_registration_number
+            cs.setString(index++, medicine.getRegistrationNumber());
+
+            // 11 - p_registration_date
+            cs.setObject(index++, medicine.getRegistrationDate(), Types.DATE);
+
+            // 12 - p_shelf_life_months
+            cs.setObject(index++, medicine.getShelfLifeMonths(), Types.INTEGER);
+
+            // 13 - p_storage_temperature_min
+            cs.setObject(index++, medicine.getStorageTemperatureMin(), Types.INTEGER);
+
+            // 14 - p_storage_temperature_max
+            cs.setObject(index++, medicine.getStorageTemperatureMax(), Types.INTEGER);
+
+            // 15 - p_requires_refrigeration
+            cs.setObject(index++, medicine.getRequiresRefrigeration(), Types.BOOLEAN);
+
+            // 16 - p_light_sensitive
+            cs.setObject(index++, medicine.getLightSensitive(), Types.BOOLEAN);
+
+            // 17 - p_requires_dark_storage
+            cs.setObject(index++, medicine.getRequiresDarkStorage(), Types.BOOLEAN);
+
+            // 18 - p_is_active
+            cs.setObject(index++, medicine.getIsActive(), Types.BOOLEAN);
+
+            // 19 - p_is_vital
+            cs.setObject(index++, medicine.getIsVital(), Types.BOOLEAN);
+
+            // 20 - p_is_available
+            cs.setObject(index++, medicine.getIsAvailable(), Types.BOOLEAN);
+
+            // 21 - p_pharmacological_group_id
+            cs.setObject(index++, medicine.getPharmacologicalGroupId(), Types.NUMERIC);
+
+            // 22 - p_therapeutic_group_id
+            cs.setObject(index++, medicine.getTherapeuticGroupId(), Types.NUMERIC);
+
+            // 23 - p_manufacturer_id
+            cs.setObject(index++, medicine.getManufacturerId(), Types.NUMERIC);
+
+            // 24 - p_country_id
+            cs.setObject(index++, medicine.getCountryId(), Types.NUMERIC);
+
+            // 25 - p_prescription_form_id
+            cs.setObject(index++, medicine.getPrescriptionFormId(), Types.NUMERIC);
+
+            // 26 - p_dosage_form_id
+            cs.setObject(index++, medicine.getDosageFormId(), Types.NUMERIC);
+
+            // 27 - p_brand_id
+            cs.setObject(index++, medicine.getBrandId(), Types.NUMERIC);
+
+            // 28 - p_atc_id
+            cs.setObject(index++, medicine.getAtcId(), Types.NUMERIC);
+
+            // 29 - p_package_type_id (последний параметр)
+            cs.setObject(index, medicine.getPackageTypeId(), Types.NUMERIC);
 
             cs.execute();
 
-            // Получаем результат из первого (и единственного) выходного параметра
+
             String error = cs.getString(1);
-            BigDecimal idMedicine = medicine.getId();
             Medicine medicine1 = new Medicine();
-            medicine1.setResult(error, idMedicine);
+            medicine1.setResult(error, medicine.getId());
             return medicine1;
         });
     }
@@ -473,6 +520,131 @@ public class MedicineService {
             Medicine medicine1 = new Medicine();
             medicine1.setResult(error, idMedicine);
             return medicine1;
+        });
+    }
+
+
+    public List<Manufacturer> getAllManufacturers() {
+        String sql = "select * from medicine_pkg.get_all_manufacturers()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Manufacturer.class));
+    }
+
+    public List<Country> getAllCountries() {
+        String sql = "select * from medicine_pkg.get_all_countries()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Country.class));
+    }
+
+    public List<PharmacologicalGroup> getAllPharmacologicalGroups() {
+        String sql = "select * from medicine_pkg.get_all_pharmacologicalGroups()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PharmacologicalGroup.class));
+    }
+
+    public List<TherapeuticGroup> getAllTherapeuticGroups() {
+        String sql = "select * from medicine_pkg.get_all_therapeuticGroups()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(TherapeuticGroup.class));
+    }
+
+    public List<DosageForm> getAllDosageForms() {
+        String sql = "select * from medicine_pkg.get_all_dosageForms()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(DosageForm.class));
+    }
+
+    public List<TypePackaging> getAllPackageTypes() {
+        String sql = "select * from medicine_pkg.get_all_packageTypes()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(TypePackaging.class));
+    }
+
+    public List<Brand> getAllBrands() {
+        String sql = "select * from medicine_pkg.get_all_brands()";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Brand.class));
+    }
+
+    public List<Medicine> sortMedicine(Medicine filter) {
+        String sql = "{call medicine_pkg.sort_medicine(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            int index = 1;
+
+            // IN параметры
+            cs.setObject(index++, filter.getName(), Types.VARCHAR);
+            cs.setObject(index++, filter.getInternationalName(), Types.VARCHAR);
+            cs.setObject(index++, filter.getDosageStrength(), Types.VARCHAR);
+            cs.setObject(index++, filter.getPackageQuantityMin(), Types.INTEGER);
+            cs.setObject(index++, filter.getPackageQuantityMax(), Types.INTEGER);
+            cs.setObject(index++, filter.getPrescriptionRequired(), Types.BOOLEAN);
+            cs.setObject(index++, filter.getPriceMin(), Types.NUMERIC);
+            cs.setObject(index++, filter.getPriceMax(), Types.NUMERIC);
+            cs.setObject(index++, filter.getManufacturerId(), Types.NUMERIC);
+            cs.setObject(index++, filter.getCountryId(), Types.NUMERIC);
+            cs.setObject(index++, filter.getPharmacologicalGroupId(), Types.NUMERIC);
+            cs.setObject(index++, filter.getTherapeuticGroupId(), Types.NUMERIC);
+            cs.setObject(index++, filter.getAtc_code(), Types.VARCHAR);
+            cs.setObject(index++, filter.getDosageFormId(), Types.NUMERIC);
+            cs.setObject(index++, filter.getPackageTypeId(), Types.NUMERIC);
+            cs.setObject(index++, filter.getBrandId(), Types.NUMERIC);
+            cs.setObject(index++, filter.getIsActive(), Types.BOOLEAN);
+
+            // Регистрация REF_CURSOR для возвращаемого набора данных
+            cs.registerOutParameter(index, Types.REF_CURSOR);
+
+            cs.execute();
+
+            // Получаем результат
+            ResultSet rs = (ResultSet) cs.getObject(index);
+            List<Medicine> medicines = new ArrayList<>();
+
+            while (rs.next()) {
+                Medicine medicine = new Medicine();
+
+                // Основные поля
+                medicine.setId(rs.getBigDecimal("id"));
+                medicine.setName(rs.getString("name"));
+                medicine.setInternationalName(rs.getString("international_name"));
+                medicine.setDosageStrength(rs.getString("dosage_strength"));
+                medicine.setPackageQuantity(rs.getInt("package_quantity"));
+                medicine.setPrescriptionRequired(rs.getBoolean("prescription_required"));
+                medicine.setRegistrationNumber(rs.getString("registration_number"));
+                medicine.setRegistrationDate(rs.getDate("registration_date") != null ?
+                        rs.getDate("registration_date").toLocalDate() : null);
+                medicine.setShelfLifeMonths(rs.getInt("shelf_life_months"));
+                medicine.setStorageTemperatureMin(rs.getInt("storage_temperature_min"));
+                medicine.setStorageTemperatureMax(rs.getInt("storage_temperature_max"));
+                medicine.setRequiresRefrigeration(rs.getBoolean("requires_refrigeration"));
+                medicine.setLightSensitive(rs.getBoolean("light_sensitive"));
+                medicine.setRequiresDarkStorage(rs.getBoolean("requires_dark_storage"));
+                medicine.setIsActive(rs.getBoolean("is_active"));
+                medicine.setIsVital(rs.getBoolean("is_vital"));
+                medicine.setIsAvailable(rs.getBoolean("is_available"));
+                medicine.setPrice(rs.getBigDecimal("price"));
+                medicine.setUnitOfMeasure(rs.getString("unit_of_measure"));
+
+                // ID справочников
+                medicine.setPharmacologicalGroupId(rs.getBigDecimal("pharmacological_group_id"));
+                medicine.setTherapeuticGroupId(rs.getBigDecimal("therapeutic_group_id"));
+                medicine.setManufacturerId(rs.getBigDecimal("manufacturer_id"));
+                medicine.setCountryId(rs.getBigDecimal("country_id"));
+                medicine.setPrescriptionFormId(rs.getBigDecimal("prescription_form_id"));
+                medicine.setDosageFormId(rs.getBigDecimal("dosage_form_id"));
+                medicine.setBrandId(rs.getBigDecimal("brand_id"));
+                medicine.setAtcId(rs.getBigDecimal("atc_id"));
+                medicine.setPackageTypeId(rs.getBigDecimal("package_type_id"));
+
+                // Transient поля
+                medicine.setBrandName(rs.getString("brandname"));
+                medicine.setCountryName(rs.getString("countryname"));
+                medicine.setAtc_code(rs.getString("atc_code"));
+                medicine.setManufacturer_name(rs.getString("manufacturer_name"));
+                medicine.setPackage_type_name(rs.getString("package_type_name"));
+                medicine.setPharmacological_group_name(rs.getString("pharmacological_group_name"));
+                medicine.setTherapeutic_group_name(rs.getString("therapeutic_group_name"));
+                medicine.setDosageFormName(rs.getString("dosageformname"));
+                medicine.setPrescription_form_name(rs.getString("prescription_form_name"));
+
+                medicines.add(medicine);
+            }
+
+            rs.close();
+            return medicines;
         });
     }
 }

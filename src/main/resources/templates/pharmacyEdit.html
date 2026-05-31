@@ -5,13 +5,72 @@
     <title>Вход</title>
     <link rel="stylesheet" th:href="@{/style.css}">
     <script th:inline="javascript">
+        const FORM_STORAGE_KEY = 'pharmacyFormData';
+
+        function saveFormData() {
+            const formData = {
+                name: document.getElementById('name_pharmacy')?.value || '',
+                legal_name: document.getElementById('legal_name_pharmacy')?.value || '',
+                inn: document.getElementById('INN')?.value || '',
+                kpp: document.getElementById('KPP')?.value || '',
+                ogrn: document.getElementById('OGRN')?.value || '',
+                address: document.getElementById('adress_pharmacy')?.value || '',
+                postal_code: document.getElementById('POSTAL_CODE')?.value || ''
+            };
+            sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
+        }
+
+        function restoreFormData() {
+            const savedData = sessionStorage.getItem(FORM_STORAGE_KEY);
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+
+                if (document.getElementById('name_pharmacy'))
+                    document.getElementById('name_pharmacy').value = formData.name || '';
+                if (document.getElementById('legal_name_pharmacy'))
+                    document.getElementById('legal_name_pharmacy').value = formData.legal_name || '';
+                if (document.getElementById('INN'))
+                    document.getElementById('INN').value = formData.inn || '';
+                if (document.getElementById('KPP'))
+                    document.getElementById('KPP').value = formData.kpp || '';
+                if (document.getElementById('OGRN'))
+                    document.getElementById('OGRN').value = formData.ogrn || '';
+                if (document.getElementById('adress_pharmacy'))
+                    document.getElementById('adress_pharmacy').value = formData.address || '';
+                if (document.getElementById('POSTAL_CODE'))
+                    document.getElementById('POSTAL_CODE').value = formData.postal_code || '';
+            }
+        }
+
+        function clearFormData() {
+            sessionStorage.removeItem(FORM_STORAGE_KEY);
+        }
+
+        function attachAutoSave() {
+            const inputs = ['name_pharmacy', 'legal_name_pharmacy', 'INN', 'KPP', 'OGRN', 'adress_pharmacy', 'POSTAL_CODE'];
+            inputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', () => saveFormData());
+                    input.addEventListener('change', () => saveFormData());
+                }
+            });
+        }
+
+        function attachLinkHandlers() {
+            const links = document.querySelectorAll('a');
+            links.forEach(link => {
+                link.addEventListener('click', () => saveFormData());
+            });
+        }
+
         function uploadPhoto(input) {
             let formData = new FormData();
             formData.append('photo', input.files[0]);
             formData.append('pharmacyID', document.getElementById('pharmacyID').value);
             document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
 
-            fetch('/api/pharmacy/pharmacyEdit/uploadPhoto', {
+            fetch('/api/pharmacy/pharmacyCreate/uploadPhoto', {
                 method: 'POST',
                 body: formData
             })
@@ -25,6 +84,17 @@
                 })
                 .catch(() => document.getElementById('status').innerHTML = '✗ Ошибка');
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            restoreFormData();
+            attachAutoSave();
+            attachLinkHandlers();
+
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', () => clearFormData());
+            }
+        });
     </script>
 </HEAD>
 <body>
@@ -34,7 +104,7 @@
         <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
         <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
         <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
-        <a class="medicines" th:text="#{medicines}"></a>
+        <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace}"></a>
     </div>
     <div th:id="forPhoto">
         <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
@@ -46,6 +116,7 @@
 
         <div class="createObject" th:id="pharmacies" >
             <h3 th:text="#{pharmacy.registration.details}"></h3>
+            <input type="hidden" id="id" name="id" th:value="${pharmacy != null ? pharmacy.getId() : ''}">
             <div class="form-group">
                 <label for="name_pharmacy" th:text="#{name_pharmacy}"></label>
                 <br>
@@ -147,8 +218,8 @@
         </div>
         <div>
             <a th:href="@{/api/pharmacy/workerCreate}"th:text="#{add}"></a>
-            <a th:href="@{/api/pharmacy/pharmacyEdit(addAdministrator=${false}idAdmin=${idAdmin},
-                        selectAdmin=${a.userFio}, idCity=${idCity}, selectCity=${selectCity},
+            <a th:href="@{/api/pharmacy/pharmacyEdit(addAdministrator=${false}, idAdmin=${idAdmin},
+                        selectAdmin=${selectAdmin}, idCity=${idCity}, selectCity=${selectCity},
                         selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
             photoID=${photos != null ? photos.getId() : ''})}" th:text="#{cancel}"></a>
         </div>
@@ -210,7 +281,7 @@
 <div th:class="findPerconal" th:id="okForm" th:if="${delete == true}">
     <H3 th:text="#{deleteTrue} + ${pharmacy.getName()}"></H3>
     <div>
-        <a class="forDeleteObject" th:href="@{/api/pharmacy/pharmacyEdit(deletePharmacy = true, pharmacyID=${pharmacyID})}" th:text="#{yes}"></a>
+        <a class="forDeleteObject" th:href="@{/api/pharmacy/pharmacyEdit(deletePharmacy = true, pharmacyID=${pharmacy.getId()})}" th:text="#{yes}"></a>
         <a th:href="@{/api/pharmacy/pharmacyEdit(delete=false, addAdministrator=${false}, idAdmin=${idAdmin},
         selectAdmin=${selectAdmin}, idCity=${idCity}, selectCity=${selectCity}, selectCityRegion=${selectCityRegion},
         pharmacyID=${pharmacy != null ? pharmacy.getId() : ''}, photoID=${photos != null ? photos.getId() : ''})}"

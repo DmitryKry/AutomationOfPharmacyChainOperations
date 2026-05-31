@@ -129,29 +129,31 @@ public class PharmacyService {
     }
 
     public Pharmacy updatePharmacy(Pharmacy pharmacy, BigDecimal idAdmin) {
-        String sql = "CALL pharmacy_pkg.update_pharmacy(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "CALL pharmacy_pkg.update_pharmacy(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
-            cs.setString(1, pharmacy.getName());
-            cs.setString(2, pharmacy.getLegal_name());
-            cs.setString(3, pharmacy.getInn());
-            cs.setString(4, pharmacy.getKpp());
-            cs.setString(5, pharmacy.getOgrn());
-            cs.setString(6, pharmacy.getAddress());
-            cs.setObject(7, pharmacy.getID_CITY());
-            cs.setString(8, pharmacy.getRegion());
-            cs.setString(9, pharmacy.getPostal_code());
-            cs.setObject(10, idAdmin);
+            int index = 1;
 
-            cs.registerOutParameter(11, Types.VARCHAR);
-            cs.registerOutParameter(12, Types.NUMERIC);
+            cs.setObject(index++, pharmacy.getId());           // 1 - p_id
+            cs.setString(index++, pharmacy.getName());         // 2 - p_name
+            cs.setString(index++, pharmacy.getLegal_name());   // 3 - p_legal_name
+            cs.setString(index++, pharmacy.getInn());          // 4 - p_inn
+            cs.setString(index++, pharmacy.getKpp());          // 5 - p_kpp
+            cs.setString(index++, pharmacy.getOgrn());         // 6 - p_ogrn
+            cs.setString(index++, pharmacy.getAddress());      // 7 - p_address
+            cs.setObject(index++, pharmacy.getID_CITY());      // 8 - p_ID_CITY
+            cs.setString(index++, pharmacy.getRegion());       // 9 - p_region
+            cs.setString(index++, pharmacy.getPostal_code());  // 10 - p_postal_code
+            cs.setObject(index++, idAdmin);                    // 11 - id_of_worker (IN)
+
+            cs.registerOutParameter(index, Types.VARCHAR);     // 12 - p_error
 
             cs.execute();
 
-            String error = cs.getString(11);
-            BigDecimal id = pharmacy.getId();
+            String error = cs.getString(12);
+
             Pharmacy p = new Pharmacy();
-            p.setPharmacyResult(error, id);
+            p.setPharmacyResult(error, pharmacy.getId());
             return p;
         });
     }

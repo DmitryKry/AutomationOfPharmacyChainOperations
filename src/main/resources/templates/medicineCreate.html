@@ -89,7 +89,143 @@
 
     </style>
     <script th:inline="javascript">
+        const FORM_STORAGE_KEY = 'medicineFormData';
+        const SCROLL_STORAGE_KEY = 'medicineScrollPosition';
+
+        function saveMedicineFormData() {
+            const formData = {
+                name: document.getElementById('name')?.value || '',
+                international_name: document.getElementById('international_name')?.value || '',
+                dosage_strength: document.getElementById('dosage_strength')?.value || '',
+                package_quantity: document.getElementById('package_quantity')?.value || '',
+                prescription_required: document.getElementById('prescription_required')?.value || '',
+                registration_number: document.getElementById('registration_number')?.value || '',
+                registration_date: document.getElementById('registration_date')?.value || '',
+                unitOfMeasure: document.getElementById('unitOfMeasure')?.value || '',
+                price: document.getElementById('price')?.value || '',
+                shelf_life_months: document.getElementById('shelf_life_months')?.value || '',
+                storage_temperature_min: document.getElementById('storage_temperature_min')?.value || '',
+                storage_temperature_max: document.getElementById('storage_temperature_max')?.value || '',
+                requires_refrigeration: document.getElementById('requires_refrigeration')?.value || '',
+                light_sensitive: document.getElementById('light_sensitive')?.value || '',
+                requires_dark_storage: document.getElementById('requires_dark_storage')?.value || ''
+            };
+            sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
+        }
+
+        function restoreMedicineFormData() {
+            const savedData = sessionStorage.getItem(FORM_STORAGE_KEY);
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+                setTimeout(() => {
+                    if (document.getElementById('name')) document.getElementById('name').value = formData.name || '';
+                    if (document.getElementById('international_name')) document.getElementById('international_name').value = formData.international_name || '';
+                    if (document.getElementById('dosage_strength')) document.getElementById('dosage_strength').value = formData.dosage_strength || '';
+                    if (document.getElementById('package_quantity')) document.getElementById('package_quantity').value = formData.package_quantity || '';
+                    if (document.getElementById('prescription_required')) document.getElementById('prescription_required').value = formData.prescription_required || '';
+                    if (document.getElementById('registration_number')) document.getElementById('registration_number').value = formData.registration_number || '';
+                    if (document.getElementById('registration_date')) document.getElementById('registration_date').value = formData.registration_date || '';
+                    if (document.getElementById('unitOfMeasure')) document.getElementById('unitOfMeasure').value = formData.unitOfMeasure || '';
+                    if (document.getElementById('price')) document.getElementById('price').value = formData.price || '';
+                    if (document.getElementById('shelf_life_months')) document.getElementById('shelf_life_months').value = formData.shelf_life_months || '';
+                    if (document.getElementById('storage_temperature_min')) document.getElementById('storage_temperature_min').value = formData.storage_temperature_min || '';
+                    if (document.getElementById('storage_temperature_max')) document.getElementById('storage_temperature_max').value = formData.storage_temperature_max || '';
+                    if (document.getElementById('requires_refrigeration')) document.getElementById('requires_refrigeration').value = formData.requires_refrigeration || '';
+                    if (document.getElementById('light_sensitive')) document.getElementById('light_sensitive').value = formData.light_sensitive || '';
+                    if (document.getElementById('requires_dark_storage')) document.getElementById('requires_dark_storage').value = formData.requires_dark_storage || '';
+                }, 10);
+            }
+        }
+
+        function saveScrollPosition() {
+            const scrollPosition = window.scrollY || document.documentElement.scrollTop;
+            sessionStorage.setItem(SCROLL_STORAGE_KEY, scrollPosition);
+        }
+
+        function restoreScrollPosition() {
+            const savedPosition = sessionStorage.getItem(SCROLL_STORAGE_KEY);
+            if (savedPosition) {
+                const pos = parseInt(savedPosition);
+                sessionStorage.removeItem(SCROLL_STORAGE_KEY);
+
+
+                setTimeout(() => window.scrollTo(0, pos), 0);
+                setTimeout(() => window.scrollTo(0, pos), 50);
+                setTimeout(() => window.scrollTo(0, pos), 100);
+                setTimeout(() => window.scrollTo(0, pos), 200);
+                setTimeout(() => window.scrollTo(0, pos), 500);
+            }
+        }
+
+        function clearMedicineFormData() {
+            sessionStorage.removeItem(FORM_STORAGE_KEY);
+        }
+
+        function attachMedicineAutoSave() {
+            const inputIds = [
+                'name', 'international_name', 'dosage_strength', 'package_quantity', 'prescription_required',
+                'registration_number', 'registration_date', 'unitOfMeasure', 'price',
+                'shelf_life_months', 'storage_temperature_min', 'storage_temperature_max',
+                'requires_refrigeration', 'light_sensitive', 'requires_dark_storage'
+            ];
+
+            inputIds.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', () => saveMedicineFormData());
+                    input.addEventListener('change', () => saveMedicineFormData());
+                }
+            });
+        }
+
+        function attachMedicineLinkHandlers() {
+            const links = document.querySelectorAll('a');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('/api/') && !href.startsWith('#')) {
+                    link.addEventListener('click', () => {
+                        saveMedicineFormData();
+                        saveScrollPosition();
+                    });
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            restoreScrollPosition();
+
+            restoreMedicineFormData();
+
+            attachMedicineAutoSave();
+            attachMedicineLinkHandlers();
+        });
+
+
+        window.addEventListener('load', () => {
+            restoreScrollPosition();
+            restoreMedicineFormData();
+        });
+
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', () => {
+                clearMedicineFormData();
+                sessionStorage.removeItem(SCROLL_STORAGE_KEY);
+            });
+        }
+
+        window.addEventListener('beforeunload', () => {
+            saveMedicineFormData();
+            saveScrollPosition();
+        });
+
+        window.saveMedicineFormData = saveMedicineFormData;
+        window.restoreMedicineFormData = restoreMedicineFormData;
+        window.clearMedicineFormData = clearMedicineFormData;
+
         function uploadPhoto(input) {
+            saveMedicineFormData();
             let formData = new FormData();
             formData.append('photo', input.files[0]);
             formData.append('medicineId', document.getElementById('medicineId').value);
@@ -105,12 +241,12 @@
                         document.getElementById('preview').src = data.photoUrl + '?t=' + new Date().getTime();
                         document.getElementById('status').innerHTML = '✓ Загружено';
                         setTimeout(() => document.getElementById('status').innerHTML = '', 2000);
+                        saveMedicineFormData();
                     }
                 })
                 .catch(() => document.getElementById('status').innerHTML = '✗ Ошибка');
         }
     </script>
-
 </HEAD>
 <body>
 <div class="menu">
@@ -118,7 +254,7 @@
     <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
     <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
     <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
-    <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicine}"></a>
+    <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace}"></a>
 </div>
 
 <div class="AllInfo">
@@ -479,7 +615,25 @@
 <!-- МОДАЛЬНЫЕ ОКНА -->
 <div th:class="findPerconal" th:if="${addBrand == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addBrand}" method="post">
+        <form th:action="@{/api/pharmacy/addBrand(source='medicineCreate',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="brandName" th:placeholder="#{medicine.brand}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -515,7 +669,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineCreate/brandCreate}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/brandCreate}" th:text="#{add}"></a>
         <a th:href="@{/api/pharmacy/medicineCreate(addBrand=${false},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
@@ -542,7 +696,25 @@
 <!-- Форма выпуска -->
 <div th:class="findPerconal" th:if="${addDosageForm == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addDosageForm}" method="post">
+        <form th:action="@{/api/pharmacy/addDosageForm(source='medicineCreate',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="dosageFormName" th:placeholder="#{medicine.dosage_form}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -604,7 +776,25 @@
 
 <div th:class="findPerconal" th:if="${addManufacturer == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addManufacturer}" method="post">
+        <form th:action="@{/api/pharmacy/addManufacturer(source='medicineCreate',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="manufacturerName" th:placeholder="#{medicine.manufacturer}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -666,7 +856,25 @@
 <!-- Добавление страны -->
 <div th:class="findPerconal" th:if="${addCountry == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addCountry}" method="post">
+        <form th:action="@{/api/pharmacy/addCountry(source='medicineCreate',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="countryName" th:placeholder="#{medicine.country}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -729,7 +937,25 @@
 <!-- Добавление АТХ кода -->
 <div th:class="findPerconal" th:if="${addAtc == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addAtc}" method="post">
+        <form th:action="@{/api/pharmacy/addAtc(source='medicineCreate',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="atcCode" th:placeholder="#{medicine.atc_code}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -792,7 +1018,25 @@
 <!-- Добавление фармакологической группы -->
 <div th:class="findPerconal" th:if="${addPharmacologicalGroup == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addPharmacologicalGroup}" method="post">
+        <form th:action="@{/api/pharmacy/addPharmacologicalGroup(source='medicineCreate',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="groupName" th:placeholder="#{medicine.pharma_group}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -855,7 +1099,25 @@
 <!-- Добавление терапевтической группы -->
 <div th:class="findPerconal" th:if="${addTherapeuticGroup == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addTherapeuticGroup}" method="post">
+        <form th:action="@{/api/pharmacy/addTherapeuticGroup(source='medicineCreate',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="groupName" th:placeholder="#{medicine.therapeutic_group}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -918,7 +1180,25 @@
 <!-- Добавление формы рецепта -->
 <div th:class="findPerconal" th:if="${addPrescriptionForm == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addPrescriptionForm}" method="post">
+        <form th:action="@{/api/pharmacy/addPrescriptionForm(source='medicineCreate',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="formName" th:placeholder="#{medicine.prescription_form}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -981,7 +1261,25 @@
 <!-- Добавление типа упаковки -->
 <div th:class="findPerconal" th:if="${addPackageType == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicineCreate/addPackageType}" method="post">
+        <form th:action="@{/api/pharmacy/addPackageType(source='medicineCreate',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="packageTypeName" th:placeholder="#{medicine.package_type}">
             <button th:text="#{find}">Найти</button>
         </form>
@@ -1125,7 +1423,7 @@
 </div>
 <!-- Бренд -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${brandCreate == true}">
-    <form th:action="@{/api/pharmacy/medicineCreate/brandCreate}" method="post">
+    <form th:action="@{/api/pharmacy/brandCreate}" method="post">
         <label for="BrandName" th:text="#{name}"></label>
         <input th:name="name" id="BrandName" th:type="text" th:placeholder="#{medicine.brand}">
         <button th:text="#{create}"></button>

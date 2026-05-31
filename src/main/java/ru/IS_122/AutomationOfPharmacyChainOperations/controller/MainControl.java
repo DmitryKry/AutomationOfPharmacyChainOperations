@@ -20,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -326,7 +328,8 @@ public class MainControl {
         BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
         if (deletePharmacy && pharmacyID != null){
             Pharmacy pharmacy = pharmacyService.deletePharmacy(pharmacyID);
-            return "redirect:/api/pharmacy/pharmacyCreate?InfoError=" + pharmacy.getErrorMessage() + "&InfoErrorShow=" + true;
+            String encodedError = URLEncoder.encode(pharmacy.getErrorMessage(), StandardCharsets.UTF_8);
+            return "redirect:/api/pharmacy/pharmacyCreate?InfoError=" + encodedError + "&InfoErrorShow=" + true;
         }
         if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
                 .findFirst().orElse(null) != null) {
@@ -364,6 +367,7 @@ public class MainControl {
                                      @RequestParam(required = false) BigDecimal idAdmin,
                                      HttpSession session, Model model) {
         Pharmacy pharmacy = Pharmacy.builder()
+                .id(form.getId())
                 .name(form.getName())
                 .legal_name(form.getLegal_name())
                 .inn(form.getInn())
@@ -539,6 +543,40 @@ public class MainControl {
     @GetMapping("/medicinePlace")
     public String showMedicinePlacePage(@RequestParam(defaultValue = "0") int pagin,
                                         @RequestParam(defaultValue = "1") int page,
+                                        @RequestParam(defaultValue = "false") boolean addBrand,
+                                        @RequestParam(defaultValue = "false") boolean addDosageForm,
+                                        @RequestParam(defaultValue = "false") boolean addManufacturer,
+                                        @RequestParam(defaultValue = "false") boolean addCountry,
+                                        @RequestParam(defaultValue = "false") boolean addAtc,
+                                        @RequestParam(defaultValue = "false") boolean addPharmacologicalGroup,
+                                        @RequestParam(defaultValue = "false") boolean addTherapeuticGroup,
+                                        @RequestParam(defaultValue = "false") boolean addPrescriptionForm,
+                                        @RequestParam(defaultValue = "false") boolean addPackageType,
+                                        @RequestParam(defaultValue = "false") boolean createCountry,
+                                        @RequestParam(defaultValue = "false") boolean InfoErrorShow,
+                                        @RequestParam(defaultValue = "false") boolean addInjectionMethods,
+                                        @RequestParam(required = false) BigDecimal brand_id,
+                                        @RequestParam(defaultValue = "") String selectBrand,
+                                        @RequestParam(required = false) BigDecimal atc_id,
+                                        @RequestParam(defaultValue = "") String selectAtc,
+                                        @RequestParam(required = false) BigDecimal manufacturer_id,
+                                        @RequestParam(defaultValue = "") String selectManufacturer,
+                                        @RequestParam(required = false) BigDecimal country_id,
+                                        @RequestParam(defaultValue = "") String selectCountry,
+                                        @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                        @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                        @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                        @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                        @RequestParam(required = false) BigDecimal prescription_form_id,
+                                        @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                        @RequestParam(required = false) BigDecimal package_type_id,
+                                        @RequestParam(defaultValue = "") String selectPackageType,
+                                        @RequestParam(required = false) BigDecimal dosage_form_id,
+                                        @RequestParam(defaultValue = "") String selectDosageForm,
+                                        @RequestParam(defaultValue = "false") boolean edit,
+                                        @RequestParam(required = false) BigDecimal idMedicine,
+                                        @RequestParam(required = false) BigDecimal photoID,
+                                        @RequestParam(required = false) String InfoError,
                                         Model model) {
         if (page < 1) {
             page = 1;
@@ -549,11 +587,79 @@ public class MainControl {
                 .limit(15 + pagin)
                 .collect(Collectors.toList());
         List<Photos> photos = medicineService.getPhotosMed();
+        model.addAttribute("addBrand", addBrand);
+        model.addAttribute("addDosageForm", addDosageForm);
+        model.addAttribute("addManufacturer", addManufacturer);
+        model.addAttribute("addCountry", addCountry);
+        model.addAttribute("InfoError", InfoError);
+        model.addAttribute("InfoErrorShow", InfoErrorShow);
+        model.addAttribute("addAtc", addAtc);
+        model.addAttribute("addPharmacologicalGroup", addPharmacologicalGroup);
+        model.addAttribute("addTherapeuticGroup", addTherapeuticGroup);
+        model.addAttribute("addPrescriptionForm", addPrescriptionForm);
+        model.addAttribute("addPackageType", addPackageType);
+        model.addAttribute("createCountry", createCountry);
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        model.addAttribute("manufacturers", medicineService.getAllManufacturers());
+        model.addAttribute("brands", medicineService.getAllBrands());
+        model.addAttribute("packageTypes", medicineService.getAllPackageTypes());
+        model.addAttribute("dosageForms", medicineService.getAllDosageForms());
+        model.addAttribute("therapeuticGroups", medicineService.getAllTherapeuticGroups());
+        model.addAttribute("pharmacologicalGroups", medicineService.getAllPharmacologicalGroups());
+        model.addAttribute("countries", medicineService.getAllCountries());
+
         model.addAttribute("medicines", medicines);
         model.addAttribute("pagin", pagin);
         model.addAttribute("photos", photos);
         model.addAttribute("page", page);
         return "medicinePlace";
+    }
+
+    @PostMapping("/medicinePlace")
+    public String showMedicineSortPage(@RequestParam(defaultValue = "0") int pagin,
+                                       @RequestParam(defaultValue = "1") int page,
+                                       @ModelAttribute Medicine medicine,
+                                       Model model) {
+        if (page < 1) {
+            page = 1;
+            pagin = 0;
+        }
+        List<Medicine> medicines;
+        medicines = medicineService.sortMedicine(medicine)
+                .stream()
+                .limit(15 + pagin)
+                .collect(Collectors.toList());
+        if (medicines.isEmpty()) {
+            medicines = medicineService.getAllMedicine().stream()
+                    .limit(15 + pagin)
+                    .collect(Collectors.toList());
+            model.addAttribute("InfoError", "Ничего не найдено");
+            model.addAttribute("InfoErrorShow", true);
+        }
+        model.addAttribute("medicines", medicines);
+        model.addAttribute("photos", pharmacyService.getPhotosPharmacy());
+        model.addAttribute("pagin", pagin);
+        model.addAttribute("page", page);
+        return "userPlace";
     }
 
     @GetMapping("/medicineCreate")
@@ -599,6 +705,7 @@ public class MainControl {
         model.addAttribute("addManufacturer", addManufacturer);
         model.addAttribute("addCountry", addCountry);
         model.addAttribute("InfoError", InfoError);
+        model.addAttribute("InfoErrorShow", InfoErrorShow);
         model.addAttribute("addAtc", addAtc);
         model.addAttribute("addPharmacologicalGroup", addPharmacologicalGroup);
         model.addAttribute("addTherapeuticGroup", addTherapeuticGroup);
@@ -774,7 +881,8 @@ public class MainControl {
         model.addAttribute("delete", delete);
         if (deleteMedicine && idMedicine != null){
             Medicine medicine = medicineService.deleteMedicine(idMedicine);
-
+            String encodedError = URLEncoder.encode(medicine.getErrorMessage(), StandardCharsets.UTF_8);
+            return "redirect:/api/pharmacy/medicineCreate?InfoError=" + encodedError + "&InfoErrorShow=" + true;
         }
         BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
         if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
@@ -853,16 +961,76 @@ public class MainControl {
         return "medicineCreate";
     }
 
-    @PostMapping("/medicineCreate/addBrand")
+    @PostMapping("/addBrand")
     public String showFindBrandPage(@RequestParam(defaultValue = "true") boolean addBrand,
-                                    @RequestParam String brandName, Model model) {
+                                    @RequestParam String brandName,
+                                    @RequestParam String source,
+                                    @RequestParam(required = false) BigDecimal brand_id,
+                                    @RequestParam(defaultValue = "") String selectBrand,
+                                    @RequestParam(required = false) BigDecimal atc_id,
+                                    @RequestParam(defaultValue = "") String selectAtc,
+                                    @RequestParam(required = false) BigDecimal manufacturer_id,
+                                    @RequestParam(defaultValue = "") String selectManufacturer,
+                                    @RequestParam(required = false) BigDecimal country_id,
+                                    @RequestParam(defaultValue = "") String selectCountry,
+                                    @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                    @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                    @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                    @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                    @RequestParam(required = false) BigDecimal prescription_form_id,
+                                    @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                    @RequestParam(required = false) BigDecimal package_type_id,
+                                    @RequestParam(defaultValue = "") String selectPackageType,
+                                    @RequestParam(required = false) BigDecimal dosage_form_id,
+                                    @RequestParam(defaultValue = "") String selectDosageForm,
+                                    @RequestParam(defaultValue = "false") boolean edit,
+                                    @RequestParam(required = false) BigDecimal idMedicine,
+                                    @RequestParam(required = false) BigDecimal photoID,
+                                    @RequestParam(required = false) boolean delete,
+                                    @RequestParam(required = false) boolean deleteMedicine,
+                                    Model model) {
         model.addAttribute("addBrand", addBrand);
         Brand brand = Brand.builder().name(brandName).build();
         model.addAttribute("brands", medicineService.findBrands(brand.getName()));
+
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if ("medicineEdit".equals(source)) {
+            return "medicineEdit";
+        }
+        if ("medicinePlace".equals(source)) {
+            return "medicinePlace";
+        }
         return "medicineCreate";
     }
 
-    @GetMapping("medicineCreate/brandCreate")
+    @GetMapping("/medicineCreate/brandCreate")
     public String showBrandCreatePage(@RequestParam(defaultValue = "true") boolean brandCreate,
                                       @RequestParam(defaultValue = "false") boolean edit, Model model) {
         model.addAttribute("brandCreate", brandCreate);
@@ -870,7 +1038,7 @@ public class MainControl {
         return "medicineCreate";
     }
 
-    @PostMapping("medicineCreate/brandCreate")
+    @PostMapping("/medicineCreate/brandCreate")
     public String BrandCreatePage(@RequestParam(defaultValue = "true") boolean createCountry,
                               @ModelAttribute Brand brand, Model model) {
         String error = medicineService.createBrands(brand);
@@ -885,32 +1053,151 @@ public class MainControl {
         return "medicineCreate";
     }
 
-    @PostMapping("/medicineCreate/addAtc")
+    @PostMapping("/addAtc")
     public String showFindAtcCodePage(@RequestParam(defaultValue = "true") boolean addAtc,
-                                    @RequestParam String atcCode, Model model) {
+                                    @RequestParam String atcCode,
+                                      @RequestParam String source,
+                                      @RequestParam(required = false) BigDecimal brand_id,
+                                      @RequestParam(defaultValue = "") String selectBrand,
+                                      @RequestParam(required = false) BigDecimal atc_id,
+                                      @RequestParam(defaultValue = "") String selectAtc,
+                                      @RequestParam(required = false) BigDecimal manufacturer_id,
+                                      @RequestParam(defaultValue = "") String selectManufacturer,
+                                      @RequestParam(required = false) BigDecimal country_id,
+                                      @RequestParam(defaultValue = "") String selectCountry,
+                                      @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                      @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                      @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                      @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                      @RequestParam(required = false) BigDecimal prescription_form_id,
+                                      @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                      @RequestParam(required = false) BigDecimal package_type_id,
+                                      @RequestParam(defaultValue = "") String selectPackageType,
+                                      @RequestParam(required = false) BigDecimal dosage_form_id,
+                                      @RequestParam(defaultValue = "") String selectDosageForm,
+                                      @RequestParam(defaultValue = "false") boolean edit,
+                                      @RequestParam(required = false) BigDecimal idMedicine,
+                                      @RequestParam(required = false) BigDecimal photoID,
+                                      @RequestParam(required = false) boolean delete,
+                                      @RequestParam(required = false) boolean deleteMedicine,
+                                      Model model) {
         model.addAttribute("addAtc", addAtc);
         AtcClassification atcClassification = AtcClassification.builder().code(atcCode).build();
         model.addAttribute("atcList", medicineService.findAtcCode(atcClassification.getCode()));
+
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if ("medicineEdit".equals(source)) {
+            return "medicineEdit";
+        }
+        if ("medicinePlace".equals(source)) {
+            return "medicinePlace";
+        }
         return "medicineCreate";
     }
 
-    @GetMapping("medicineCreate/prescriptionFormCreate")
+    @GetMapping("/medicineCreate/prescriptionFormCreate")
     public String showPrescriptionFormCreatePage(@RequestParam(defaultValue = "true") boolean createPrescriptionForm,
                                                   Model model) {
         model.addAttribute("createPrescriptionForm", createPrescriptionForm);
         return "medicineCreate";
     }
 
-    @PostMapping("medicineCreate/addPrescriptionForm")
+    @PostMapping("/addPrescriptionForm")
     public String showPrescriptionFormsPage(@RequestParam(defaultValue = "true") boolean addPrescriptionForm,
                                                  @RequestParam String formName,
+                                            @RequestParam String source,
+                                            @RequestParam(required = false) BigDecimal brand_id,
+                                            @RequestParam(defaultValue = "") String selectBrand,
+                                            @RequestParam(required = false) BigDecimal atc_id,
+                                            @RequestParam(defaultValue = "") String selectAtc,
+                                            @RequestParam(required = false) BigDecimal manufacturer_id,
+                                            @RequestParam(defaultValue = "") String selectManufacturer,
+                                            @RequestParam(required = false) BigDecimal country_id,
+                                            @RequestParam(defaultValue = "") String selectCountry,
+                                            @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                            @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                            @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                            @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                            @RequestParam(required = false) BigDecimal prescription_form_id,
+                                            @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                            @RequestParam(required = false) BigDecimal package_type_id,
+                                            @RequestParam(defaultValue = "") String selectPackageType,
+                                            @RequestParam(required = false) BigDecimal dosage_form_id,
+                                            @RequestParam(defaultValue = "") String selectDosageForm,
+                                            @RequestParam(defaultValue = "false") boolean edit,
+                                            @RequestParam(required = false) BigDecimal idMedicine,
+                                            @RequestParam(required = false) BigDecimal photoID,
+                                            @RequestParam(required = false) boolean delete,
+                                            @RequestParam(required = false) boolean deleteMedicine,
                                                  Model model) {
         model.addAttribute("addPrescriptionForm", addPrescriptionForm);
         model.addAttribute("prescriptionForms", medicineService.findPrescriptionForm(formName));
+
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if ("medicineEdit".equals(source)) {
+            return "medicineEdit";
+        }
+        if ("medicinePlace".equals(source)) {
+            return "medicinePlace";
+        }
         return "medicineCreate";
     }
 
-    @PostMapping("medicineCreate/prescriptionFormCreate")
+    @PostMapping("/medicineCreate/prescriptionFormCreate")
     public String PrescriptionFormCreatePage(@RequestParam(defaultValue = "true") boolean createPrescriptionForm,
                                                  @ModelAttribute PrescriptionForm prescriptionForm, Model model) {
         model.addAttribute("createPrescriptionForm", createPrescriptionForm);
@@ -926,7 +1213,7 @@ public class MainControl {
     }
 
 
-    @GetMapping("medicineCreate/packageTypeCreate")
+    @GetMapping("/medicineCreate/packageTypeCreate")
     public String showPackageTypeCreatePage(@RequestParam(defaultValue = "true") boolean createPackageType,
                                                  Model model) {
         model.addAttribute("createPackageType", createPackageType);
@@ -935,9 +1222,68 @@ public class MainControl {
 
     @PostMapping("medicineCreate/addPackageType")
     public String findPackageTypePage(@RequestParam(defaultValue = "true") boolean addPackageType,
-                                            @RequestParam String packageTypeName, Model model) {
+                                            @RequestParam String packageTypeName, @RequestParam String source,
+                                      @RequestParam(required = false) BigDecimal brand_id,
+                                      @RequestParam(defaultValue = "") String selectBrand,
+                                      @RequestParam(required = false) BigDecimal atc_id,
+                                      @RequestParam(defaultValue = "") String selectAtc,
+                                      @RequestParam(required = false) BigDecimal manufacturer_id,
+                                      @RequestParam(defaultValue = "") String selectManufacturer,
+                                      @RequestParam(required = false) BigDecimal country_id,
+                                      @RequestParam(defaultValue = "") String selectCountry,
+                                      @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                      @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                      @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                      @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                      @RequestParam(required = false) BigDecimal prescription_form_id,
+                                      @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                      @RequestParam(required = false) BigDecimal package_type_id,
+                                      @RequestParam(defaultValue = "") String selectPackageType,
+                                      @RequestParam(required = false) BigDecimal dosage_form_id,
+                                      @RequestParam(defaultValue = "") String selectDosageForm,
+                                      @RequestParam(defaultValue = "false") boolean edit,
+                                      @RequestParam(required = false) BigDecimal idMedicine,
+                                      @RequestParam(required = false) BigDecimal photoID,
+                                      @RequestParam(required = false) boolean delete,
+                                      @RequestParam(required = false) boolean deleteMedicine,
+                                      Model model) {
         model.addAttribute("addPackageType", addPackageType);
         model.addAttribute("packageTypes", medicineService.findTypePackaging(packageTypeName));
+
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if ("medicineEdit".equals(source)) {
+            return "medicineEdit";
+        }
+        if ("medicinePlace".equals(source)) {
+            return "medicinePlace";
+        }
         return "medicineCreate";
     }
 
@@ -957,12 +1303,70 @@ public class MainControl {
     }
 
 
-    @PostMapping("medicineCreate/addPharmacologicalGroup")
+    @PostMapping("/addPharmacologicalGroup")
     public String findPharmacologicalGroupCreatePage(@RequestParam(defaultValue = "true") boolean addPharmacologicalGroup,
-                                                     @RequestParam String groupName,
+                                                     @RequestParam String groupName, @RequestParam String source,
+                                                     @RequestParam(required = false) BigDecimal brand_id,
+                                                     @RequestParam(defaultValue = "") String selectBrand,
+                                                     @RequestParam(required = false) BigDecimal atc_id,
+                                                     @RequestParam(defaultValue = "") String selectAtc,
+                                                     @RequestParam(required = false) BigDecimal manufacturer_id,
+                                                     @RequestParam(defaultValue = "") String selectManufacturer,
+                                                     @RequestParam(required = false) BigDecimal country_id,
+                                                     @RequestParam(defaultValue = "") String selectCountry,
+                                                     @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                                     @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                                     @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                                     @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                                     @RequestParam(required = false) BigDecimal prescription_form_id,
+                                                     @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                                     @RequestParam(required = false) BigDecimal package_type_id,
+                                                     @RequestParam(defaultValue = "") String selectPackageType,
+                                                     @RequestParam(required = false) BigDecimal dosage_form_id,
+                                                     @RequestParam(defaultValue = "") String selectDosageForm,
+                                                     @RequestParam(defaultValue = "false") boolean edit,
+                                                     @RequestParam(required = false) BigDecimal idMedicine,
+                                                     @RequestParam(required = false) BigDecimal photoID,
+                                                     @RequestParam(required = false) boolean delete,
+                                                     @RequestParam(required = false) boolean deleteMedicine,
                                             Model model) {
         model.addAttribute("addPharmacologicalGroup", addPharmacologicalGroup);
         model.addAttribute("pharmacologicalGroups", medicineService.findPharmacologicalGroup(groupName));
+
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if ("medicineEdit".equals(source)) {
+            return "medicineEdit";
+        }
+        if ("medicinePlace".equals(source)) {
+            return "medicinePlace";
+        }
         return "medicineCreate";
     }
 
@@ -996,12 +1400,71 @@ public class MainControl {
         return "medicineCreate";
     }
 
-    @PostMapping("medicineCreate/addTherapeuticGroup")
+    @PostMapping("/addTherapeuticGroup")
     public String TherapeuticGroupCreatePage(@RequestParam(defaultValue = "true") boolean addTherapeuticGroup,
-                                             @RequestParam String groupName,
+                                             @RequestParam String groupName, @RequestParam String source,
+                                             @RequestParam(required = false) BigDecimal brand_id,
+                                             @RequestParam(defaultValue = "") String selectBrand,
+                                             @RequestParam(required = false) BigDecimal atc_id,
+                                             @RequestParam(defaultValue = "") String selectAtc,
+                                             @RequestParam(required = false) BigDecimal manufacturer_id,
+                                             @RequestParam(defaultValue = "") String selectManufacturer,
+                                             @RequestParam(required = false) BigDecimal country_id,
+                                             @RequestParam(defaultValue = "") String selectCountry,
+                                             @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                             @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                             @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                             @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                             @RequestParam(required = false) BigDecimal prescription_form_id,
+                                             @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                             @RequestParam(required = false) BigDecimal package_type_id,
+                                             @RequestParam(defaultValue = "") String selectPackageType,
+                                             @RequestParam(required = false) BigDecimal dosage_form_id,
+                                             @RequestParam(defaultValue = "") String selectDosageForm,
+                                             @RequestParam(defaultValue = "false") boolean edit,
+                                             @RequestParam(required = false) BigDecimal idMedicine,
+                                             @RequestParam(required = false) BigDecimal photoID,
+                                             @RequestParam(required = false) boolean delete,
+                                             @RequestParam(required = false) boolean deleteMedicine,
                                              Model model) {
         model.addAttribute("addTherapeuticGroup", addTherapeuticGroup);
         model.addAttribute("therapeuticGroups", medicineService.findTherapeuticGroup(groupName));
+
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+
+        if ("medicineEdit".equals(source)) {
+            return "medicineEdit";
+        }
+        if ("medicinePlace".equals(source)) {
+            return "medicinePlace";
+        }
         return "medicineCreate";
     }
 
@@ -1021,12 +1484,70 @@ public class MainControl {
         return "medicineCreate";
     }
 
-    @PostMapping("medicineCreate/addManufacturer")
+    @PostMapping("/addManufacturer")
     public String showManufacturerAddPage(@RequestParam(defaultValue = "true") boolean addManufacturer,
-                                          @RequestParam String manufacturerName,
+                                          @RequestParam String manufacturerName, @RequestParam String source,
+                                          @RequestParam(required = false) BigDecimal brand_id,
+                                          @RequestParam(defaultValue = "") String selectBrand,
+                                          @RequestParam(required = false) BigDecimal atc_id,
+                                          @RequestParam(defaultValue = "") String selectAtc,
+                                          @RequestParam(required = false) BigDecimal manufacturer_id,
+                                          @RequestParam(defaultValue = "") String selectManufacturer,
+                                          @RequestParam(required = false) BigDecimal country_id,
+                                          @RequestParam(defaultValue = "") String selectCountry,
+                                          @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                          @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                          @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                          @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                          @RequestParam(required = false) BigDecimal prescription_form_id,
+                                          @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                          @RequestParam(required = false) BigDecimal package_type_id,
+                                          @RequestParam(defaultValue = "") String selectPackageType,
+                                          @RequestParam(required = false) BigDecimal dosage_form_id,
+                                          @RequestParam(defaultValue = "") String selectDosageForm,
+                                          @RequestParam(defaultValue = "false") boolean edit,
+                                          @RequestParam(required = false) BigDecimal idMedicine,
+                                          @RequestParam(required = false) BigDecimal photoID,
+                                          @RequestParam(required = false) boolean delete,
+                                          @RequestParam(required = false) boolean deleteMedicine,
                                              Model model) {
         model.addAttribute("addManufacturer", addManufacturer);
         model.addAttribute("manufacturers", medicineService.findManufucture(manufacturerName));
+
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if ("medicineEdit".equals(source)) {
+            return "medicineEdit";
+        }
+        if ("medicinePlace".equals(source)) {
+            return "medicinePlace";
+        }
         return "medicineCreate";
     }
 
@@ -1076,12 +1597,70 @@ public class MainControl {
         return "medicineCreate";
     }
 
-    @PostMapping("medicineCreate/addDosageForm")
+    @PostMapping("/addDosageForm")
     public String findDosageFormPage(@RequestParam(defaultValue = "true") boolean addDosageForm,
-                                    @RequestParam String dosageFormName,
+                                    @RequestParam String dosageFormName, @RequestParam String source,
+                                     @RequestParam(required = false) BigDecimal brand_id,
+                                     @RequestParam(defaultValue = "") String selectBrand,
+                                     @RequestParam(required = false) BigDecimal atc_id,
+                                     @RequestParam(defaultValue = "") String selectAtc,
+                                     @RequestParam(required = false) BigDecimal manufacturer_id,
+                                     @RequestParam(defaultValue = "") String selectManufacturer,
+                                     @RequestParam(required = false) BigDecimal country_id,
+                                     @RequestParam(defaultValue = "") String selectCountry,
+                                     @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                     @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                     @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                     @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                     @RequestParam(required = false) BigDecimal prescription_form_id,
+                                     @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                     @RequestParam(required = false) BigDecimal package_type_id,
+                                     @RequestParam(defaultValue = "") String selectPackageType,
+                                     @RequestParam(required = false) BigDecimal dosage_form_id,
+                                     @RequestParam(defaultValue = "") String selectDosageForm,
+                                     @RequestParam(defaultValue = "false") boolean edit,
+                                     @RequestParam(required = false) BigDecimal idMedicine,
+                                     @RequestParam(required = false) BigDecimal photoID,
+                                     @RequestParam(required = false) boolean delete,
+                                     @RequestParam(required = false) boolean deleteMedicine,
                                     Model model) {
         model.addAttribute("dosageForms", medicineService.findDosageForm(dosageFormName));
         model.addAttribute("addDosageForm", addDosageForm);
+
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if ("medicineEdit".equals(source)) {
+            return "medicineEdit";
+        }
+        if ("medicinePlace".equals(source)) {
+            return "medicinePlace";
+        }
         return "medicineCreate";
     }
 
@@ -1164,12 +1743,70 @@ public class MainControl {
         return "medicineCreate";
     }
 
-    @PostMapping("medicineCreate/addCountry")
+    @PostMapping("/addCountry")
     public String showCountriesPage(@RequestParam(defaultValue = "true") boolean addCountry,
-                                    @RequestParam String countryName,
+                                    @RequestParam String countryName, @RequestParam String source,
+                                    @RequestParam(required = false) BigDecimal brand_id,
+                                    @RequestParam(defaultValue = "") String selectBrand,
+                                    @RequestParam(required = false) BigDecimal atc_id,
+                                    @RequestParam(defaultValue = "") String selectAtc,
+                                    @RequestParam(required = false) BigDecimal manufacturer_id,
+                                    @RequestParam(defaultValue = "") String selectManufacturer,
+                                    @RequestParam(required = false) BigDecimal country_id,
+                                    @RequestParam(defaultValue = "") String selectCountry,
+                                    @RequestParam(required = false) BigDecimal pharmacological_group_id,
+                                    @RequestParam(defaultValue = "") String selectPharmacologicalGroup,
+                                    @RequestParam(required = false) BigDecimal therapeutic_group_id,
+                                    @RequestParam(defaultValue = "") String selectTherapeuticGroup,
+                                    @RequestParam(required = false) BigDecimal prescription_form_id,
+                                    @RequestParam(defaultValue = "") String selectPrescriptionForm,
+                                    @RequestParam(required = false) BigDecimal package_type_id,
+                                    @RequestParam(defaultValue = "") String selectPackageType,
+                                    @RequestParam(required = false) BigDecimal dosage_form_id,
+                                    @RequestParam(defaultValue = "") String selectDosageForm,
+                                    @RequestParam(defaultValue = "false") boolean edit,
+                                    @RequestParam(required = false) BigDecimal idMedicine,
+                                    @RequestParam(required = false) BigDecimal photoID,
+                                    @RequestParam(required = false) boolean delete,
+                                    @RequestParam(required = false) boolean deleteMedicine,
                                     Model model) {
         model.addAttribute("countries", medicineService.findCountry(countryName));
         model.addAttribute("addCountry", addCountry);
+
+        model.addAttribute("selectBrand", selectBrand);
+        model.addAttribute("brand_id", brand_id);
+        model.addAttribute("selectAtc", selectAtc);
+        model.addAttribute("atc_id", atc_id);
+        model.addAttribute("selectManufacturer", selectManufacturer);
+        model.addAttribute("manufacturer_id", manufacturer_id);
+        model.addAttribute("selectCountry", selectCountry);
+        model.addAttribute("country_id", country_id);
+        model.addAttribute("selectPharmacologicalGroup", selectPharmacologicalGroup);
+        model.addAttribute("pharmacological_group_id", pharmacological_group_id);
+        model.addAttribute("selectTherapeuticGroup", selectTherapeuticGroup);
+        model.addAttribute("therapeutic_group_id", therapeutic_group_id);
+        model.addAttribute("selectPrescriptionForm", selectPrescriptionForm);
+        model.addAttribute("prescription_form_id", prescription_form_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectPackageType", selectPackageType);
+        model.addAttribute("package_type_id", package_type_id);
+        model.addAttribute("selectDosageForm", selectDosageForm);
+        model.addAttribute("dosage_form_id", dosage_form_id);
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
+        }
+        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = medicineService.getPhotoMed(idMedicine);
+            if (photoID == null)
+                model.addAttribute("photos", photos);
+        }
+        if ("medicineEdit".equals(source)) {
+            return "medicineEdit";
+        }
+        if ("medicinePlace".equals(source)) {
+            return "medicinePlace";
+        }
         return "medicineCreate";
     }
 
