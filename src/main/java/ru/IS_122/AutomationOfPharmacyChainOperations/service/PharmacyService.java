@@ -62,7 +62,7 @@ public class PharmacyService {
     }
 
     public List<City> findCities(String city) {
-        String sql = "SELECT * FROM pharmacy_pkg.get_all_city(?)";
+        String sql = "SELECT * FROM pharmacy_pkg.find_city(?)";
 
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(City.class), city);
     }

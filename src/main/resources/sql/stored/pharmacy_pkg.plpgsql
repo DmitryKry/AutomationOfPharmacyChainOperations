@@ -89,9 +89,9 @@ CREATE OR REPLACE FUNCTION pharmacy_pkg.find_city(p_name character varying(100))
 RETURNS SETOF city AS $$
 BEGIN
 RETURN QUERY
-SELECT p.name
+SELECT p.*
 FROM city p
-where p.name = p_name;
+where LOWER(name) LIKE LOWER(CONCAT('%', p_name, '%'));
 END;
 $$ LANGUAGE plpgsql;
 

@@ -187,8 +187,10 @@
     </form>
     <div th:class="findPerconal" th:if="${addAdministrator == true}">
         <div>
-            <form th:action="@{/api/pharmacy/pharmacyCreate/addAdministrator(idCity=${idCity}, selectCity=${selectCity},
-            REGION=${REGION})}" method="post">
+            <form th:action="@{/api/pharmacy/addAdministrator(source='pharmacyEdit',
+            selectCity=${selectCity}, selectCityRegion=${selectCityRegion}, idCity=${idCity},
+                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
+            photoID=${photos != null ? photos.getId() : ''})}" method="post">
                 <input th:type="text" th:name="addAdministratorName">
                 <button th:text="#{find}">
                 </button>
@@ -218,8 +220,10 @@
     </div>
     <div th:class="findPerconal" th:if="${addCity == true}">
         <div>
-            <form th:action="@{/api/pharmacy/registration}" method="post">
-                <input th:type="text">
+            <form th:action="@{/api/pharmacy/addCity(source='pharmacyEdit',
+            selectCity=${selectCity}, selectCityRegion=${selectCityRegion}, idCity=${idCity},
+                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}" method="post">
+                <input name="city" th:type="text">
                 <button th:text="#{find}">
                 </button>
             </form>
@@ -242,8 +246,7 @@
             <a th:href="@{/api/pharmacy/pharmacyCreate(createCity = ${true})}"th:text="#{add}"></a>
             <a th:href="@{/api/pharmacy/pharmacyCreate(addAdministrator=${false},
             selectCity=${selectCity}, selectCityRegion=${selectCityRegion}, idCity=${idCity},
-                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
-            photoID=${photos != null ? photos.getId() : ''})}" th:text="#{cancel}"></a>
+                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''})}" th:text="#{cancel}"></a>
         </div>
     </div>
     <div th:class="findPerconal" th:id="createCity" th:if="${createCity == true}">

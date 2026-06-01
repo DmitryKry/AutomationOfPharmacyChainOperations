@@ -17,6 +17,7 @@ import ru.IS_122.AutomationOfPharmacyChainOperations.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -398,56 +399,76 @@ public class MainControl {
     }
 
 
-    @PostMapping("/pharmacyCreate/addAdministrator")
+    @PostMapping("/addAdministrator")
     public String pharmacyCreatePage(@RequestParam String addAdministratorName,
                                      @RequestParam(defaultValue = "") String selectAdmin,
                                      @RequestParam(defaultValue = "") String selectCityRegion,
                                      @RequestParam(defaultValue = "") String selectCity,
                                      @RequestParam(required = false) BigDecimal idAdmin,
                                      @RequestParam(required = false) BigDecimal idCity,
-                                     @RequestParam(defaultValue = "true") boolean addAdministrator, Model model) {
+                                     @RequestParam(required = false) BigDecimal photoID,
+                                     @RequestParam(defaultValue = "true") boolean addAdministrator,
+                                     @RequestParam(defaultValue = "pharmacyCreate") String source, Model model) {
         if (!addAdministratorName.isEmpty())
             model.addAttribute("addAdministrators", userService.searchAdministrators(addAdministratorName));
         else
             model.addAttribute("addAdministrators", userService.getAdministrators());
+        if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+            model.addAttribute("photos", photos);
+        }
         model.addAttribute("addAdministrator", addAdministrator);
         model.addAttribute("idAdmin", idAdmin);
         model.addAttribute("idCity", idCity);
         model.addAttribute("selectAdmin", selectAdmin);
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
-        model.addAttribute("addAdministrator", addAdministrator);
+        if ("pharmacyEdit".equals(source)){
+            return "pharmacyEdit";
+        }
         return "pharmacyCreate";
     }
 
-    @PostMapping("/pharmacyCreate/addCity")
-    public String pharmacyCreatePageAddCity(@RequestParam String addCity,
+    @PostMapping("/addCity")
+    public String pharmacyCreatePageAddCity(@RequestParam String city,
                                             @RequestParam(defaultValue = "") String selectAdmin,
                                             @RequestParam(defaultValue = "") String selectCityRegion,
                                             @RequestParam(defaultValue = "") String selectCity,
                                             @RequestParam(required = false) BigDecimal idAdmin,
                                             @RequestParam(required = false) BigDecimal idCity,
-                                     @RequestParam(defaultValue = "false") boolean addAdministrator, Model model) {
-        if (!addCity.isEmpty())
-            model.addAttribute("cities", pharmacyService.findCities(addCity));
+                                            @RequestParam(required = false) BigDecimal photoID,
+                                     @RequestParam(defaultValue = "false") boolean addAdministrator,
+                                            @RequestParam(defaultValue = "true") boolean addCity,
+                                            @RequestParam(defaultValue = "pharmacyCreate") String source, Model model) {
+        if (!city.isEmpty()) {
+            List<City> cities = pharmacyService.findCities(city);
+            model.addAttribute("cities", cities);
+        }
         else
             model.addAttribute("cities", pharmacyService.getAllCities());
-        model.addAttribute("addAdministrator", addAdministrator);
+        if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+            model.addAttribute("photos", photos);
+        }
         model.addAttribute("idAdmin", idAdmin);
         model.addAttribute("idCity", idCity);
         model.addAttribute("selectAdmin", selectAdmin);
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
-        model.addAttribute("addAdministrator", addAdministrator);
+        model.addAttribute("addCity", addCity);
+        if ("pharmacyEdit".equals(source)){
+            return "pharmacyEdit";
+        }
         return "pharmacyCreate";
     }
 
 
-    @PostMapping("/pharmacyCreate/createCity")
+    @PostMapping("/createCity")
     public String pharmacyCreatePageCreateCity(City city,
                                                @RequestParam(defaultValue = "false") boolean createCity,
                                                @RequestParam(defaultValue = "false") boolean addCity,
-                                               @RequestParam(defaultValue = "false") boolean addAdministrator, Model model) {
+                                               @RequestParam(defaultValue = "false") boolean addAdministrator,
+                                               @RequestParam Spring source, Model model) {
         String error = pharmacyService.createCity(city);
         model.addAttribute("addAdministrator", createCity);
         model.addAttribute("addAdministrator", addAdministrator);
@@ -459,6 +480,9 @@ public class MainControl {
             model.addAttribute("InfoError", "Объект создан успешно");
         }
         model.addAttribute("InfoErrorShow", true);
+        if ("pharmacyEdit".equals(source)){
+            return "pharmacyEdit";
+        }
         return "pharmacyCreate";
     }
 
@@ -577,6 +601,7 @@ public class MainControl {
                                         @RequestParam(required = false) BigDecimal idMedicine,
                                         @RequestParam(required = false) BigDecimal photoID,
                                         @RequestParam(required = false) String InfoError,
+                                        @RequestParam(defaultValue = "false") boolean needScroll,
                                         Model model) {
         if (page < 1) {
             page = 1;
@@ -588,6 +613,7 @@ public class MainControl {
                 .collect(Collectors.toList());
         List<Photos> photos = medicineService.getPhotosMed();
         model.addAttribute("addBrand", addBrand);
+        model.addAttribute("needScroll", needScroll);
         model.addAttribute("addDosageForm", addDosageForm);
         model.addAttribute("addManufacturer", addManufacturer);
         model.addAttribute("addCountry", addCountry);
@@ -655,11 +681,12 @@ public class MainControl {
             model.addAttribute("InfoError", "Ничего не найдено");
             model.addAttribute("InfoErrorShow", true);
         }
+        List<Photos> photos = medicineService.getPhotosMed();
         model.addAttribute("medicines", medicines);
-        model.addAttribute("photos", pharmacyService.getPhotosPharmacy());
+        model.addAttribute("photos", photos);
         model.addAttribute("pagin", pagin);
         model.addAttribute("page", page);
-        return "userPlace";
+        return "medicinePlace";
     }
 
     @GetMapping("/medicineCreate")
@@ -992,7 +1019,14 @@ public class MainControl {
         model.addAttribute("addBrand", addBrand);
         Brand brand = Brand.builder().name(brandName).build();
         model.addAttribute("brands", medicineService.findBrands(brand.getName()));
-
+        model.addAttribute("pagin", 0);
+        model.addAttribute("page", 0);
+        List<Medicine> medicines = medicineService.getAllMedicine().stream()
+                .limit(15)
+                .collect(Collectors.toList());
+        List<Photos> photos = medicineService.getPhotosMed();
+        model.addAttribute("medicines", medicines);
+        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);
@@ -1015,11 +1049,6 @@ public class MainControl {
         model.addAttribute("dosage_form_id", dosage_form_id);
         if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
             model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
-        }
-        if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0){
-            Photos photos = medicineService.getPhotoMed(idMedicine);
-            if (photoID == null)
-                model.addAttribute("photos", photos);
         }
         if ("medicineEdit".equals(source)) {
             return "medicineEdit";

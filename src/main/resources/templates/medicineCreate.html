@@ -178,6 +178,29 @@
             });
         }
 
+        function uploadPhoto(input) {
+            saveMedicineFormData();
+            let formData = new FormData();
+            formData.append('photo', input.files[0]);
+            formData.append('medicineId', document.getElementById('medicineId').value);
+            document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
+
+            fetch('/api/pharmacy/medicineCreate/uploadPhoto', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('preview').src = data.photoUrl + '?t=' + new Date().getTime();
+                        document.getElementById('status').innerHTML = '✓ Загружено';
+                        setTimeout(() => document.getElementById('status').innerHTML = '', 2000);
+                        saveMedicineFormData();
+                    }
+                })
+                .catch(() => document.getElementById('status').innerHTML = '✗ Ошибка');
+        }
+
         function attachMedicineLinkHandlers() {
             const links = document.querySelectorAll('a');
             links.forEach(link => {
@@ -224,28 +247,7 @@
         window.restoreMedicineFormData = restoreMedicineFormData;
         window.clearMedicineFormData = clearMedicineFormData;
 
-        function uploadPhoto(input) {
-            saveMedicineFormData();
-            let formData = new FormData();
-            formData.append('photo', input.files[0]);
-            formData.append('medicineId', document.getElementById('medicineId').value);
-            document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
 
-            fetch('/api/pharmacy/medicineCreate/uploadPhoto', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('preview').src = data.photoUrl + '?t=' + new Date().getTime();
-                        document.getElementById('status').innerHTML = '✓ Загружено';
-                        setTimeout(() => document.getElementById('status').innerHTML = '', 2000);
-                        saveMedicineFormData();
-                    }
-                })
-                .catch(() => document.getElementById('status').innerHTML = '✗ Ошибка');
-        }
     </script>
 </HEAD>
 <body>

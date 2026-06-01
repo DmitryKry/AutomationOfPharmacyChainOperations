@@ -852,7 +852,7 @@ CREATE OR REPLACE FUNCTION medicine_pkg.sort_medicine(
     p_is_active BOOLEAN DEFAULT TRUE
 )
 RETURNS TABLE(
-    id NUMERIC(38,2),
+    id NUMERIC,
     name VARCHAR,
     international_name VARCHAR,
     dosage_strength VARCHAR,
@@ -869,7 +869,7 @@ RETURNS TABLE(
     is_active BOOLEAN,
     is_vital BOOLEAN,
     is_available BOOLEAN,
-    price NUMERIC(38,2),
+    price NUMERIC,
     unit_of_measure VARCHAR,
     pharmacological_group_id NUMERIC,
     therapeutic_group_id NUMERIC,

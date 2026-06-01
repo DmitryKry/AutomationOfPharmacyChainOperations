@@ -564,8 +564,6 @@ public class MedicineService {
 
         return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             int index = 1;
-
-            // IN параметры
             cs.setObject(index++, filter.getName(), Types.VARCHAR);
             cs.setObject(index++, filter.getInternationalName(), Types.VARCHAR);
             cs.setObject(index++, filter.getDosageStrength(), Types.VARCHAR);
@@ -584,67 +582,63 @@ public class MedicineService {
             cs.setObject(index++, filter.getBrandId(), Types.NUMERIC);
             cs.setObject(index++, filter.getIsActive(), Types.BOOLEAN);
 
-            // Регистрация REF_CURSOR для возвращаемого набора данных
-            cs.registerOutParameter(index, Types.REF_CURSOR);
+            boolean hasResultSet = cs.execute();
 
-            cs.execute();
-
-            // Получаем результат
-            ResultSet rs = (ResultSet) cs.getObject(index);
             List<Medicine> medicines = new ArrayList<>();
 
-            while (rs.next()) {
-                Medicine medicine = new Medicine();
-
-                // Основные поля
-                medicine.setId(rs.getBigDecimal("id"));
-                medicine.setName(rs.getString("name"));
-                medicine.setInternationalName(rs.getString("international_name"));
-                medicine.setDosageStrength(rs.getString("dosage_strength"));
-                medicine.setPackageQuantity(rs.getInt("package_quantity"));
-                medicine.setPrescriptionRequired(rs.getBoolean("prescription_required"));
-                medicine.setRegistrationNumber(rs.getString("registration_number"));
-                medicine.setRegistrationDate(rs.getDate("registration_date") != null ?
-                        rs.getDate("registration_date").toLocalDate() : null);
-                medicine.setShelfLifeMonths(rs.getInt("shelf_life_months"));
-                medicine.setStorageTemperatureMin(rs.getInt("storage_temperature_min"));
-                medicine.setStorageTemperatureMax(rs.getInt("storage_temperature_max"));
-                medicine.setRequiresRefrigeration(rs.getBoolean("requires_refrigeration"));
-                medicine.setLightSensitive(rs.getBoolean("light_sensitive"));
-                medicine.setRequiresDarkStorage(rs.getBoolean("requires_dark_storage"));
-                medicine.setIsActive(rs.getBoolean("is_active"));
-                medicine.setIsVital(rs.getBoolean("is_vital"));
-                medicine.setIsAvailable(rs.getBoolean("is_available"));
-                medicine.setPrice(rs.getBigDecimal("price"));
-                medicine.setUnitOfMeasure(rs.getString("unit_of_measure"));
-
-                // ID справочников
-                medicine.setPharmacologicalGroupId(rs.getBigDecimal("pharmacological_group_id"));
-                medicine.setTherapeuticGroupId(rs.getBigDecimal("therapeutic_group_id"));
-                medicine.setManufacturerId(rs.getBigDecimal("manufacturer_id"));
-                medicine.setCountryId(rs.getBigDecimal("country_id"));
-                medicine.setPrescriptionFormId(rs.getBigDecimal("prescription_form_id"));
-                medicine.setDosageFormId(rs.getBigDecimal("dosage_form_id"));
-                medicine.setBrandId(rs.getBigDecimal("brand_id"));
-                medicine.setAtcId(rs.getBigDecimal("atc_id"));
-                medicine.setPackageTypeId(rs.getBigDecimal("package_type_id"));
-
-                // Transient поля
-                medicine.setBrandName(rs.getString("brandname"));
-                medicine.setCountryName(rs.getString("countryname"));
-                medicine.setAtc_code(rs.getString("atc_code"));
-                medicine.setManufacturer_name(rs.getString("manufacturer_name"));
-                medicine.setPackage_type_name(rs.getString("package_type_name"));
-                medicine.setPharmacological_group_name(rs.getString("pharmacological_group_name"));
-                medicine.setTherapeutic_group_name(rs.getString("therapeutic_group_name"));
-                medicine.setDosageFormName(rs.getString("dosageformname"));
-                medicine.setPrescription_form_name(rs.getString("prescription_form_name"));
-
-                medicines.add(medicine);
+            if (hasResultSet) {
+                ResultSet rs = cs.getResultSet();
+                while (rs.next()) {
+                    Medicine medicine = extractMedicineFromResultSet(rs);
+                    medicines.add(medicine);
+                }
+                rs.close();
             }
 
-            rs.close();
             return medicines;
         });
+    }
+
+    private Medicine extractMedicineFromResultSet(ResultSet rs) throws SQLException {
+        Medicine medicine = new Medicine();
+        medicine.setId(rs.getBigDecimal("id"));
+        medicine.setName(rs.getString("name"));
+        medicine.setInternationalName(rs.getString("international_name"));
+        medicine.setDosageStrength(rs.getString("dosage_strength"));
+        medicine.setPackageQuantity(rs.getInt("package_quantity"));
+        medicine.setPrescriptionRequired(rs.getBoolean("prescription_required"));
+        medicine.setRegistrationNumber(rs.getString("registration_number"));
+        medicine.setRegistrationDate(rs.getDate("registration_date") != null ?
+                rs.getDate("registration_date").toLocalDate() : null);
+        medicine.setShelfLifeMonths(rs.getInt("shelf_life_months"));
+        medicine.setStorageTemperatureMin(rs.getInt("storage_temperature_min"));
+        medicine.setStorageTemperatureMax(rs.getInt("storage_temperature_max"));
+        medicine.setRequiresRefrigeration(rs.getBoolean("requires_refrigeration"));
+        medicine.setLightSensitive(rs.getBoolean("light_sensitive"));
+        medicine.setRequiresDarkStorage(rs.getBoolean("requires_dark_storage"));
+        medicine.setIsActive(rs.getBoolean("is_active"));
+        medicine.setIsVital(rs.getBoolean("is_vital"));
+        medicine.setIsAvailable(rs.getBoolean("is_available"));
+        medicine.setPrice(rs.getBigDecimal("price"));
+        medicine.setUnitOfMeasure(rs.getString("unit_of_measure"));
+        medicine.setPharmacologicalGroupId(rs.getBigDecimal("pharmacological_group_id"));
+        medicine.setTherapeuticGroupId(rs.getBigDecimal("therapeutic_group_id"));
+        medicine.setManufacturerId(rs.getBigDecimal("manufacturer_id"));
+        medicine.setCountryId(rs.getBigDecimal("country_id"));
+        medicine.setPrescriptionFormId(rs.getBigDecimal("prescription_form_id"));
+        medicine.setDosageFormId(rs.getBigDecimal("dosage_form_id"));
+        medicine.setBrandId(rs.getBigDecimal("brand_id"));
+        medicine.setAtcId(rs.getBigDecimal("atc_id"));
+        medicine.setPackageTypeId(rs.getBigDecimal("package_type_id"));
+        medicine.setBrandName(rs.getString("brandname"));
+        medicine.setCountryName(rs.getString("countryname"));
+        medicine.setAtc_code(rs.getString("atc_code"));
+        medicine.setManufacturer_name(rs.getString("manufacturer_name"));
+        medicine.setPackage_type_name(rs.getString("package_type_name"));
+        medicine.setPharmacological_group_name(rs.getString("pharmacological_group_name"));
+        medicine.setTherapeutic_group_name(rs.getString("therapeutic_group_name"));
+        medicine.setDosageFormName(rs.getString("dosageformname"));
+        medicine.setPrescription_form_name(rs.getString("prescription_form_name"));
+        return medicine;
     }
 }

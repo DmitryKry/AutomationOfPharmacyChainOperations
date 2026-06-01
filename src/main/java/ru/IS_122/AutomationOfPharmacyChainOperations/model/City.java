@@ -22,6 +22,5 @@ public class City {
     @NonNull
     private String name;
     @Column(name = "region", nullable = false, length = 100)
-    @NonNull
     private String region;
 }

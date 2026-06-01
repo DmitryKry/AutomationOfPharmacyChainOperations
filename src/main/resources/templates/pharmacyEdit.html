@@ -195,8 +195,10 @@
     </form>
     <div th:class="findPerconal" th:if="${addAdministrator == true}">
         <div>
-            <form th:action="@{/api/pharmacy/pharmacyEdit/addAdministrator(idCity=${idCity}, selectCity=${selectCity},
-            REGION=${REGION})}" method="post">
+            <form th:action="@{/api/pharmacy/addAdministrator(source='pharmacyEdit',
+            selectCity=${selectCity}, selectCityRegion=${selectCityRegion}, idCity=${idCity},
+                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
+            photoID=${photos != null ? photos.getId() : ''})}" method="post">
                 <input th:type="text" th:name="addAdministratorName">
                 <button th:text="#{find}">
                 </button>
@@ -226,8 +228,11 @@
     </div>
     <div th:class="findPerconal" th:if="${addCity == true}">
         <div>
-            <form th:action="@{/api/pharmacy/registration}" method="post">
-                <input th:type="text">
+            <form th:action="@{/api/pharmacy/addCity(source='pharmacyEdit', addAdministrator=${false},
+            selectCity=${selectCity}, selectCityRegion=${selectCityRegion}, idCity=${idCity},
+                        selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
+            photoID=${photos != null ? photos.getId() : ''})}" method="post">
+                <input name="city" th:type="text">
                 <button th:text="#{find}">
                 </button>
             </form>
@@ -255,7 +260,7 @@
         </div>
     </div>
     <div th:class="findPerconal" th:id="createCity" th:if="${createCity == true}">
-        <form th:action="@{/api/pharmacy/pharmacyEdit/createCity(selectAdmin=${selectAdmin}, idAdmin=${idAdmin})}" method="post">
+        <form th:action="@{/api/pharmacy/createCity(source='pharmacyEdit', selectAdmin=${selectAdmin}, idAdmin=${idAdmin})}" method="post">
             <label for="createC" th:text="#{CITY}"></label>
             <br>
             <input id="createC"  th:name="name" th:type="text">
