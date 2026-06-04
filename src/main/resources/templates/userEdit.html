@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</HEAD>
+<body>
+<div class="menu">
+    <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+    <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+</div>
+<form th:action="@{/api/pharmacy/userEdit}" method="post" th:if="${user != null}">
+    <div class="Entrace">
+        <h2 th:if="${error == null}" th:text="#{view.user}"></h2>
+        <div th:id="errorCheak" th:if="${error != null}">
+            <h2 th:if="${error != null}" th:text="${error}"></h2>
+        </div>
+        <div class="form-group">
+            <label for="login" th:text="#{login}"></label>
+            <br>
+            <input type="hidden" name="id" required th:value="${user.getId() != null ? user.getId() : ''}">
+            <input type="text" id="login" name="login" required th:value="${user.getLogin().isEmpty() ? '': user.getLogin() }">
+        </div>
+        <div class="form-group">
+            <label for="dataOfBirt" th:text="#{data_of_birt}"></label>
+            <br>
+            <input type="date" id="dataOfBirt" name="dataOfBirt" required th:value="${user.getDataOfBirt() != null ? user.getDataOfBirt() : ''}">
+        </div>
+        <div class="form-group">
+            <label for="phone" th:text="#{phone}"></label>
+            <br>
+            <input type="text" id="phone" name="phone" required th:value="${user.getPhone() != null ? user.getPhone() : ''}">
+        </div>
+        <div class="form-group">
+            <label for="email" th:text="#{email}"></label>
+            <br>
+            <input type="email" id="email" name="email" required th:value="${user.getEmail() != null ? user.getEmail() : ''}">
+        </div>
+        <div class="form-group">
+            <label for="fio" th:text="#{fio}"></label>
+            <br>
+            <input type="text" id="fio" name="fio" required th:value="${user.getFio() != null ? user.getFio() : ''}">
+        </div>
+        <div class="form-group">
+            <label for="passport" th:text="#{passport}"></label>
+            <br>
+            <input type="text" id="passport" name="passport" th:value="${user.getPassport() != null ? user.getPassport() : ''}">
+        </div>
+        <div class="form-group">
+            <label for="password" th:text="#{password}"></label>
+            <br>
+            <input type="password" id="password" name="password" required th:value="${user.getPassword() != null ? user.getPassword() : ''}">
+        </div>
+        <div th:class="userView" id="userEdit">
+            <button th:id="create" th:text="#{edit}"></button>
+            <a th:href="@{/api/pharmacy/userEdit(userID=${user.getId()}, deleteUser=true)}" th:id="deleteEdit" th:text="#{delete}"></a>
+        </div>
+    </div>
+    <div th:class="findPerconal" th:id="okForm" th:if="${deleteUser == true}">
+        <H3 th:text="#{deleteTrue} + ${user.getFio()}"></H3>
+        <div>
+            <a class="forDeleteObject" th:href="@{/api/pharmacy/userEdit/deleteUser(userID=${user.getId()})}" th:text="#{yes}"></a>
+            <a th:href="@{/api/pharmacy/userEdit(userID=${user.getId()})}"
+               th:text="#{no}" class="forDeleteObject"></a>
+        </div>
+    </div>
+    <div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
+        <H3 th:text="${InfoError}"></H3>
+        <div>
+            <a th:href="@{/api/pharmacy/userEdit(userID=${user.getId()})}" th:text="#{Ok}"></a>
+        </div>
+    </div>
+</form>
+</body>
+</HTML>

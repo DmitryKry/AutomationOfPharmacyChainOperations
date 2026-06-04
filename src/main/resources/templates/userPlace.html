@@ -88,9 +88,10 @@
 </HEAD>
 <body>
     <div class="menu">
-        <a class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
-        <a class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
-        <a class="about_of_pharmacy" th:text="#{about_of_pharmacy}"></a>
+        <a th:if="${user == null}" class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+        <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+        <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
+        <a class="about_of_pharmacy" th:text="#{basket}"></a>
         <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy}"></a>
         <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace}"></a>
     </div>
@@ -145,10 +146,10 @@
                     <label for="coverage" th:text="#{coverage}"></label>
                     <br>
                     <input type="number" id="coverage" name="coverage">
-                    <button type="submit" th:class="ButtonPost" th:text="#{find}"></button>
+                    <button th:if="${user != null ? true : false}" type="submit" th:class="ButtonPost" th:text="#{find}"></button>
                 </div>
             </form>
-            <a th:href="@{/api/pharmacy/pharmacyCreate}" th:id="create" th:text="#{create}"></a>
+            <a th:if="${user != null ? user.getRole() == 1 : false}" th:href="@{/api/pharmacy/pharmacyCreate}" th:id="create" th:text="#{create}"></a>
         </div>
     </div>
     <div th:class="content">

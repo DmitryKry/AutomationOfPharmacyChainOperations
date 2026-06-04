@@ -631,7 +631,8 @@
                             selectBrand=${selectBrand},
                             dosage_form_id=${dosage_form_id},
                             selectDosageForm=${selectDosageForm},
-                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''}, needScroll=true)}" th:text="#{cancel}"></a>
+                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''}, needScroll=true)}"
+           th:text="#{cancel}"></a>
     </div>
 </div>
 
@@ -958,7 +959,25 @@
 <!-- Добавление типа упаковки -->
 <div th:class="findPerconal" th:if="${addPackageType == true}">
     <div>
-        <form th:action="@{/api/pharmacy/medicinePlace/addPackageType}" method="post">
+        <form th:action="@{/api/pharmacy/addPackageType(source='medicinePlace',atc_id=${atc_id},
+                            selectAtc=${selectAtc},
+                            manufacturer_id=${manufacturer_id},
+                            selectManufacturer=${selectManufacturer},
+                            country_id=${country_id},
+                            selectCountry=${selectCountry},
+                            pharmacological_group_id=${pharmacological_group_id},
+                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                            therapeutic_group_id=${therapeutic_group_id},
+                            selectTherapeuticGroup=${selectTherapeuticGroup},
+                            prescription_form_id=${prescription_form_id},
+                            selectPrescriptionForm=${selectPrescriptionForm},
+                            package_type_id=${package_type_id},
+                            selectPackageType=${selectPackageType},
+                            dosage_form_id=${dosage_form_id},
+                            selectDosageForm=${selectDosageForm},
+                            brand_id=${brand_id},
+                            selectBrand=${selectBrand},
+                            idMedicine=${medicine != null ? medicine.getId() : ''})}" method="post">
             <input type="text" name="packageTypeName" th:placeholder="#{medicine.package_type}">
             <button th:text="#{find}">Найти</button>
         </form>

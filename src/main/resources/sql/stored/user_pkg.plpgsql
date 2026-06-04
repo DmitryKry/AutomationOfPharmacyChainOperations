@@ -7,6 +7,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION user_pkg.get_id_user(userID numeric) RETURNS SETOF userofpharmacy AS $$
+BEGIN
+RETURN QUERY
+select * from userofpharmacy where id = userID;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE PROCEDURE user_pkg.set_of_user(
     p_login varchar,
     p_data_of_birt date,
@@ -201,14 +208,29 @@ create or replace function user_pkg.find_photo_path(p_path varchar)
 end;
 $$ language plpgsql;
 
-create or replace procedure delete_user(id_user numeric)
+create or replace procedure user_pkg.delete_user(userID numeric)
        as $$
        begin
-       delete from userofpharmacy where id = id_user;
+       delete from userofpharmacy where id = userID;
 end;
 $$ language plpgsql;
 
-
+create or replace procedure user_pkg.update_user(p_user_id numeric,
+       p_data_of_birt date, p_phone varchar, p_login varchar,
+       p_email varchar, p_fio varchar, p_password varchar, p_passport varchar)
+       as $$
+       begin
+       update userofpharmacy set
+           data_of_birt = p_data_of_birt,
+           phone = p_phone,
+           login = p_login,
+           email = p_email,
+           fio = p_fio,
+           password = p_password,
+           passport = p_passport
+       where id = p_user_id;
+end;
+$$ language plpgsql;
 
 
 

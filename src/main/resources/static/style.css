@@ -937,3 +937,18 @@ input:focus, select:focus {
 .ButtonPost{
     margin-top: 3%;
 }
+
+.userView{
+    display: flex;
+    flex-direction: row;
+    gap: 28%;
+    align-items: flex-end;
+}
+
+#userEdit{
+    gap: 15%;
+}
+
+#deleteEdit{
+    padding: 2%;
+}

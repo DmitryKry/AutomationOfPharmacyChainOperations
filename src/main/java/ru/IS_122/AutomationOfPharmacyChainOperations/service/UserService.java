@@ -124,4 +124,30 @@ public class UserService {
         String sql = "SELECT * FROM user_pkg.find_photo_path(?)";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Photos.class), photoPath).get(0);
     }
+
+    public UserOfPharmacy get_id_user(BigDecimal id){
+        String sql = "SELECT * FROM user_pkg.get_id_user(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(UserOfPharmacy.class), id).get(0);
+    }
+
+    public void updateUser(UserOfPharmacy user) {
+        String sql = "call user_pkg.update_user(?, ?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            int index = 1;
+
+            cs.setBigDecimal(index++, user.getId());           // 1 - p_id
+            cs.setDate(index++, java.sql.Date.valueOf(user.getDataOfBirt()));    // 2 - p_name
+            cs.setString(index++, user.getPhone());   // 3 - p_legal_name
+            cs.setString(index++, user.getLogin());          // 4 - p_inn
+            cs.setString(index++, user.getEmail());          // 5 - p_kpp
+            cs.setString(index++, user.getFio());         // 6 - p_ogrn
+            cs.setString(index++, user.getPassword());      // 7 - p_address
+            cs.setString(index, user.getPassport());      // 8 - p_ID_CITY// 11 - id_of_worker (IN)
+
+
+            cs.execute();
+            return null;
+        });
+
+    }
 }
