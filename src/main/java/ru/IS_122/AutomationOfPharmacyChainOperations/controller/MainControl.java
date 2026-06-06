@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.*;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.MedicineService;
+import ru.IS_122.AutomationOfPharmacyChainOperations.service.OrderService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.PharmacyService;
 import ru.IS_122.AutomationOfPharmacyChainOperations.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,11 +51,12 @@ public class MainControl {
 
     @Autowired
     private PharmacyService pharmacyService;
-
     @Autowired
     private UserService userService;
     @Autowired
-    MedicineService medicineService;
+    private MedicineService medicineService;
+    @Autowired
+    private OrderService orderService;
 
 
     @GetMapping("/admin")
@@ -159,6 +161,7 @@ public class MainControl {
     @GetMapping("/pharmacy")
     public String showPharmacyPage(@RequestParam(defaultValue = "0") int pagin,
                                    @RequestParam(defaultValue = "1") int page,
+                                   @RequestParam(required = false) BigDecimal userID,
                                    Model model) {
         if (page < 1) {
             page = 1;
@@ -168,6 +171,7 @@ public class MainControl {
                 .stream()
                 .limit(15 + pagin)
                 .collect(Collectors.toList());
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("pharmacies", pharmacies);
         model.addAttribute("photos", pharmacyService.getPhotosPharmacy());
         model.addAttribute("pagin", pagin);
@@ -184,6 +188,7 @@ public class MainControl {
                                        @RequestParam(required = false) String adress,
                                        @RequestParam(required = false) String grade,
                                        @RequestParam(required = false) String coverage,
+                                       @RequestParam(required = false) BigDecimal userID,
                                        @RequestParam(defaultValue = "false") Boolean InfoErrorShow,
                                    Model model) {
         if (page < 1) {
@@ -204,6 +209,7 @@ public class MainControl {
             model.addAttribute("InfoError", "Ничего не найдено");
             model.addAttribute("InfoErrorShow", true);
         }
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("pharmacies", pharmacies);
         model.addAttribute("photos", pharmacyService.getPhotosPharmacy());
         model.addAttribute("pagin", pagin);
@@ -225,6 +231,7 @@ public class MainControl {
                                          @RequestParam(defaultValue = "false") boolean edit,
                                          @RequestParam(required = false) String InfoError,
                                          @RequestParam(required = false) Boolean InfoErrorShow,
+                                         @RequestParam(required = false) BigDecimal userID,
                                          HttpSession session, HttpServletResponse response,
                                          Model model) {
         model.addAttribute("addAdministrator", addAdministrator);
@@ -238,6 +245,7 @@ public class MainControl {
         model.addAttribute("edit", edit);
         model.addAttribute("InfoError", InfoError);
         model.addAttribute("InfoErrorShow", InfoErrorShow);
+        model.addAttribute("user", userService.get_id_user(userID));
         BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
         if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
                 .findFirst().orElse(null) != null) {
@@ -273,6 +281,7 @@ public class MainControl {
                                      @RequestParam(required = false) BigDecimal photoID,
                                      @RequestParam(required = false) BigDecimal idCity,
                                      @RequestParam(required = false) BigDecimal idAdmin,
+                                     @RequestParam(required = false) BigDecimal userID,
             HttpSession session, Model model) {
         Pharmacy pharmacy = Pharmacy.builder()
                 .name(form.getName())
@@ -290,6 +299,7 @@ public class MainControl {
         if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0){
             pharmacyService.updatePhoto(pharmacy1.getId(), photoID);
         }
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("addAdministrator", addAdministrator);
         model.addAttribute("idAdmin", idAdmin);
         model.addAttribute("selectAdmin", selectAdmin);
@@ -322,6 +332,7 @@ public class MainControl {
                                          @RequestParam(defaultValue = "false") boolean edit,
                                          @RequestParam(required = false) boolean delete,
                                          @RequestParam(required = false) boolean deletePharmacy,
+                                         @RequestParam(required = false) BigDecimal userID,
                                          HttpSession session, HttpServletResponse response,
                                          Model model) {
         model.addAttribute("addAdministrator", addAdministrator);
@@ -333,6 +344,7 @@ public class MainControl {
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
         model.addAttribute("edit", edit);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("delete", delete);
         BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
         if (deletePharmacy && pharmacyID != null){
@@ -374,6 +386,7 @@ public class MainControl {
                                      @RequestParam(required = false) BigDecimal photoID,
                                      @RequestParam(required = false) BigDecimal idCity,
                                      @RequestParam(required = false) BigDecimal idAdmin,
+                                     @RequestParam(required = false) BigDecimal userID,
                                      HttpSession session, Model model) {
         Pharmacy pharmacy = Pharmacy.builder()
                 .id(form.getId())
@@ -395,6 +408,7 @@ public class MainControl {
         model.addAttribute("idCity", idCity);
         model.addAttribute("selectAdmin", selectAdmin);
         model.addAttribute("selectCityRegion", selectCityRegion);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("selectCity", selectCity);
         if (pharmacy1.getErrorMessage() != null){
             model.addAttribute("InfoError", pharmacy1.getErrorMessage());
@@ -416,6 +430,7 @@ public class MainControl {
                                      @RequestParam(required = false) BigDecimal idCity,
                                      @RequestParam(required = false) BigDecimal photoID,
                                      @RequestParam(defaultValue = "true") boolean addAdministrator,
+                                     @RequestParam(required = false) BigDecimal userID,
                                      @RequestParam(defaultValue = "pharmacyCreate") String source, Model model) {
         if (!addAdministratorName.isEmpty())
             model.addAttribute("addAdministrators", userService.searchAdministrators(addAdministratorName));
@@ -429,6 +444,7 @@ public class MainControl {
         model.addAttribute("idAdmin", idAdmin);
         model.addAttribute("idCity", idCity);
         model.addAttribute("selectAdmin", selectAdmin);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
         if ("pharmacyEdit".equals(source)){
@@ -446,6 +462,7 @@ public class MainControl {
                                             @RequestParam(required = false) BigDecimal idCity,
                                             @RequestParam(required = false) BigDecimal photoID,
                                      @RequestParam(defaultValue = "false") boolean addAdministrator,
+                                            @RequestParam(required = false) BigDecimal userID,
                                             @RequestParam(defaultValue = "true") boolean addCity,
                                             @RequestParam(defaultValue = "pharmacyCreate") String source, Model model) {
         if (!city.isEmpty()) {
@@ -461,6 +478,7 @@ public class MainControl {
         model.addAttribute("idAdmin", idAdmin);
         model.addAttribute("idCity", idCity);
         model.addAttribute("selectAdmin", selectAdmin);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("selectCityRegion", selectCityRegion);
         model.addAttribute("selectCity", selectCity);
         model.addAttribute("addCity", addCity);
@@ -476,11 +494,13 @@ public class MainControl {
                                                @RequestParam(defaultValue = "false") boolean createCity,
                                                @RequestParam(defaultValue = "false") boolean addCity,
                                                @RequestParam(defaultValue = "false") boolean addAdministrator,
+                                               @RequestParam(required = false) BigDecimal userID,
                                                @RequestParam Spring source, Model model) {
         String error = pharmacyService.createCity(city);
         model.addAttribute("addAdministrator", createCity);
         model.addAttribute("addAdministrator", addAdministrator);
         model.addAttribute("addAdministrator", addCity);
+        model.addAttribute("user", userService.get_id_user(userID));
         if (error != null){
             model.addAttribute("InfoError", error);
         }
@@ -512,6 +532,7 @@ public class MainControl {
                                        @RequestParam(required = false) BigDecimal idUser,
                                        @RequestParam(required = false) BigDecimal idRole,
                                        @RequestParam(defaultValue = "") String selectRole,
+                                       @RequestParam(required = false) BigDecimal userID,
                                        @RequestParam(defaultValue = "") String selectUser, Model model) {
         model.addAttribute("users", userService.searchUsers(fio));
         model.addAttribute("roles", userService.getRoles());
@@ -519,6 +540,7 @@ public class MainControl {
         model.addAttribute("addUser", addUser);
         model.addAttribute("createRole", createRole);
         model.addAttribute("idUser", idUser);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("idRole", idRole);
         model.addAttribute("selectRole", selectRole);
         model.addAttribute("selectUser", selectUser);
@@ -529,10 +551,12 @@ public class MainControl {
     public String showWorkerCreatePageTakeUsersSearchUsers(@RequestParam(defaultValue = "false") boolean addRole,
                                                 @RequestParam String searchUser,
                                        @RequestParam(defaultValue = "true") boolean addUser,
+                                                           @RequestParam(required = false) BigDecimal userID,
                                        @RequestParam(defaultValue = "") String fio, Model model) {
         model.addAttribute("users", userService.searchUsers(searchUser));
         model.addAttribute("addRole", addRole);
         model.addAttribute("addUser", addUser);
+        model.addAttribute("user", userService.get_id_user(userID));
         return "workersCreate";
     }
 
@@ -544,6 +568,7 @@ public class MainControl {
                                        @RequestParam String education,
                                        @RequestParam BigDecimal id_of_role,
                                        @RequestParam String INN,
+                                       @RequestParam(required = false) BigDecimal userID,
                                        @RequestParam String snils, Model model) {
         Workers worker = Workers.builder()
                 .id_of_user(id_of_user)
@@ -554,6 +579,7 @@ public class MainControl {
                 .snils(snils)
                 .build();
         userService.workerCreate(worker);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("addRole", addRole);
         model.addAttribute("addUser", addUser);
         return "workersCreate";
@@ -563,10 +589,12 @@ public class MainControl {
     public String showWorkerCreatePageCreateRole(@RequestParam(defaultValue = "true") boolean addRole,
                                                  @RequestParam(defaultValue = "false") boolean createRole,
                                                 @RequestParam(defaultValue = "true") boolean addUser,
+                                                 @RequestParam(required = false) BigDecimal userID,
                                                 @RequestParam(defaultValue = "") String roleName, Model model) {
         Role role = Role.builder().name(roleName).build();
         userService.roleCreate(role);
         model.addAttribute("addRole", addRole);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("createRole", createRole);
         model.addAttribute("addUser", addUser);
         return "workersCreate";
@@ -605,6 +633,7 @@ public class MainControl {
                                         @RequestParam(defaultValue = "") String selectPackageType,
                                         @RequestParam(required = false) BigDecimal dosage_form_id,
                                         @RequestParam(defaultValue = "") String selectDosageForm,
+                                        @RequestParam(required = false) BigDecimal userID,
                                         @RequestParam(defaultValue = "false") boolean edit,
                                         @RequestParam(required = false) BigDecimal idMedicine,
                                         @RequestParam(required = false) BigDecimal photoID,
@@ -620,6 +649,7 @@ public class MainControl {
                 .limit(15 + pagin)
                 .collect(Collectors.toList());
         List<Photos> photos = medicineService.getPhotosMed();
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("addBrand", addBrand);
         model.addAttribute("needScroll", needScroll);
         model.addAttribute("addDosageForm", addDosageForm);
@@ -672,6 +702,7 @@ public class MainControl {
     public String showMedicineSortPage(@RequestParam(defaultValue = "0") int pagin,
                                        @RequestParam(defaultValue = "1") int page,
                                        @ModelAttribute Medicine medicine,
+                                       @RequestParam(required = false) BigDecimal userID,
                                        Model model) {
         if (page < 1) {
             page = 1;
@@ -689,6 +720,7 @@ public class MainControl {
             model.addAttribute("InfoError", "Ничего не найдено");
             model.addAttribute("InfoErrorShow", true);
         }
+        model.addAttribute("user", userService.get_id_user(userID));
         List<Photos> photos = medicineService.getPhotosMed();
         model.addAttribute("medicines", medicines);
         model.addAttribute("photos", photos);
@@ -728,6 +760,7 @@ public class MainControl {
                                          @RequestParam(defaultValue = "") String selectPackageType,
                                          @RequestParam(required = false) BigDecimal dosage_form_id,
                                          @RequestParam(defaultValue = "") String selectDosageForm,
+                                         @RequestParam(required = false) BigDecimal userID,
                                          @RequestParam(defaultValue = "false") boolean edit,
                                          @RequestParam(required = false) BigDecimal idMedicine,
                                          @RequestParam(required = false) BigDecimal photoID,
@@ -736,6 +769,7 @@ public class MainControl {
         System.out.println("Received brand_id: " + brand_id);
         System.out.println("Received selectBrand: " + selectBrand);
         model.addAttribute("addBrand", addBrand);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("addDosageForm", addDosageForm);
         model.addAttribute("addManufacturer", addManufacturer);
         model.addAttribute("addCountry", addCountry);
@@ -825,10 +859,12 @@ public class MainControl {
 
     @PostMapping("/medicineCreate")
     public String medicineCreatePage(@ModelAttribute Medicine medicine,
+                                     @RequestParam(required = false) BigDecimal userID,
                                      @RequestParam(required = false) BigDecimal photoID, HttpSession session, Model model) {
         Medicine medicine1 = medicineService.createMedicine(medicine);
         model.addAttribute("InfoErrorShow", true);
         photoID = (BigDecimal) session.getAttribute("photoID");
+        model.addAttribute("user", userService.get_id_user(userID));
         if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0){
             medicineService.updatePhoto(medicine1.getId(), photoID);
         }
@@ -872,6 +908,7 @@ public class MainControl {
                                          @RequestParam(defaultValue = "") String selectPackageType,
                                          @RequestParam(required = false) BigDecimal dosage_form_id,
                                          @RequestParam(defaultValue = "") String selectDosageForm,
+                                       @RequestParam(required = false) BigDecimal userID,
                                          @RequestParam(defaultValue = "false") boolean edit,
                                          @RequestParam(required = false) BigDecimal idMedicine,
                                          @RequestParam(required = false) BigDecimal photoID,
@@ -914,6 +951,7 @@ public class MainControl {
         model.addAttribute("dosage_form_id", dosage_form_id);
         model.addAttribute("edit", edit);
         model.addAttribute("delete", delete);
+        model.addAttribute("user", userService.get_id_user(userID));
         if (deleteMedicine && idMedicine != null){
             Medicine medicine = medicineService.deleteMedicine(idMedicine);
             String encodedError = URLEncoder.encode(medicine.getErrorMessage(), StandardCharsets.UTF_8);
@@ -976,9 +1014,11 @@ public class MainControl {
 
     @PostMapping("/medicineEdit")
     public String medicineEditPage(@ModelAttribute Medicine medicine,
+                                   @RequestParam(required = false) BigDecimal userID,
                                      @RequestParam(required = false) BigDecimal photoID, HttpSession session, Model model) {
         Medicine medicine1 = medicineService.editMedicine(medicine);
         model.addAttribute("InfoErrorShow", true);
+        model.addAttribute("user", userService.get_id_user(userID));
         if (medicine1.getErrorMessage() != null) {
             model.addAttribute("InfoError", medicine1.getErrorMessage());
         }
@@ -990,8 +1030,10 @@ public class MainControl {
 
     @PostMapping("/medicineCreate/dosageFormCreate/addInjectionMethods")
     public String showInjectionMethodsPage(@RequestParam(defaultValue = "true") boolean addInjectionMethods,
+                                           @RequestParam(required = false) BigDecimal userID,
                                     @RequestParam String name, Model model) {
         model.addAttribute("addInjectionMethods", addInjectionMethods);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("InjectionMethods", medicineService.findAdministrationRoute(name));
         return "medicineCreate";
     }
@@ -1018,6 +1060,7 @@ public class MainControl {
                                     @RequestParam(defaultValue = "") String selectPackageType,
                                     @RequestParam(required = false) BigDecimal dosage_form_id,
                                     @RequestParam(defaultValue = "") String selectDosageForm,
+                                    @RequestParam(required = false) BigDecimal userID,
                                     @RequestParam(defaultValue = "false") boolean edit,
                                     @RequestParam(required = false) BigDecimal idMedicine,
                                     @RequestParam(required = false) BigDecimal photoID,
@@ -1033,6 +1076,7 @@ public class MainControl {
                 .limit(15)
                 .collect(Collectors.toList());
         List<Photos> photos = medicineService.getPhotosMed();
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("medicines", medicines);
         model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
@@ -1069,17 +1113,21 @@ public class MainControl {
 
     @GetMapping("/medicineCreate/brandCreate")
     public String showBrandCreatePage(@RequestParam(defaultValue = "true") boolean brandCreate,
+                                      @RequestParam(required = false) BigDecimal userID,
                                       @RequestParam(defaultValue = "false") boolean edit, Model model) {
         model.addAttribute("brandCreate", brandCreate);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("edit", edit);
         return "medicineCreate";
     }
 
     @PostMapping("/medicineCreate/brandCreate")
     public String BrandCreatePage(@RequestParam(defaultValue = "true") boolean createCountry,
+                                  @RequestParam(required = false) BigDecimal userID,
                               @ModelAttribute Brand brand, Model model) {
         String error = medicineService.createBrands(brand);
         model.addAttribute("createCountry", createCountry);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("InfoErrorShow", true);
         if (error != null) {
             model.addAttribute("InfoError", error);
@@ -1112,6 +1160,7 @@ public class MainControl {
                                       @RequestParam(defaultValue = "") String selectPackageType,
                                       @RequestParam(required = false) BigDecimal dosage_form_id,
                                       @RequestParam(defaultValue = "") String selectDosageForm,
+                                      @RequestParam(required = false) BigDecimal userID,
                                       @RequestParam(defaultValue = "false") boolean edit,
                                       @RequestParam(required = false) BigDecimal idMedicine,
                                       @RequestParam(required = false) BigDecimal photoID,
@@ -1123,6 +1172,7 @@ public class MainControl {
         model.addAttribute("atcList", medicineService.findAtcCode(atcClassification.getCode()));
         model.addAttribute("pagin", 0);
         model.addAttribute("page", 0);
+        model.addAttribute("user", userService.get_id_user(userID));
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
@@ -1163,8 +1213,10 @@ public class MainControl {
 
     @GetMapping("/medicineCreate/prescriptionFormCreate")
     public String showPrescriptionFormCreatePage(@RequestParam(defaultValue = "true") boolean createPrescriptionForm,
+                                                 @RequestParam(required = false) BigDecimal userID,
                                                   Model model) {
         model.addAttribute("createPrescriptionForm", createPrescriptionForm);
+        model.addAttribute("user", userService.get_id_user(userID));
         return "medicineCreate";
     }
 
@@ -1190,6 +1242,7 @@ public class MainControl {
                                             @RequestParam(defaultValue = "") String selectPackageType,
                                             @RequestParam(required = false) BigDecimal dosage_form_id,
                                             @RequestParam(defaultValue = "") String selectDosageForm,
+                                            @RequestParam(required = false) BigDecimal userID,
                                             @RequestParam(defaultValue = "false") boolean edit,
                                             @RequestParam(required = false) BigDecimal idMedicine,
                                             @RequestParam(required = false) BigDecimal photoID,
@@ -1204,6 +1257,7 @@ public class MainControl {
                 .limit(15)
                 .collect(Collectors.toList());
         List<Photos> photos = medicineService.getPhotosMed();
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("medicines", medicines);
         model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
@@ -1240,9 +1294,11 @@ public class MainControl {
 
     @PostMapping("/medicineCreate/prescriptionFormCreate")
     public String PrescriptionFormCreatePage(@RequestParam(defaultValue = "true") boolean createPrescriptionForm,
+                                             @RequestParam(required = false) BigDecimal userID,
                                                  @ModelAttribute PrescriptionForm prescriptionForm, Model model) {
         model.addAttribute("createPrescriptionForm", createPrescriptionForm);
         String error = medicineService.createPrescriptionForm(prescriptionForm);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("InfoErrorShow", true);
         if (error != null) {
             model.addAttribute("InfoError", error);
@@ -1256,8 +1312,10 @@ public class MainControl {
 
     @GetMapping("/medicineCreate/packageTypeCreate")
     public String showPackageTypeCreatePage(@RequestParam(defaultValue = "true") boolean createPackageType,
+                                            @RequestParam(required = false) BigDecimal userID,
                                                  Model model) {
         model.addAttribute("createPackageType", createPackageType);
+        model.addAttribute("user", userService.get_id_user(userID));
         return "medicineCreate";
     }
 
@@ -1282,6 +1340,7 @@ public class MainControl {
                                       @RequestParam(defaultValue = "") String selectPackageType,
                                       @RequestParam(required = false) BigDecimal dosage_form_id,
                                       @RequestParam(defaultValue = "") String selectDosageForm,
+                                      @RequestParam(required = false) BigDecimal userID,
                                       @RequestParam(defaultValue = "false") boolean edit,
                                       @RequestParam(required = false) BigDecimal idMedicine,
                                       @RequestParam(required = false) BigDecimal photoID,
@@ -1291,6 +1350,7 @@ public class MainControl {
         model.addAttribute("addPackageType", addPackageType);
         model.addAttribute("packageTypes", medicineService.findTypePackaging(packageTypeName));
         model.addAttribute("pagin", 0);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("page", 0);
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
@@ -1332,9 +1392,11 @@ public class MainControl {
 
     @PostMapping("medicineCreate/packageTypeCreate")
     public String showPackageTypeCreatePage(@RequestParam(defaultValue = "true") boolean createPackageType,
+                                            @RequestParam(required = false) BigDecimal userID,
                                             @ModelAttribute TypePackaging packageType, Model model) {
         model.addAttribute("createPackageType", createPackageType);
         String error = medicineService.createTypePackaging(packageType);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("InfoErrorShow", true);
         if (error != null) {
             model.addAttribute("InfoError", error);
@@ -1368,6 +1430,7 @@ public class MainControl {
                                                      @RequestParam(required = false) BigDecimal dosage_form_id,
                                                      @RequestParam(defaultValue = "") String selectDosageForm,
                                                      @RequestParam(defaultValue = "false") boolean edit,
+                                                     @RequestParam(required = false) BigDecimal userID,
                                                      @RequestParam(required = false) BigDecimal idMedicine,
                                                      @RequestParam(required = false) BigDecimal photoID,
                                                      @RequestParam(required = false) boolean delete,
@@ -1382,6 +1445,7 @@ public class MainControl {
                 .collect(Collectors.toList());
         List<Photos> photos = medicineService.getPhotosMed();
         model.addAttribute("medicines", medicines);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
@@ -1417,16 +1481,20 @@ public class MainControl {
 
     @GetMapping("medicineCreate/pharmacologicalGroupCreate")
     public String showPharmacologicalGroupCreatePage(@RequestParam(defaultValue = "true") boolean pharmacologicalGroupCreate,
+                                                     @RequestParam(required = false) BigDecimal userID,
                                                      Model model) {
         model.addAttribute("pharmacologicalGroupCreate", pharmacologicalGroupCreate);
+        model.addAttribute("user", userService.get_id_user(userID));
         return "medicineCreate";
     }
 
     @PostMapping("medicineCreate/pharmacologicalGroupCreate")
     public String PharmacologicalGroupCreatePage(@RequestParam(defaultValue = "true") boolean pharmacologicalGroupCreate,
+                                                 @RequestParam(required = false) BigDecimal userID,
                                                      @ModelAttribute PharmacologicalGroup pharmacologicalGroup,
                                                  Model model) {
         model.addAttribute("pharmacologicalGroupCreate", pharmacologicalGroupCreate);
+        model.addAttribute("user", userService.get_id_user(userID));
         String error = medicineService.createPharmacologicalGroup(pharmacologicalGroup);
         model.addAttribute("InfoErrorShow", true);
         if (error != null) {
@@ -1440,8 +1508,10 @@ public class MainControl {
 
     @GetMapping("medicineCreate/therapeuticGroupCreate")
     public String showTherapeuticGroupCreatePage(@RequestParam(defaultValue = "true") boolean therapeuticGroupCreate,
+                                                 @RequestParam(required = false) BigDecimal userID,
                                                      Model model) {
         model.addAttribute("therapeuticGroupCreate", therapeuticGroupCreate);
+        model.addAttribute("user", userService.get_id_user(userID));
         return "medicineCreate";
     }
 
@@ -1466,6 +1536,7 @@ public class MainControl {
                                              @RequestParam(defaultValue = "") String selectPackageType,
                                              @RequestParam(required = false) BigDecimal dosage_form_id,
                                              @RequestParam(defaultValue = "") String selectDosageForm,
+                                             @RequestParam(required = false) BigDecimal userID,
                                              @RequestParam(defaultValue = "false") boolean edit,
                                              @RequestParam(required = false) BigDecimal idMedicine,
                                              @RequestParam(required = false) BigDecimal photoID,
@@ -1476,6 +1547,7 @@ public class MainControl {
         model.addAttribute("therapeuticGroups", medicineService.findTherapeuticGroup(groupName));
         model.addAttribute("pagin", 0);
         model.addAttribute("page", 0);
+        model.addAttribute("user", userService.get_id_user(userID));
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
@@ -1517,10 +1589,12 @@ public class MainControl {
 
     @PostMapping("medicineCreate/therapeuticGroupCreate")
     public String TherapeuticGroupCreatePage(@RequestParam(defaultValue = "true") boolean therapeuticGroupCreate,
+                                             @RequestParam(required = false) BigDecimal userID,
                                              @ModelAttribute TherapeuticGroup therapeuticGroup,
                                                  Model model) {
         model.addAttribute("therapeuticGroupCreate", therapeuticGroupCreate);
         String error = medicineService.createTherapeuticGroup(therapeuticGroup);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("InfoErrorShow", true);
         if (error != null) {
             model.addAttribute("InfoError", error);
@@ -1552,6 +1626,7 @@ public class MainControl {
                                           @RequestParam(defaultValue = "") String selectPackageType,
                                           @RequestParam(required = false) BigDecimal dosage_form_id,
                                           @RequestParam(defaultValue = "") String selectDosageForm,
+                                          @RequestParam(required = false) BigDecimal userID,
                                           @RequestParam(defaultValue = "false") boolean edit,
                                           @RequestParam(required = false) BigDecimal idMedicine,
                                           @RequestParam(required = false) BigDecimal photoID,
@@ -1562,6 +1637,7 @@ public class MainControl {
         model.addAttribute("manufacturers", medicineService.findManufucture(manufacturerName));
         model.addAttribute("pagin", 0);
         model.addAttribute("page", 0);
+        model.addAttribute("user", userService.get_id_user(userID));
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
@@ -1602,16 +1678,20 @@ public class MainControl {
 
     @GetMapping("medicineCreate/manufacturerCreate")
     public String showManufacturerCreatePage(@RequestParam(defaultValue = "true") boolean manufacturerCreate,
+                                             @RequestParam(required = false) BigDecimal userID,
                                                  Model model) {
         model.addAttribute("manufacturerCreate", manufacturerCreate);
+        model.addAttribute("user", userService.get_id_user(userID));
         return "medicineCreate";
     }
 
     @PostMapping("medicineCreate/manufacturerCreate")
     public String ManufacturerCreatePage(@RequestParam(defaultValue = "true") boolean manufacturerCreate,
+                                         @RequestParam(required = false) BigDecimal userID,
                                          @ModelAttribute Manufacturer manufacturer,
                                              Model model) {
         model.addAttribute("manufacturerCreate", manufacturerCreate);
+        model.addAttribute("user", userService.get_id_user(userID));
         String error = medicineService.createManufacturer(manufacturer);
         model.addAttribute("InfoErrorShow", true);
         if (error != null) {
@@ -1625,16 +1705,20 @@ public class MainControl {
 
     @GetMapping("medicineCreate/atcCreate")
     public String showAtcCreatePage(@RequestParam(defaultValue = "true") boolean atcCreate,
+                                    @RequestParam(required = false) BigDecimal userID,
                                              Model model) {
         model.addAttribute("atcCreate", atcCreate);
+        model.addAttribute("user", userService.get_id_user(userID));
         return "medicineCreate";
     }
 
     @PostMapping("medicineCreate/atcCreate")
     public String AtcCodeCreatePage(@RequestParam(defaultValue = "true") boolean atcCreate,
                                     @ModelAttribute AtcClassification atcClassification,
+                                    @RequestParam(required = false) BigDecimal userID,
                                     Model model) {
         String error = medicineService.createAtcCode(atcClassification);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("atcCreate", atcCreate);
         model.addAttribute("InfoErrorShow", true);
         if (error != null) {
@@ -1668,6 +1752,7 @@ public class MainControl {
                                      @RequestParam(required = false) BigDecimal dosage_form_id,
                                      @RequestParam(defaultValue = "") String selectDosageForm,
                                      @RequestParam(defaultValue = "false") boolean edit,
+                                     @RequestParam(required = false) BigDecimal userID,
                                      @RequestParam(required = false) BigDecimal idMedicine,
                                      @RequestParam(required = false) BigDecimal photoID,
                                      @RequestParam(required = false) boolean delete,
@@ -1677,6 +1762,7 @@ public class MainControl {
         model.addAttribute("addDosageForm", addDosageForm);
         model.addAttribute("pagin", 0);
         model.addAttribute("page", 0);
+        model.addAttribute("user", userService.get_id_user(userID));
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
@@ -1719,10 +1805,12 @@ public class MainControl {
     public String showDosageFormCreatePage(@RequestParam(defaultValue = "true") boolean dosageFormCreate,
                                            @RequestParam(defaultValue = "false") boolean addInjectionMethods,
                                            @RequestParam(required = false) BigDecimal InjectionMethods_id,
+                                           @RequestParam(required = false) BigDecimal userID,
                                            @RequestParam(defaultValue = "") String selectInjectionMethods,
                                     Model model) {
         model.addAttribute("dosageFormCreate", dosageFormCreate);
         model.addAttribute("InjectionMethods_id", InjectionMethods_id);
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("selectInjectionMethods", selectInjectionMethods);
         model.addAttribute("addInjectionMethods", addInjectionMethods);
         if (addInjectionMethods){
@@ -1734,10 +1822,12 @@ public class MainControl {
     @PostMapping("medicineCreate/dosageFormCreate")
     public String DosageFormCreate(@RequestParam(defaultValue = "true") boolean addDosageForm,
                                                    @ModelAttribute DosageForm dosageForm,
+                                   @RequestParam(required = false) BigDecimal userID,
                                                    Model model) {
         model.addAttribute("addDosageForm", addDosageForm);
         String error = medicineService.createDosageForm(dosageForm);
         model.addAttribute("InfoErrorShow", true);
+        model.addAttribute("user", userService.get_id_user(userID));
         if (error != null) {
             model.addAttribute("InfoError", error);
         }
@@ -1749,16 +1839,20 @@ public class MainControl {
 
     @GetMapping("medicineCreate/dosageFormCreate/methodOfAdministrationCreate")
     public String showMethodOfAdministrationCreatePage(@RequestParam(defaultValue = "true") boolean methodOfAdministrationCreate,
+                                                       @RequestParam(required = false) BigDecimal userID,
                                       Model model) {
         model.addAttribute("methodOfAdministrationCreate", methodOfAdministrationCreate);
+        model.addAttribute("user", userService.get_id_user(userID));
         return "medicineCreate";
     }
 
     @PostMapping("medicineCreate/dosageFormCreate/methodOfAdministrationCreate")
     public String MethodOfAdministrationCreatePage(@RequestParam(defaultValue = "true") boolean methodOfAdministrationCreate,
+                                                   @RequestParam(required = false) BigDecimal userID,
                                                        @ModelAttribute AdministrationRoute administrationRoute,
                                                        Model model) {
         model.addAttribute("methodOfAdministrationCreate", methodOfAdministrationCreate);
+        model.addAttribute("user", userService.get_id_user(userID));
         String error = medicineService.createAdministrationRoute(administrationRoute);
         model.addAttribute("methodOfAdministrationCreate", methodOfAdministrationCreate);
         model.addAttribute("InfoErrorShow", true);
@@ -1773,18 +1867,22 @@ public class MainControl {
 
     @GetMapping("medicineCreate/createCountry")
     public String showCountryPage(@RequestParam(defaultValue = "true") boolean createCountry,
+                                  @RequestParam(required = false) BigDecimal userID,
                                            Model model) {
         model.addAttribute("createCountry", createCountry);
+        model.addAttribute("user", userService.get_id_user(userID));
         return "medicineCreate";
     }
 
     @PostMapping("medicineCreate/createCountry")
     public String CountryPage(@RequestParam(defaultValue = "true") boolean createCountry,
+                              @RequestParam(required = false) BigDecimal userID,
                                   @RequestParam String countryName, Model model) {
         Country country = Country.builder().name(countryName).build();
         String error = medicineService.createCountry(country);
         model.addAttribute("createCountry", createCountry);
         model.addAttribute("InfoErrorShow", true);
+        model.addAttribute("user", userService.get_id_user(userID));
         if (error != null) {
             model.addAttribute("InfoError", error);
         }
@@ -1815,6 +1913,7 @@ public class MainControl {
                                     @RequestParam(defaultValue = "") String selectPackageType,
                                     @RequestParam(required = false) BigDecimal dosage_form_id,
                                     @RequestParam(defaultValue = "") String selectDosageForm,
+                                    @RequestParam(required = false) BigDecimal userID,
                                     @RequestParam(defaultValue = "false") boolean edit,
                                     @RequestParam(required = false) BigDecimal idMedicine,
                                     @RequestParam(required = false) BigDecimal photoID,
@@ -1829,6 +1928,7 @@ public class MainControl {
                 .limit(15)
                 .collect(Collectors.toList());
         List<Photos> photos = medicineService.getPhotosMed();
+        model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("medicines", medicines);
         model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
@@ -1864,19 +1964,20 @@ public class MainControl {
     }
 
     @GetMapping("medicineView")
-    public String showMedicineView(BigDecimal idMedicine ,Model model) {
+    public String showMedicineView(BigDecimal idMedicine, @RequestParam(required = false) BigDecimal userID, Model model) {
         model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
         model.addAttribute("photos", medicineService.getPhotoMed(idMedicine));
+        model.addAttribute("user", userService.get_id_user(userID));
         return "medicineView";
     }
 
     @PostMapping("/medicineCreate/uploadPhoto")
-    public String uploadPhoto(@RequestParam("photo") MultipartFile file,
-                              @RequestParam(required = false) BigDecimal medicineId,
+    public String uploadPhoto(@RequestParam("photo") MultipartFile file, @RequestParam(required = false) BigDecimal userID,
+                              @RequestParam(required = false) BigDecimal medicineId, Model model,
                               HttpSession session) {
         String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
         String fileName = file.getOriginalFilename();
-
+        model.addAttribute("user", userService.get_id_user(userID));
         try {
             File destination = new File(uploadDir + fileName);
             file.transferTo(destination);
@@ -1919,12 +2020,12 @@ public class MainControl {
     }
 
     @PostMapping("/pharmacyCreate/uploadPhoto")
-    public String uploadPhotoPharmacy(@RequestParam("photo") MultipartFile file,
-                                      @RequestParam(required = false) BigDecimal pharmacyID,
+    public String uploadPhotoPharmacy(@RequestParam("photo") MultipartFile file, @RequestParam(required = false) BigDecimal userID,
+                                      @RequestParam(required = false) BigDecimal pharmacyID, Model model,
                               HttpSession session) {
         String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
         String fileName = file.getOriginalFilename();
-
+        model.addAttribute("user", userService.get_id_user(userID));
         try {
             File destination = new File(uploadDir + fileName);
             file.transferTo(destination);
@@ -1955,7 +2056,8 @@ public class MainControl {
     }
 
     @GetMapping("/userView")
-    public String userView(BigDecimal userID, @RequestParam(defaultValue = "false") Boolean exitUser,
+    public String userView(@RequestParam(required = false) BigDecimal userID, @RequestParam(defaultValue = "false") Boolean exitUser,
+
             Model model,
             HttpSession session) {
         UserOfPharmacy user = userService.get_id_user(userID);
@@ -1965,7 +2067,7 @@ public class MainControl {
     }
 
     @GetMapping("/userEdit")
-    public String userEditShow(BigDecimal userID, @RequestParam(defaultValue = "false") Boolean deleteUser, Model model){
+    public String userEditShow(@RequestParam(required = false) BigDecimal userID, @RequestParam(defaultValue = "false") Boolean deleteUser, Model model){
         UserOfPharmacy user = userService.get_id_user(userID);
         model.addAttribute("user", user);
         model.addAttribute("deleteUser", deleteUser);
@@ -1973,7 +2075,7 @@ public class MainControl {
     }
 
     @PostMapping("/userEdit")
-    public String userEdit(@ModelAttribute UserOfPharmacy beforeUser, Model model){
+    public String userEdit(@ModelAttribute UserOfPharmacy beforeUser, @RequestParam(required = false) BigDecimal userID, Model model){
         userService.updateUser(beforeUser);
         UserOfPharmacy afterUser = userService.get_id_user(beforeUser.getId());
         model.addAttribute("user", afterUser);
@@ -1983,11 +2085,26 @@ public class MainControl {
     }
 
     @GetMapping("/userEdit/deleteUser")
-    public String userViewDelete(BigDecimal userID,
+    public String userViewDelete(@RequestParam(required = false) BigDecimal userID,
                            Model model,
                            HttpSession session) {
         UserOfPharmacy user = userService.get_id_user(userID);
         model.addAttribute("user", user);
         return "entrace";
+    }
+
+    @GetMapping("/medicineView/order")
+    public String getMedicineUser(@RequestParam BigDecimal userID, @RequestParam BigDecimal medicineID, Model model, HttpSession session) {
+        orderService.createOrderMedicine(userID, medicineID);
+        model.addAttribute("pagin", 0);
+        model.addAttribute("page", 0);
+        List<Medicine> medicines = medicineService.getAllMedicine().stream()
+                .limit(15)
+                .collect(Collectors.toList());
+        List<Photos> photos = medicineService.getPhotosMed();
+        model.addAttribute("user", userService.get_id_user(userID));
+        model.addAttribute("medicines", medicines);
+        model.addAttribute("photos", photos);
+        return "medicinePlace";
     }
 }

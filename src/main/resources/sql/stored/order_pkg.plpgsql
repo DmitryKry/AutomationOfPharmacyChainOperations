@@ -1,0 +1,105 @@
+CREATE SCHEMA IF NOT EXISTS order_pkg;
+
+create or replace procedure order_pkg.create_order(user_id numeric)
+       as $$
+       declare
+roleId numeric;
+begin
+select role into roleId from userofpharmacy where id = user_id;
+insert into orders(id_of_user, id_his_role)
+values (user_id, roleId);
+end;
+$$ language plpgsql;
+
+create or replace procedure order_pkg.create_order_medicine(user_id numeric, medicine_id numeric)
+       as $$
+       declare
+ordersId numeric;
+begin
+select id into ordersId from orders where id_of_user = user_id and id_of_pharmacy is null;
+if ordersId is not null then
+            insert into order_medicine (order_id, id_of_medicine, count)
+            values (ordersId, medicine_id, 1);
+end if;
+end;
+$$ language plpgsql;
+
+create or replace procedure order_pkg.update_order_medicine(user_id numeric, medicine_id numeric, count_medicine numeric)
+          as $$
+          declare
+ordersId numeric;
+            ordersMedicineId numeric;
+begin
+select id into ordersId from orders where id_of_user = user_id and id_of_pharmacy is null;
+if ordersId is not null then
+select id into ordersMedicineId from order_medicine where order_id = ordersId and id_of_medicine = medicine_id;
+end if;
+if ordersMedicineId is not null then
+update order_medicine
+set count = count_medicine
+where id = ordersMedicineId;
+end if;
+end;
+$$ language plpgsql;
+
+create or replace procedure order_pkg.end_order(user_id numeric, pharmacy_id numeric)
+       as $$
+begin
+update orders
+set id_of_pharmacy = pharmacy_id
+where id_of_user = user_id;
+end;
+$$ language plpgsql;
+
+create or replace procedure order_pkg.delete_medicine_order(orders_Medicine_Id numeric)
+       as $$
+begin
+delete from order_medicine where id = orders_Medicine_Id;
+end;
+$$ language plpgsql;
+
+create or replace procedure order_pkg.delete_pharmacy_order(orders_pharmacy_Id numeric)
+       as $$
+begin
+delete from orders where id = orders_pharmacy_Id;
+end;
+$$ language plpgsql;
+
+create or replace function order_pkg.get_med_order(user_id numeric)
+       returns setof order_medicine as $$
+       declare
+         orderID numeric;
+       begin
+        select id into orderID from orders where id_of_user = user_id and id_of_pharmacy is null;
+       if orderID is not null then
+          return query
+          select * from order_medicine where order_id = orderID;
+       else
+          return;
+       end if;
+end;
+$$ language plpgsql;
+
+create or replace function order_pkg.get_order_pharmacy(pharmacy_id numeric)
+       returns setof orders as $$
+       begin
+       return query
+       select * from orders where id_of_pharmacy = pharmacy_id;
+end;
+$$ language plpgsql;
+
+create or replace function order_pkg.get_all_orders()
+    returns setof orders as $$
+       begin
+       return query
+       select * from orders;
+end;
+$$ language plpgsql;
+
+create or replace function order_pkg.get_all_orders_admin()
+       returns setof orders as $$
+begin
+return query
+select * from orders where id_user_role = 3;
+end;
+$$ language plpgsql;
