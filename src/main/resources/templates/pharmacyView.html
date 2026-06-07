@@ -11,7 +11,7 @@
         <a th:if="${user == null}" class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
         <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
         <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
-        <a class="about_of_pharmacy" th:text="#{basket}"></a>
+        <a th:if="${user != null}" class="authorization"  th:text="#{basket}"></a>
         <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
         <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
     </div>
@@ -19,10 +19,9 @@
         <img th:if="${photos != null && photos.getPhotoPath() != null}"
              th:src="${photos.getPhotoPath()}">
     </div>
-    <a th:class="edit" th:id="editPharmacy" th:text="#{edit}" th:href="@{/api/pharmacy/pharmacyEdit(pharmacyID=${pharmacy.getId()},
+    <a th:class="edit" th:id="editPharmacy" th:text="#{edit}" th:href="@{/api/pharmacy/pharmacyEdit(pharmacyID=${pharmacy.getId()}, userID=${user.getId()},
     selectAdmin=${user.getFio()}, idAdmin=${user.getWorkerID()}, idCity=${pharmacy.cityID},
     selectCityRegion=${pharmacy.region}, selectCity=${pharmacy.cityName}, edit=true)}"></a>
-
     <div th:class="createObject" th:id="pharmacies">
         <h3 th:text="#{pharmacy.registration.details}"></h3>
         <div class="form-group">

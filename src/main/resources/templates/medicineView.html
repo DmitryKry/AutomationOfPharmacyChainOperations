@@ -94,14 +94,13 @@
     <a th:if="${user == null}" class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
     <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
     <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
-    <a class="about_of_pharmacy" th:text="#{basket}"></a>
+    <a th:if="${user != null}" class="authorization"  th:text="#{basket}"></a>
     <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
     <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
 </div>
 
 <div class="AllInfo">
-    <form th:action="@{/api/pharmacy/medicineCreate}" method="post">
-        <!-- ЛЕВАЯ КОЛОНКА: ФОТО -->
+    <form th:action="@{/api/pharmacy/medicineCreate(userID=${user.getId()})}" method="post">
         <div class="form-left">
             <div th:id="forPhoto1">
                 <img th:if="${photos != null && photos.getPhotoPath() != null}"
@@ -109,7 +108,7 @@
             </div>
         </div>
 
-        <a th:class="edit" th:if="${user.getRole() != 2}" th:id="editMedicine" th:text="#{edit}" th:href="@{/api/pharmacy/medicineEdit(
+        <a th:class="edit" th:if="${user.getRole() != 2}" th:id="editMedicine" th:text="#{edit}" th:href="@{/api/pharmacy/medicineEdit(userID=${user.getId()},
     edit=true,
     idMedicine=${medicine.getId()},
     brand_id=${medicine.getBrandId()},
@@ -131,7 +130,7 @@
     dosage_form_id=${medicine.getDosageFormId()},
     selectDosageForm=${medicine.getDosageFormName()}
 )}"></a>
-        <a th:class="edit" th:id="editMedicine" th:text="#{order}"
+        <a th:if="${user.getRole() == 2}" th:class="edit" th:id="editMedicine" th:text="#{order}"
            th:href="@{/api/pharmacy/medicineView/order(userID=${user.getId()}, medicineID=${medicine.getId()})}"></a>
 
         <!-- ПРАВАЯ КОЛОНКА: ВСЕ БЛОКИ -->

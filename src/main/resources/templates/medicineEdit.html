@@ -93,13 +93,13 @@
     <a th:if="${user == null}" class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
     <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
     <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
-    <a class="about_of_pharmacy" th:text="#{basket}"></a>
+    <a th:if="${user != null}" class="authorization"  th:text="#{basket}"></a>
     <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
     <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
 </div>
 
 <div class="AllInfo">
-    <form th:action="@{/api/pharmacy/medicineEdit}" method="post">
+    <form th:action="@{/api/pharmacy/medicineEdit(userID=${user.getId()})}" method="post">
         <div class="form-left">
             <div id="forPhoto1">
                 <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
@@ -146,7 +146,7 @@
                         <input type="hidden" th:name="brandId" th:value="${brand_id}">
                         <input type="text" id="brand_id" th:value="${selectBrand}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -170,7 +170,7 @@
                         <input type="hidden" th:name="dosageFormId" th:value="${dosage_form_id}">
                         <input type="text" id="dosage_form_id" th:value="${selectDosageForm}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -209,7 +209,7 @@
                         <input type="hidden" th:name="atcId" th:value="${atc_id}">
                         <input type="text" id="atc_id" th:value="${selectAtc}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -292,7 +292,7 @@
                         <input type="hidden" th:name="manufacturerId" th:value="${manufacturer_id}">
                         <input type="text" id="manufacturer_id" th:value="${selectManufacturer}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -316,7 +316,7 @@
                         <input type="hidden" th:name="countryId" th:value="${country_id}">
                         <input type="text" id="country_id" th:value="${selectCountry}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -345,7 +345,7 @@
                         <input type="hidden" th:name="pharmacologicalGroupId" th:value="${pharmacological_group_id}">
                         <input type="text" id="pharmacological_group_id" th:value="${selectPharmacologicalGroup}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -370,7 +370,7 @@
                         <input type="hidden" th:name="therapeuticGroupId" th:value="${therapeutic_group_id}">
                         <input type="text" id="therapeutic_group_id" th:value="${selectTherapeuticGroup}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -399,7 +399,7 @@
                         <input type="hidden" th:name="prescriptionFormId" th:value="${prescription_form_id}">
                         <input type="text" id="prescription_form_id" th:value="${selectPrescriptionForm}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -423,7 +423,7 @@
                         <input type="hidden" th:name="packageTypeId" th:value="${package_type_id}">
                         <input type="text" id="package_type_id" th:value="${selectPackageType}" readonly>
                     </div>
-                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id},
+                    <a th:href="@{/api/pharmacy/medicineEdit(atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -447,7 +447,7 @@
 
             <div id="medicineIdit">
                 <button type="submit" th:class="ButtonPost" th:id="createMedicine" th:text="#{edit}"></button>
-                <a th:href="@{/api/pharmacy/medicineEdit(delete=true, addBrand=${false},
+                <a th:href="@{/api/pharmacy/medicineEdit(delete=true, addBrand=${false}, userID=${user.getId()},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
                             addBrand=${false},
@@ -476,7 +476,7 @@
 <!-- МОДАЛЬНЫЕ ОКНА -->
 <div th:class="findPerconal" th:if="${addBrand == true}">
     <div>
-        <form th:action="@{/api/pharmacy/addBrand(source='medicineEdit',atc_id=${atc_id},
+        <form th:action="@{/api/pharmacy/addBrand(source='medicineEdit',atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -504,7 +504,7 @@
         <ul>
             <li th:each="b : ${brands}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(userID=${user.getId()},
                             brand_id=${b.getId()},
                             selectBrand=${b.getName()},
                             addBrand=${false},
@@ -531,7 +531,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(addBrand=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(addBrand=${false}, userID=${user.getId()},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
                             addBrand=${false},
@@ -557,7 +557,7 @@
 <!-- Форма выпуска -->
 <div th:class="findPerconal" th:if="${addDosageForm == true}">
     <div>
-        <form th:action="@{/api/pharmacy/addDosageForm(source='medicineEdit',atc_id=${atc_id},
+        <form th:action="@{/api/pharmacy/addDosageForm(source='medicineEdit',atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -584,7 +584,7 @@
         <ul>
             <li th:each="df : ${dosageForms}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(userID=${user.getId()},
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -611,7 +611,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(addDosageForm=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(addDosageForm=${false}, userID=${user.getId()},
         atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -636,7 +636,7 @@
 
 <div th:class="findPerconal" th:if="${addManufacturer == true}">
     <div>
-        <form th:action="@{/api/pharmacy/addManufacturer(source='medicineEdit',atc_id=${atc_id},
+        <form th:action="@{/api/pharmacy/addManufacturer(source='medicineEdit',atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -663,7 +663,7 @@
         <ul>
             <li th:each="m : ${manufacturers}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(userID=${user.getId()},
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             country_id=${country_id},
@@ -690,7 +690,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(addManufacturer=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(addManufacturer=${false}, userID=${user.getId()},
         atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -715,7 +715,7 @@
 <!-- Добавление страны -->
 <div th:class="findPerconal" th:if="${addCountry == true}">
     <div>
-        <form th:action="@{/api/pharmacy/addCountry(source='medicineEdit',atc_id=${atc_id},
+        <form th:action="@{/api/pharmacy/addCountry(source='medicineEdit',atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -742,7 +742,7 @@
         <ul>
             <li th:each="c : ${countries}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(userID=${user.getId()},
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -769,7 +769,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(addCountry=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(addCountry=${false}, userID=${user.getId()},
         atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -795,7 +795,7 @@
 <!-- Добавление АТХ кода -->
 <div th:class="findPerconal" th:if="${addAtc == true}">
     <div>
-        <form th:action="@{/api/pharmacy/addAtc(source='medicineEdit',atc_id=${atc_id},
+        <form th:action="@{/api/pharmacy/addAtc(source='medicineEdit',atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -822,7 +822,7 @@
         <ul>
             <li th:each="a : ${atcList}">
                 <div th:id="Transfer">
-                    <a th:title="${a.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    <a th:title="${a.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(userID=${user.getId()},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
                             country_id=${country_id},
@@ -849,7 +849,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(addAtc=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(addAtc=${false}, userID=${user.getId()},
         atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -875,7 +875,7 @@
 <!-- Добавление фармакологической группы -->
 <div th:class="findPerconal" th:if="${addPharmacologicalGroup == true}">
     <div>
-        <form th:action="@{/api/pharmacy/addPharmacologicalGroup(source='medicineEdit',atc_id=${atc_id},
+        <form th:action="@{/api/pharmacy/addPharmacologicalGroup(source='medicineEdit',atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -903,7 +903,7 @@
             <li th:each="pg : ${pharmacologicalGroups}">
                 <div th:id="Transfer">
                     <a th:title="${pg.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
-                    atc_id=${atc_id},
+                    atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -929,7 +929,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(addPharmacologicalGroup=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(addPharmacologicalGroup=${false}, userID=${user.getId()},
         atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -955,7 +955,7 @@
 <!-- Добавление терапевтической группы -->
 <div th:class="findPerconal" th:if="${addTherapeuticGroup == true}">
     <div>
-        <form th:action="@{/api/pharmacy/addTherapeuticGroup(source='medicineEdit',atc_id=${atc_id},
+        <form th:action="@{/api/pharmacy/addTherapeuticGroup(source='medicineEdit',atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -982,7 +982,7 @@
         <ul>
             <li th:each="tg : ${therapeuticGroups}">
                 <div th:id="Transfer">
-                    <a th:title="${tg.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    <a th:title="${tg.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(userID=${user.getId()},
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -1009,7 +1009,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(therapeuticGroupCreate=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(therapeuticGroupCreate=${false}, userID=${user.getId()},
         atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -1035,7 +1035,7 @@
 <!-- Добавление формы рецепта -->
 <div th:class="findPerconal" th:if="${addPrescriptionForm == true}">
     <div>
-        <form th:action="@{/api/pharmacy/addPrescriptionForm(source='medicineEdit',atc_id=${atc_id},
+        <form th:action="@{/api/pharmacy/addPrescriptionForm(source='medicineEdit',atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -1062,7 +1062,7 @@
         <ul>
             <li th:each="pf : ${prescriptionForms}">
                 <div th:id="Transfer">
-                    <a th:title="${pf.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    <a th:title="${pf.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(userID=${user.getId()},
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -1089,7 +1089,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(addPrescriptionForm=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(addPrescriptionForm=${false}, userID=${user.getId()},
         atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -1115,7 +1115,7 @@
 <!-- Добавление типа упаковки -->
 <div th:class="findPerconal" th:if="${addPackageType == true}">
     <div>
-        <form th:action="@{/api/pharmacy/addPackageType(source='medicineEdit',atc_id=${atc_id},
+        <form th:action="@{/api/pharmacy/addPackageType(source='medicineEdit',atc_id=${atc_id}, userID=${user.getId()},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
                             selectManufacturer=${selectManufacturer},
@@ -1142,7 +1142,7 @@
         <ul>
             <li th:each="pt : ${packageTypes}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(
+                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineEdit(userID=${user.getId()},
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -1169,7 +1169,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(addPackageType=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(addPackageType=${false}, userID=${user.getId()},
         atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -1195,16 +1195,16 @@
 <div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
     <H3 th:text="${InfoError}"></H3>
     <div>
-        <a th:href="@{/api/pharmacy/medicineEdit(InfoErrorShow = false)}" th:text="#{Ok}"></a>
+        <a th:href="@{/api/pharmacy/medicineEdit(InfoErrorShow = false, userID=${user.getId()})}" th:text="#{Ok}"></a>
     </div>
 </div>
 
 <div th:class="findPerconal" th:id="okForm" th:if="${delete == true}">
     <H3 th:text="#{deleteTrue} + ${medicine.getName()}"></H3>
     <div>
-        <a class="forDeleteObject" th:href="@{/api/pharmacy/medicineEdit(deleteMedicine = true,
+        <a class="forDeleteObject" th:href="@{/api/pharmacy/medicineEdit(deleteMedicine = true, userID=${user.getId()},
         idMedicine=${medicine != null ? medicine.getId() : ''})}" th:text="#{yes}"></a>
-        <a th:href="@{/api/pharmacy/medicineEdit(delete=false, addBrand=${false},
+        <a th:href="@{/api/pharmacy/medicineEdit(delete=false, addBrand=${false}, userID=${user.getId()},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
                             addBrand=${false},

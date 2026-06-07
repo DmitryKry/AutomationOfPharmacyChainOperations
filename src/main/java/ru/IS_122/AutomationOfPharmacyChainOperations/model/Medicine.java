@@ -179,5 +179,6 @@ public class Medicine {
     private BigDecimal priceMin;
     private BigDecimal priceMax;
 
+    private BigDecimal count;
 
 }

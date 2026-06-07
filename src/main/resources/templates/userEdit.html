@@ -10,11 +10,11 @@
     <a th:if="${user == null}" class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
     <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
     <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
-    <a class="about_of_pharmacy" th:text="#{basket}"></a>
+    <a th:if="${user != null}" class="authorization"  th:text="#{basket}"></a>
     <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
     <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
 </div>
-<form th:action="@{/api/pharmacy/userEdit}" method="post" th:if="${user != null}">
+<form th:action="@{/api/pharmacy/userEdit(userID=${user.getId()})}" method="post" th:if="${user != null}">
     <div class="Entrace">
         <h2 th:if="${error == null}" th:text="#{view.user}"></h2>
         <div th:id="errorCheak" th:if="${error != null}">

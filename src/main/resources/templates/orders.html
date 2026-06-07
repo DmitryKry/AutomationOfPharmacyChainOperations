@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Карточка аптеки</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</HEAD>
+<body>
+<div class="AllInfo">
+    <div class="menu">
+        <a th:if="${user == null}" class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+        <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+        <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
+        <a th:if="${user != null}" class="authorization" th:href="@{/api/pharmacy/orders(userID=${user.getId()})}" th:text="#{basket}"></a>
+        <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
+        <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
+    </div>
+    <div th:id="forPhotoOrders">
+        <img th:if="${photos != null && photos.getPhotoPath() != null}"
+             th:src="${photos.getPhotoPath()}">
+    </div>
+    <div id="ordersContent">
+        <div id="infoOrder"><H1 th:text="#{basket}"></H1></div>
+        <ul>
+            <li th:each="med : ${medicines}" th:data-medicine-id="${med.getId()}"
+                th:data-user-id="${user.getId()}"
+                class="medicine-item">
+                <div class="medicine-info" th:text="${med.getName()} + ' ' + ${med.getBrandName()} + ' ' +
+                ${med.getDosageStrength()} + ' ' + ${med.getCountryName()} + ' ' + ${med.getPackageQuantity()}
+                + ' ' + ${med.getUnitOfMeasure()}
+                + ' ' + #{price} + ' ' + ${med.getPrice()}"></div>
+                <ul>
+                    <li th:each="oM : ${orderMedicines}" th:if="${med.getId() == oM.getIdOfMedicine()}">
+                        <a class="plus-btn" th:if="${med.getId() == oM.getIdOfMedicine()}"
+                           th:href="@{/api/pharmacy/orders(userID=${user.getId()}, medicineID=${med.getId()},
+                           count=${oM.getCount() + 1})}">+</a>
+                        <span class="quantity-value" th:if="${med.getId() == oM.getIdOfMedicine()}"
+                              th:text="${oM.getCount() == null ? 1 : oM.getCount()}"></span>
+                        <a class="minus-btn" th:if="${med.getId() == oM.getIdOfMedicine()}"
+                           th:href="@{/api/pharmacy/orders(userID=${user.getId()}, medicineID=${med.getId()},
+                           count=${oM.getCount() - 1})}">-</a>
+                    </li>
+                </ul>
+
+            </li>
+        </ul>
+    </div>
+</div>
+<script>
+    document.querySelectorAll('.medicine-info').forEach(item => {
+        item.addEventListener('click', function() {
+            const medicineId = this.getAttribute('data-medicine-id');
+            const userId = this.getAttribute('data-user-id');
+            updatePhoto(userId, medicineId);
+        });
+    });
+
+    function updatePhoto(userId, medicineId) {
+        fetch(`/api/pharmacy/orders?userID=${userId}&medicineID=${medicineId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newPhoto = doc.querySelector('#forPhotoOrders img');
+                const currentPhoto = document.querySelector('#forPhotoOrders img');
+
+                if (newPhoto && currentPhoto) {
+                    currentPhoto.src = newPhoto.src;
+                } else if (newPhoto) {
+                    document.querySelector('#forPhotoOrders').innerHTML = newPhoto.outerHTML;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>

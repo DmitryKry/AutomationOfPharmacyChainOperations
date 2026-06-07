@@ -2107,4 +2107,26 @@ public class MainControl {
         model.addAttribute("photos", photos);
         return "medicinePlace";
     }
+
+    @GetMapping("/orders")
+    public String getOrders(@RequestParam BigDecimal userID, @RequestParam(required = false) BigDecimal medicineID,
+                            @RequestParam(defaultValue = "1") BigDecimal value, @RequestParam(required = false) BigDecimal count,
+                            Model model, HttpSession session) {
+        model.addAttribute("user", userService.get_id_user(userID));
+        List<Medicine> medicines = orderService.getMedOrders(userID);
+
+        model.addAttribute("value", value);
+        if (medicineID != null) {
+            model.addAttribute("photos", medicineService.getPhotoMed(medicineID));
+        }
+        if (count != null){
+            orderService.update_count(userID, medicineID, count);
+            model.addAttribute("count", count);
+        }
+        model.addAttribute("orderMedicines", orderService.getMedOrder(userID));
+        model.addAttribute("medicines", medicines);
+        return "orders";
+    }
+
+
 }
