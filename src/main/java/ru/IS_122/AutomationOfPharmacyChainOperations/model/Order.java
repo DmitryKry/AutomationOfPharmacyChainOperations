@@ -37,4 +37,7 @@ public class Order {
 
     @Column(name = "order_date")
     private LocalDateTime orderDate;
+
+    @Column(name = "cost")
+    private BigDecimal cost;
 }

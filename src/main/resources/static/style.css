@@ -1048,3 +1048,21 @@ input:focus, select:focus {
     margin: 0;
     padding: 0;
 }
+
+#order{
+    position: fixed;
+    top: 65%;
+    left: 10%;
+}
+
+.receipt-table {
+    width: 50%;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+.receipt-table th,
+.receipt-table td {
+    text-align: center;
+    padding: 8px;
+}

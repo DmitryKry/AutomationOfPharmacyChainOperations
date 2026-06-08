@@ -35,4 +35,10 @@ public class OrderMedicine {
 
     @Column(name = "price_at_time")
     private BigDecimal priceAtTime;
+
+    @Transient
+    private BigDecimal priceMed;
+
+    @Transient
+    private String nameMed;
 }

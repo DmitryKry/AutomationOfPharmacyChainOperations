@@ -161,6 +161,7 @@ public class MainControl {
     @GetMapping("/pharmacy")
     public String showPharmacyPage(@RequestParam(defaultValue = "0") int pagin,
                                    @RequestParam(defaultValue = "1") int page,
+                                   @RequestParam(required = false) int orderID,
                                    @RequestParam(required = false) BigDecimal userID,
                                    Model model) {
         if (page < 1) {
@@ -171,8 +172,10 @@ public class MainControl {
                 .stream()
                 .limit(15 + pagin)
                 .collect(Collectors.toList());
+
         model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("pharmacies", pharmacies);
+        model.addAttribute("orderID", orderID);
         model.addAttribute("photos", pharmacyService.getPhotosPharmacy());
         model.addAttribute("pagin", pagin);
         model.addAttribute("page", page);
@@ -184,6 +187,7 @@ public class MainControl {
                                        @RequestParam(defaultValue = "1") int page,
                                        @RequestParam(required = false) String name,
                                        @RequestParam(required = false) String REGION,
+                                       @RequestParam(required = false) int orderID,
                                        @RequestParam(required = false) String CITY,
                                        @RequestParam(required = false) String adress,
                                        @RequestParam(required = false) String grade,
@@ -196,6 +200,7 @@ public class MainControl {
             pagin = 0;
         }
         List<Pharmacy> pharmacies = new ArrayList<>();
+        model.addAttribute("orderID", orderID);
         if (grade == null && coverage.isEmpty()) {
             pharmacies = pharmacyService.sortPharmacies(name, REGION, CITY, adress)
                     .stream()
@@ -2110,21 +2115,48 @@ public class MainControl {
 
     @GetMapping("/orders")
     public String getOrders(@RequestParam BigDecimal userID, @RequestParam(required = false) BigDecimal medicineID,
+                            @RequestParam(required = false) BigDecimal idPharmacy,
                             @RequestParam(defaultValue = "1") BigDecimal value, @RequestParam(required = false) BigDecimal count,
+                            @RequestParam(defaultValue = "false") boolean finalTrue, @RequestParam(required = false) BigDecimal orderID,
+                            @RequestParam(required = false) BigDecimal orderMedicine,
                             Model model, HttpSession session) {
         model.addAttribute("user", userService.get_id_user(userID));
-        List<Medicine> medicines = orderService.getMedOrders(userID);
-
         model.addAttribute("value", value);
+        model.addAttribute("idPharmacy", idPharmacy);
+        UserOfPharmacy user = userService.get_id_user(userID);
+        model.addAttribute("user", user);
+
+        if (finalTrue){
+            orderID = orderService.endOrder(userID, idPharmacy);
+            model.addAttribute("orderID", orderID);
+            model.addAttribute("InfoError", "Заказ сформирован!");
+            model.addAttribute("order", orderService.getOrderPharmacy(idPharmacy));
+        }
+        if (idPharmacy != null)
+            model.addAttribute("photos", pharmacyService.getPhotoPharmacy(idPharmacy));
         if (medicineID != null) {
             model.addAttribute("photos", medicineService.getPhotoMed(medicineID));
         }
         if (count != null){
-            orderService.update_count(userID, medicineID, count);
+            if (count.compareTo(BigDecimal.ONE) < 0) {
+                orderService.deleteMedicineOrder(orderMedicine);
+            }
+            else{
+                orderService.update_count(userID, medicineID, count);
+            }
             model.addAttribute("count", count);
         }
-        model.addAttribute("orderMedicines", orderService.getMedOrder(userID));
-        model.addAttribute("medicines", medicines);
+        model.addAttribute("finalTrue", finalTrue);
+        if (orderID != null){
+            model.addAttribute("orderMedicines", orderService.getMedOrderPharmacy(orderID));
+            List<Medicine> medicines = orderService.getMedOrdersIdOrder(orderID);
+            model.addAttribute("medicines", medicines);
+        }
+        else {
+            model.addAttribute("orderMedicines", orderService.getMedOrder(userID));
+            List<Medicine> medicines = orderService.getMedOrders(userID);
+            model.addAttribute("medicines", medicines);
+        }
         return "orders";
     }
 

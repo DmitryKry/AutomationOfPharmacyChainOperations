@@ -53,19 +53,21 @@ public class OrderService {
         });
     }
 
-    public void endOrder(BigDecimal userID, BigDecimal pharmacyID) {
+    public BigDecimal endOrder(BigDecimal userID, BigDecimal pharmacyID) {
         String sql = "call order_pkg.end_order(?, ?, ?)";
-        jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             int index = 1;
             cs.setBigDecimal(index++, userID);
             cs.setBigDecimal(index, pharmacyID);
+            cs.registerOutParameter(3, Types.NUMERIC);
             cs.execute();
-            return null;
+
+            return cs.getBigDecimal(3);
         });
     }
 
     public void deleteMedicineOrder(BigDecimal orders_Medicine_Id) {
-        String sql = "call order_pkg.delete_medicine_order(?, ?, ?)";
+        String sql = "call order_pkg.delete_medicine_order(?)";
         jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             int index = 1;
             cs.setBigDecimal(index++, orders_Medicine_Id);
@@ -75,7 +77,7 @@ public class OrderService {
     }
 
     public void deletePharmacyOrder(BigDecimal ordersPharmacyID) {
-        String sql = "call order_pkg.orders_pharmacy_Id(?, ?, ?)";
+        String sql = "call order_pkg.orders_pharmacy_Id(?)";
         jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             int index = 1;
             cs.setBigDecimal(index++, ordersPharmacyID);
@@ -95,8 +97,8 @@ public class OrderService {
     }
 
     public List<Order> getOrderPharmacy(BigDecimal pharmacyId) {
-        String sql = "select * from order_pkg.get_order_pharmacy()";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class));
+        String sql = "select * from order_pkg.get_order_pharmacy(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class), pharmacyId);
     }
 
     public List<Medicine> getMedOrders(BigDecimal userId) {
@@ -116,9 +118,19 @@ public class OrderService {
         });
     }
 
+    public List<Medicine> getMedOrdersIdOrder(BigDecimal orderID) {
+        String sql = "select * from order_pkg.get_med_orders_id_order(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Medicine.class), orderID);
+    }
+
     public List<OrderMedicine> getMedOrder(BigDecimal userID) {
         String sql = "select * from order_pkg.get_med_order(?)";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(OrderMedicine.class), userID);
+    }
+
+    public List<OrderMedicine> getMedOrderPharmacy(BigDecimal orderID) {
+        String sql = "select * from order_pkg.get_med_order_pharmacy(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(OrderMedicine.class), orderID);
     }
 
 }

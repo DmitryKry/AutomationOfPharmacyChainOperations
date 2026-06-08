@@ -97,7 +97,7 @@
 </div>
     <div th:id="openFilter">
         <div th:id="filter">
-            <form th:action="@{/api/pharmacy/pharmacy}" method="post">
+            <form th:action="@{/api/pharmacy/pharmacy(userID=${user.getId()}, orderID=${orderID != null ? orderID : ''})}" method="post">
                 <h2 align="center" th:text="#{filter}"></h2>
                 <div class="form-group">
                     <label for="name" th:text="#{name}"></label>
@@ -155,7 +155,20 @@
     <div th:class="content">
         <ul>
             <li th:each="ph : ${pharmacies}">
-                <a th:href="@{/api/pharmacy/pharmacyView(idPharmacy=${ph.getId()}, userID=${user.getId()})}">
+                <a th:if="${orderID == null}" th:href="@{/api/pharmacy/pharmacyView(idPharmacy=${ph.getId()}, userID=${user.getId()})}">
+                    <div class="for-photo">
+                        <ul th:if="${!photos.isEmpty()}">
+                            <li th:each="photo : ${photos}">
+                                <img th:if="${photo.getEntityId() == ph.getId()}"
+                                     th:src="${photo.getPhotoPath()}">
+                            </li>
+                        </ul>
+                    </div>
+                    <div th:class="for-name" th:text="${ph.getName()}"></div>
+                    <div th:class="for-content" th:text="${ph.getCityName()} + ' ' + ${ph.getAddress()}"></div>
+                </a>
+                <a th:if="${orderID != null}" th:href="@{/api/pharmacy/orders(idPharmacy=${ph.getId()}, userID=${user.getId()},
+                orderID=${orderID != null ? orderID : ''})}">
                     <div class="for-photo">
                         <ul th:if="${!photos.isEmpty()}">
                             <li th:each="photo : ${photos}">
@@ -170,16 +183,18 @@
             </li>
         </ul>
         <div th:class="pagination">
-            <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin - 15}, page=${page - 1}, userID=${user.getId()})}" th:class="previous"><</a>
+            <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin - 15}, page=${page - 1}, userID=${user.getId()},
+            orderID=${orderID != null ? orderID : ''})}" th:class="previous"><</a>
             <h5 th:text="${page}" />
-            <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin + 15}, page=${page + 1}, userID=${user.getId()})}" th:class="next">></a>
+            <a th:href="@{/api/pharmacy/pharmacy(pagin=${pagin + 15}, page=${page + 1}, userID=${user.getId()},
+            orderID=${orderID != null ? orderID : ''})}" th:class="next">></a>
         </div>
     </div>
     <div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
         <H3 th:text="${InfoError}"></H3>
         <div>
             <a th:href="@{/api/pharmacy/pharmacy(InfoErrorShow = false,
-            pagin=${pagin}, page=${page}, userID=${user.getId()})}" th:text="#{Ok}"></a>
+            pagin=${pagin}, page=${page}, userID=${user.getId()}, orderID=${orderID != null ? orderID : ''})}" th:text="#{Ok}"></a>
         </div>
     </div>
 </body>

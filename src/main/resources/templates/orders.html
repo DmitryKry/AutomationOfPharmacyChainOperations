@@ -19,6 +19,11 @@
         <img th:if="${photos != null && photos.getPhotoPath() != null}"
              th:src="${photos.getPhotoPath()}">
     </div>
+    <a th:if="${idPharmacy == null}" th:class="edit" th:id="order" th:text="#{specifyAPharmacy}" th:href="@{/api/pharmacy/pharmacy(
+    userID=${user.getId()},
+    orderID=${orderMedicines != null and orderMedicines.size() > 0 ? orderMedicines[0].orderId : null})}"></a>
+    <a th:if="${idPharmacy != null}" th:class="edit" th:id="order" th:text="#{final}" th:href="@{/api/pharmacy/orders(
+    userID=${user.getId()}, idPharmacy=${idPharmacy}, orderID=${orderID}, finalTrue=true)}"></a>
     <div id="ordersContent">
         <div id="infoOrder"><H1 th:text="#{basket}"></H1></div>
         <ul>
@@ -33,17 +38,58 @@
                     <li th:each="oM : ${orderMedicines}" th:if="${med.getId() == oM.getIdOfMedicine()}">
                         <a class="plus-btn" th:if="${med.getId() == oM.getIdOfMedicine()}"
                            th:href="@{/api/pharmacy/orders(userID=${user.getId()}, medicineID=${med.getId()},
-                           count=${oM.getCount() + 1})}">+</a>
+                           count=${oM.getCount() + 1}, orderMedicine=${oM.getId()})}">+</a>
                         <span class="quantity-value" th:if="${med.getId() == oM.getIdOfMedicine()}"
                               th:text="${oM.getCount() == null ? 1 : oM.getCount()}"></span>
                         <a class="minus-btn" th:if="${med.getId() == oM.getIdOfMedicine()}"
                            th:href="@{/api/pharmacy/orders(userID=${user.getId()}, medicineID=${med.getId()},
-                           count=${oM.getCount() - 1})}">-</a>
+                           count=${oM.getCount() - 1}, orderMedicine=${oM.getId()})}">-</a>
                     </li>
                 </ul>
 
             </li>
         </ul>
+    </div>
+</div>
+<div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${finalTrue == true}">
+    <h3 th:text="${InfoError}"></h3>
+
+    <div class="receipt">
+        <h4>Чек заказа #<span th:text="${orderID}"></span></h4>
+
+        <table class="receipt-table">
+            <thead>
+            <tr>
+                <th>Наименование</th>
+                <th>Кол-во</th>
+                <th>Цена</th>
+                <th>Сумма</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="orderMed : ${orderMedicines}">
+                <td th:text="${orderMed.getNameMed()}">
+                </td>
+                <td th:text="${orderMed.count}"></td>
+                <td th:text="${orderMed.getPriceMed()}">₽</td>
+                <td th:text="${orderMed.count * orderMed.getPriceMed()}">₽</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3"><strong>Итого:</strong></td>
+                <td>
+                    <strong th:text="${order.get(0).getCost()}">₽
+                    </strong>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+        <button >Печать чека</button>
+    </div>
+    <div>
+        <a th:href="@{/api/pharmacy/orders(userID=${user.getId()}, orderID=${orderID})}"
+           th:text="#{Ok}"></a>
     </div>
 </div>
 <script>

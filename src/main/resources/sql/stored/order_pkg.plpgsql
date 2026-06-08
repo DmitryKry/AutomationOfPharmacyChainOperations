@@ -51,12 +51,25 @@ end if;
 end;
 $$ language plpgsql;
 
-create or replace procedure order_pkg.end_order(user_id numeric, pharmacy_id numeric)
+create or replace procedure order_pkg.end_order(user_id numeric, pharmacy_id numeric, orderId out numeric)
        as $$
+declare
+       price_medicine numeric(38,2);
+       medicine_rec record;
 begin
 update orders
 set id_of_pharmacy = pharmacy_id
-where id_of_user = user_id;
+where id_of_user = user_id and id_of_pharmacy is null
+returning id into orderId;
+for medicine_rec in select * from order_medicine where order_id = orderId loop
+select price into price_medicine from medicine where id = medicine_rec.id_of_medicine;
+update order_medicine
+set price_at_time = price_medicine * medicine_rec.count
+where id = medicine_rec.id;
+end loop;
+update orders
+set cost = (select sum(price_at_time) from order_medicine where order_id = orderId)
+where id = orderId;
 end;
 $$ language plpgsql;
 
@@ -86,6 +99,18 @@ create or replace function order_pkg.get_med_order(user_id numeric)
        else
           return;
        end if;
+end;
+$$ language plpgsql;
+
+create or replace function order_pkg.get_med_order_pharmacy(orderID numeric)
+       returns table (id bigint, order_id bigint, id_of_medicine bigint,
+       count numeric, proce_at_time numeric, nameMed varchar, priceMed numeric) as $$
+        begin
+        return query
+        select om.id, om.order_id, om.id_of_medicine, om.count, om.price_at_time, m.name as nameMed, m.price as priceMed
+        from order_medicine om
+            join medicine m on m.id = om.id_of_medicine
+                     where om.order_id = orderID;
 end;
 $$ language plpgsql;
 
@@ -160,7 +185,58 @@ create or replace function order_pkg.get_med_orders(user_id numeric)
          JOIN order_medicine om ON om.id_of_medicine = m.id
          JOIN orders o ON o.id = om.order_id
          CROSS JOIN LATERAL medicine_pkg.get_medicine(m.id) mpgm
-       WHERE o.id_of_user = user_id;
+       WHERE o.id_of_user = user_id and o.id_of_pharmacy is null;
+end;
+$$ language plpgsql;
+
+create or replace function order_pkg.get_med_orders_id_order(orderId numeric)
+       returns table(
+       id numeric(38,2),
+       name character varying(200),
+       international_name character varying(200),
+       dosage_strength character varying(50),
+       package_quantity integer,
+       prescriptionRequiredWord varchar,
+       registration_number character varying(50),
+       registration_date date,
+       shelf_life_months integer,
+       storage_temperature_min integer,
+       storage_temperature_max integer,
+       requiresRefrigerationWord varchar,
+       lightSensitiveWord varchar,
+       requiresDarkStorageWord varchar,
+       is_active boolean,
+       is_vital boolean,
+       is_available boolean,
+       pharmacological_group_id numeric(38,2),
+       pharmacological_group_name varchar,
+       therapeutic_group_id numeric(38,2),
+       therapeutic_group_name varchar,
+       manufacturer_id numeric(38,2),
+       manufacturer_name varchar,
+       country_id numeric(38,2),
+       countryName varchar,
+       prescription_form_id numeric(38,2),
+       prescription_form_name varchar,
+       dosage_form_id numeric(38,2),
+       dosageFormName varchar,
+       brand_id numeric(38,2),
+       brandName varchar,
+       atc_id numeric(38,2),
+       atc_code varchar,
+       package_type_id numeric(38,2),
+       package_type_name varchar,
+       price numeric(38,2),
+       unit_of_measure character varying(255)
+       ) as $$
+begin
+return query
+SELECT mpgm.*
+FROM medicine m
+         JOIN order_medicine om ON om.id_of_medicine = m.id
+         JOIN orders o ON o.id = om.order_id
+         CROSS JOIN LATERAL medicine_pkg.get_medicine(m.id) mpgm
+WHERE o.id = orderId;
 end;
 $$ language plpgsql;
 
