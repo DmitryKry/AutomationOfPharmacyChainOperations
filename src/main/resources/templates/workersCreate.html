@@ -26,7 +26,7 @@
 
             </div>
             <a th:href="@{/api/pharmacy/workerCreate(addUser=${addUser == false ? true : false}, idRole=${idRole},
-            selectRole=${selectRole}, idUser=${idUser}, selectUser=${selectUser})}"
+            selectRole=${selectRole}, idUser=${idUser}, selectUser=${selectUser}, userID=${user.getId()})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="salary" th:text="#{salary}"></label>

@@ -49,6 +49,11 @@
             <br>
             <div th:class="view-info" id="OGRN" th:text="${pharmacy.getOgrn()}"></div>
         </div>
+        <div class="form-group">
+            <label for="OGRN" th:text="#{OPENING_DATE}"></label>
+            <br>
+            <div th:class="view-info" id="OPENING_DATE" th:text="${pharmacy.getOpening_date()}"></div>
+        </div>
     </div>
 
     <div th:class="createObject" th:id="pharmaciesSecond">

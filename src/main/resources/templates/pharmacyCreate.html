@@ -68,9 +68,12 @@
             let formData = new FormData();
             formData.append('photo', input.files[0]);
             formData.append('pharmacyID', document.getElementById('pharmacyID').value);
+            formData.append('userID', document.getElementById('userID').value);
+            formData.append('source', document.getElementById('source').value);
+
             document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
 
-            fetch('/api/pharmacy/pharmacyCreate/uploadPhoto', {
+            fetch('/api/pharmacy/uploadPhotoPharmacy', {
                 method: 'POST',
                 body: formData
             })
@@ -110,6 +113,8 @@
     <div th:id="forPhoto">
         <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
         <input type="hidden" id="pharmacyID" th:value="${pharmacy != null ? pharmacy.getId() : ''}">
+        <input type="hidden" id="userID" th:value="${user != null ? user.getId() : ''}">
+        <input type="hidden" id="source" th:value="${'pharmacyCreate'}">
         <img id="preview" th:src="${photos != null && photos.getPhotoPath() != null ? photos.getPhotoPath() : ''}">
     </div>
 
@@ -212,7 +217,10 @@
             </ul>
         </div>
         <div>
-            <a th:href="@{/api/pharmacy/workerCreate}"th:text="#{add}"></a>
+            <a th:href="@{/api/pharmacy/workerCreate(userID=${user.getId()}, addAdministrator=${false}, idAdmin=${idAdmin},
+                        selectAdmin=${selectAdmin}, idCity=${idCity}, selectCity=${selectCity},
+                        selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
+            photoID=${photos != null ? photos.getId() : ''})}" th:text="#{add}"></a>
             <a th:href="@{/api/pharmacy/pharmacyCreate(userID=${user.getId()}, addAdministrator=${false}, idAdmin=${idAdmin},
                         selectAdmin=${selectAdmin}, idCity=${idCity}, selectCity=${selectCity},
                         selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
@@ -251,7 +259,8 @@
         </div>
     </div>
     <div th:class="findPerconal" th:id="createCity" th:if="${createCity == true}">
-        <form th:action="@{/api/pharmacy/pharmacyCreate/createCity(userID=${user.getId()}, selectAdmin=${selectAdmin}, idAdmin=${idAdmin})}" method="post">
+        <form th:action="@{/api/pharmacy/createCity(source='pharmacyCreate', userID=${user.getId()},
+        selectAdmin=${selectAdmin}, idAdmin=${idAdmin})}" method="post">
             <label for="createC" th:text="#{CITY}"></label>
             <br>
             <input id="createC"  th:name="name" th:type="text">

@@ -122,6 +122,14 @@ create or replace function order_pkg.get_order_pharmacy(pharmacy_id numeric)
 end;
 $$ language plpgsql;
 
+create or replace function order_pkg.get_order_id(orderID numeric)
+       returns setof orders as $$
+begin
+return query
+select * from orders where id = orderID;
+end;
+$$ language plpgsql;
+
 create or replace function order_pkg.get_all_orders()
     returns setof orders as $$
        begin
@@ -135,6 +143,19 @@ create or replace function order_pkg.get_all_orders_admin()
 begin
 return query
 select * from orders where id_user_role = 3;
+end;
+$$ language plpgsql;
+
+create or replace function order_pkg.get_all_orders_user(userID numeric)
+       returns table (id bigint, id_of_pharmacy bigint, id_of_user bigint, id_user_role bigint,
+       order_date timestamp, cost numeric, pharmacyName varchar, pharmacyAddress varchar, pharmacyCity varchar, userFio varchar) as $$
+begin
+return query
+select o.*, p.name pharmacyName, p.address pharmacyAddress, c.name pharmacyCity, u.fio userFio from orders o
+         join pharmacy p on p.id = o.id_of_pharmacy
+         join userofpharmacy u on u.id = o.id_of_user
+         join city c on c.id = p.id_city
+         where o.id_of_user = userID;
 end;
 $$ language plpgsql;
 
@@ -250,3 +271,4 @@ create or replace procedure order_pkg.update_count(user_id numeric,med_id numeri
        set count = count_med where order_id = orderID and id_of_medicine = med_id;
 end;
 $$ language plpgsql;
+

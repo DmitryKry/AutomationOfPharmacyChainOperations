@@ -295,7 +295,7 @@
 </div>
 <div th:class="content">
     <ul>
-        <li th:each="med : ${medicines}">
+        <li th:each="med : ${medicines}" th:if="${med.getIsDeleted() == false}" >
             <a th:href="@{/api/pharmacy/medicineView(idMedicine=${med.getId()}, userID=${user.getId()})}">
                 <div class="for-photo" id="medPlace">
                     <ul th:if="${photos != null and !photos.isEmpty()}">

@@ -45,6 +45,13 @@ public class Pharmacy {
     @NonNull
     private String postal_code;
 
+    @Column(name = "opening_date", nullable = false)
+    private LocalDate opening_date;
+    @Column(name = "closing_date", nullable = false)
+    private LocalDate closing_date;
+    @Column(name = "status", nullable = false)
+    private String status;
+
     @Transient
     private String cityName;
 

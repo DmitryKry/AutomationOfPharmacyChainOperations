@@ -161,7 +161,7 @@ public class MainControl {
     @GetMapping("/pharmacy")
     public String showPharmacyPage(@RequestParam(defaultValue = "0") int pagin,
                                    @RequestParam(defaultValue = "1") int page,
-                                   @RequestParam(required = false) int orderID,
+                                   @RequestParam(required = false) BigDecimal orderID,
                                    @RequestParam(required = false) BigDecimal userID,
                                    Model model) {
         if (page < 1) {
@@ -354,8 +354,8 @@ public class MainControl {
         BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
         if (deletePharmacy && pharmacyID != null){
             Pharmacy pharmacy = pharmacyService.deletePharmacy(pharmacyID);
-            String encodedError = URLEncoder.encode(pharmacy.getErrorMessage(), StandardCharsets.UTF_8);
-            return "redirect:/api/pharmacy/pharmacyCreate?InfoError=" + encodedError + "&InfoErrorShow=" + true;
+            model.addAttribute("InfoError", pharmacy.getErrorMessage());
+            model.addAttribute("InfoErrorShow", true);
         }
         if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
                 .findFirst().orElse(null) != null) {
@@ -500,7 +500,7 @@ public class MainControl {
                                                @RequestParam(defaultValue = "false") boolean addCity,
                                                @RequestParam(defaultValue = "false") boolean addAdministrator,
                                                @RequestParam(required = false) BigDecimal userID,
-                                               @RequestParam Spring source, Model model) {
+                                               @RequestParam String source, Model model) {
         String error = pharmacyService.createCity(city);
         model.addAttribute("addAdministrator", createCity);
         model.addAttribute("addAdministrator", addAdministrator);
@@ -959,8 +959,8 @@ public class MainControl {
         model.addAttribute("user", userService.get_id_user(userID));
         if (deleteMedicine && idMedicine != null){
             Medicine medicine = medicineService.deleteMedicine(idMedicine);
-            String encodedError = URLEncoder.encode(medicine.getErrorMessage(), StandardCharsets.UTF_8);
-            return "redirect:/api/pharmacy/medicineCreate?InfoError=" + encodedError + "&InfoErrorShow=" + true;
+            model.addAttribute("InfoError", medicine.getErrorMessage());
+            model.addAttribute("InfoErrorShow", true);
         }
         BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
         if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
@@ -1972,12 +1972,13 @@ public class MainControl {
     public String showMedicineView(BigDecimal idMedicine, @RequestParam(required = false) BigDecimal userID, Model model) {
         model.addAttribute("medicine", medicineService.getMedicineByID(idMedicine).get(0));
         model.addAttribute("photos", medicineService.getPhotoMed(idMedicine));
+        UserOfPharmacy user = userService.get_id_user(userID);
         model.addAttribute("user", userService.get_id_user(userID));
         return "medicineView";
     }
 
-    @PostMapping("/medicineCreate/uploadPhoto")
-    public String uploadPhoto(@RequestParam("photo") MultipartFile file, @RequestParam(required = false) BigDecimal userID,
+    @PostMapping("/uploadPhotoMedicine")
+    public String uploadPhotoMedicine(@RequestParam("photo") MultipartFile file, @RequestParam(required = false) BigDecimal userID,
                               @RequestParam(required = false) BigDecimal medicineId, Model model,
                               HttpSession session) {
         String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
@@ -2024,9 +2025,9 @@ public class MainControl {
         return "redirect:" + redirectUrl;
     }
 
-    @PostMapping("/pharmacyCreate/uploadPhoto")
+    @PostMapping("/uploadPhotoPharmacy")
     public String uploadPhotoPharmacy(@RequestParam("photo") MultipartFile file, @RequestParam(required = false) BigDecimal userID,
-                                      @RequestParam(required = false) BigDecimal pharmacyID, Model model,
+                                      @RequestParam(required = false) BigDecimal pharmacyID, String source, Model model,
                               HttpSession session) {
         String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
         String fileName = file.getOriginalFilename();
@@ -2045,7 +2046,7 @@ public class MainControl {
         Pharmacy pharmacy = new Pharmacy();
         if (pharmacyID != null)
             pharmacy = pharmacyService.getPharmacyById(pharmacyID).get(0);
-        String redirectUrl = UriComponentsBuilder.fromPath("/api/pharmacy/pharmacyCreate")
+        String redirectUrl = UriComponentsBuilder.fromPath("/api/pharmacy/" + source)
                 .queryParam("edit", true)
                 .queryParam("idPharmacy", pharmacy.getId())
                 .queryParam("idAdmin", pharmacyID != null ?
@@ -2125,12 +2126,14 @@ public class MainControl {
         model.addAttribute("idPharmacy", idPharmacy);
         UserOfPharmacy user = userService.get_id_user(userID);
         model.addAttribute("user", user);
-
+        if (orderID != null)
+            model.addAttribute("orderID", orderID);
         if (finalTrue){
-            orderID = orderService.endOrder(userID, idPharmacy);
+            if (orderID == null)
+                orderID = orderService.endOrder(userID, idPharmacy);
             model.addAttribute("orderID", orderID);
             model.addAttribute("InfoError", "Заказ сформирован!");
-            model.addAttribute("order", orderService.getOrderPharmacy(idPharmacy));
+            model.addAttribute("order", orderService.getOrderId(orderID));
         }
         if (idPharmacy != null)
             model.addAttribute("photos", pharmacyService.getPhotoPharmacy(idPharmacy));
@@ -2148,7 +2151,8 @@ public class MainControl {
         }
         model.addAttribute("finalTrue", finalTrue);
         if (orderID != null){
-            model.addAttribute("orderMedicines", orderService.getMedOrderPharmacy(orderID));
+            List<OrderMedicine> orderMedicines = orderService.getMedOrderPharmacy(orderID);
+            model.addAttribute("orderMedicines", orderMedicines);
             List<Medicine> medicines = orderService.getMedOrdersIdOrder(orderID);
             model.addAttribute("medicines", medicines);
         }
@@ -2160,5 +2164,24 @@ public class MainControl {
         return "orders";
     }
 
+    @GetMapping("/ordersList")
+    public String getOrdersList(@RequestParam BigDecimal userID, @RequestParam(required = false) BigDecimal medicineID,
+                            @RequestParam(required = false) BigDecimal idPharmacy,
+                            @RequestParam(defaultValue = "1") BigDecimal value, @RequestParam(required = false) BigDecimal count,
+                            @RequestParam(defaultValue = "false") boolean finalTrue, @RequestParam(required = false) BigDecimal orderID,
+                            @RequestParam(required = false) BigDecimal orderMedicine,
+                            Model model, HttpSession session) {
+        model.addAttribute("user", userService.get_id_user(userID));
+        model.addAttribute("value", value);
+        UserOfPharmacy user = userService.get_id_user(userID);
+        model.addAttribute("user", user);
+        List<Order> orders = orderService.getAllOrdersUser(userID);
+        model.addAttribute("ordersList", orders);
+        if (idPharmacy != null){
+            Photos photos = pharmacyService.getPhotoPharmacy(idPharmacy);
+            model.addAttribute("photos", pharmacyService.getPhotoPharmacy(idPharmacy));
+        }
+        return "ordersList";
+    }
 
 }

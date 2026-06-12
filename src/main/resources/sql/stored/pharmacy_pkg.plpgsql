@@ -13,10 +13,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION pharmacy_pkg.get_all_pharmacies_table()
-RETURNS table(id numeric(38,2), name varchar, cityName varchar, address varchar, region varchar) AS $$
+RETURNS table(id numeric(38,2), name varchar, cityName varchar, address varchar, region varchar, closing_date date) AS $$
 BEGIN
 RETURN QUERY
-SELECT p.id, p.name, c.name as cityName, p.address, p.region
+SELECT p.id, p.name, c.name as cityName, p.address, p.region, p.closing_date
 FROM pharmacy p
 join city c on c.id = p.id_city;
 END;
@@ -340,8 +340,7 @@ $$ language plpgsql;
 create or replace procedure pharmacy_pkg.delete_pharmacy(idPharmacy numeric(38, 2))
        as $$
        begin
-       delete from pharmacy where pharmacy.id = idPharmacy;
-       delete from photos where photos.entity_id = idPharmacy;
+       update pharmacy set closing_date = now(), status = 'closed' where id = idPharmacy;
 end;
 $$ language plpgsql;
 

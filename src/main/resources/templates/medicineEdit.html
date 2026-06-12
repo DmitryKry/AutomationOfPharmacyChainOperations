@@ -69,9 +69,11 @@
             let formData = new FormData();
             formData.append('photo', input.files[0]);
             formData.append('medicineId', document.getElementById('medicineId').value);
+            formData.append('userID', document.getElementById('userID').value);
+            formData.append('source', document.getElementById('source').value);
             document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
 
-            fetch('/api/pharmacy/medicineEdit/uploadPhoto', {
+            fetch('/api/pharmacy/uploadPhoto', {
                 method: 'POST',
                 body: formData
             })
@@ -104,6 +106,8 @@
             <div id="forPhoto1">
                 <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
                 <input type="hidden" id="medicineId" th:value="${medicine != null ? medicine.getId() : ''}">
+                <input type="hidden" id="userID" th:value="${user != null ? user.getId() : ''}">
+                <input type="hidden" id="source" th:value="${'medicineEdit'}">
                 <img id="preview" th:src="${photos != null && photos.getPhotoPath() != null ? photos.getPhotoPath() : ''}">
             </div>
         </div>

@@ -12,6 +12,7 @@
         <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
         <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
         <a th:if="${user != null}" class="authorization" th:href="@{/api/pharmacy/orders(userID=${user.getId()})}" th:text="#{basket}"></a>
+        <a th:if="${user != null}" class="orders" th:href="@{/api/pharmacy/ordersList(userID=${user.getId()})}" th:text="#{orders}"></a>
         <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
         <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
     </div>
@@ -23,7 +24,7 @@
     userID=${user.getId()},
     orderID=${orderMedicines != null and orderMedicines.size() > 0 ? orderMedicines[0].orderId : null})}"></a>
     <a th:if="${idPharmacy != null}" th:class="edit" th:id="order" th:text="#{final}" th:href="@{/api/pharmacy/orders(
-    userID=${user.getId()}, idPharmacy=${idPharmacy}, orderID=${orderID}, finalTrue=true)}"></a>
+    userID=${user.getId()}, idPharmacy=${idPharmacy}, orderID=${orderID != null ? orderID : ''}, finalTrue=true)}"></a>
     <div id="ordersContent">
         <div id="infoOrder"><H1 th:text="#{basket}"></H1></div>
         <ul>
@@ -36,12 +37,12 @@
                 + ' ' + #{price} + ' ' + ${med.getPrice()}"></div>
                 <ul>
                     <li th:each="oM : ${orderMedicines}" th:if="${med.getId() == oM.getIdOfMedicine()}">
-                        <a class="plus-btn" th:if="${med.getId() == oM.getIdOfMedicine()}"
+                        <a class="plus-btn" th:if="${med.getId() == oM.getIdOfMedicine() && idPharmacy == null}"
                            th:href="@{/api/pharmacy/orders(userID=${user.getId()}, medicineID=${med.getId()},
                            count=${oM.getCount() + 1}, orderMedicine=${oM.getId()})}">+</a>
                         <span class="quantity-value" th:if="${med.getId() == oM.getIdOfMedicine()}"
                               th:text="${oM.getCount() == null ? 1 : oM.getCount()}"></span>
-                        <a class="minus-btn" th:if="${med.getId() == oM.getIdOfMedicine()}"
+                        <a class="minus-btn" th:if="${med.getId() == oM.getIdOfMedicine() && idPharmacy == null}"
                            th:href="@{/api/pharmacy/orders(userID=${user.getId()}, medicineID=${med.getId()},
                            count=${oM.getCount() - 1}, orderMedicine=${oM.getId()})}">-</a>
                     </li>
@@ -71,15 +72,15 @@
                 <td th:text="${orderMed.getNameMed()}">
                 </td>
                 <td th:text="${orderMed.count}"></td>
-                <td th:text="${orderMed.getPriceMed()}">₽</td>
-                <td th:text="${orderMed.count * orderMed.getPriceMed()}">₽</td>
+                <td th:text="${orderMed.getPriceMed()} + '₽'"></td>
+                <td th:text="${orderMed.count * orderMed.getPriceMed()} + '₽'"></td>
             </tr>
             </tbody>
             <tfoot>
             <tr>
                 <td colspan="3"><strong>Итого:</strong></td>
                 <td>
-                    <strong th:text="${order.get(0).getCost()}">₽
+                    <strong th:text="${order.getCost()}">₽
                     </strong>
                 </td>
             </tr>

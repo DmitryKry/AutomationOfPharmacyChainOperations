@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<HEAD>
+    <meta charset="UTF-8">
+    <title>Карточка аптеки</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</HEAD>
+<body>
+<div class="AllInfo">
+    <div class="menu">
+        <a th:if="${user == null}" class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
+        <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
+        <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
+        <a th:if="${user != null}" class="authorization" th:href="@{/api/pharmacy/orders(userID=${user.getId()})}" th:text="#{basket}"></a>
+        <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
+        <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
+    </div>
+    <div th:id="forPhotoOrders">
+        <img th:if="${photos != null && photos.getPhotoPath() != null}"
+             th:src="${photos.getPhotoPath()}">
+    </div>
+    <div id="ordersContent">
+        <div id="infoOrder"><H1 th:text="#{orders}"></H1></div>
+        <ul>
+            <li th:each="ord : ${ordersList}" th:data-pharmacy-id="${ord.getIdOfPharmacy()}"
+                th:data-user-id="${user.getId()}" th:data-order-id="${ord.getId()}"
+                class="medicine-item">
+                <div class="medicine-info" th:text="${'№' + ord.getId()} + ' ' + ${ord.getPharmacyName()} + ' ' +
+                ${ord.getPharmacyCity()} + ' ' + ${ord.getPharmacyAddress()} + ' ' + ${ord.getUserFio()}
+                + ' '"></div>
+                <span th:text="${ord.getCost()}"></span>
+            </li>
+        </ul>
+    </div>
+</div>
+    <div>
+        <a th:href="@{/api/pharmacy/orders(userID=${user.getId()}, orderID=${orderID})}"
+           th:text="#{Ok}"></a>
+    </div>
+</div>
+<script>
+    let hoverTimer = null;
+    let currentOrderId = null;
+
+    document.querySelectorAll('.medicine-item').forEach(item => {
+        item.addEventListener('mouseenter', function(e) {
+            const orderId = this.getAttribute('data-order-id');
+            const userId = this.getAttribute('data-user-id');
+            const pharmacyId = this.getAttribute('data-pharmacy-id');
+
+            if (currentOrderId !== orderId) {
+                if (hoverTimer) clearTimeout(hoverTimer);
+                currentOrderId = orderId;
+            }
+
+            hoverTimer = setTimeout(() => {
+                window.location.href = `/api/pharmacy/ordersList?orderID=${orderId}&userID=${userId}&idPharmacy=${pharmacyId}`;
+            }, 1000);
+        });
+
+        item.addEventListener('mouseleave', function(e) {
+            if (hoverTimer) {
+                clearTimeout(hoverTimer);
+                hoverTimer = null;
+                currentOrderId = null;
+            }
+        });
+
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (hoverTimer) {
+                clearTimeout(hoverTimer);
+                hoverTimer = null;
+            }
+            const orderId = this.getAttribute('data-order-id');
+            const userId = this.getAttribute('data-user-id');
+            const pharmacyId = this.getAttribute('data-pharmacy-id');
+            window.location.href = `/api/pharmacy/orders?orderID=${orderId}&userID=${userId}&idPharmacy=${pharmacyId}`;
+        });
+    });
+</script>
+</body>
+</html>

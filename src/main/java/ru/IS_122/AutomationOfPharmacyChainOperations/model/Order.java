@@ -40,4 +40,16 @@ public class Order {
 
     @Column(name = "cost")
     private BigDecimal cost;
+
+    @Transient
+    private String pharmacyName;
+
+    @Transient
+    private String pharmacyAddress;
+
+    @Transient
+    private String pharmacyCity;
+
+    @Transient
+    private String userFio;
 }

@@ -470,7 +470,9 @@ returns table (
     countryName varchar,
     dosageFormName varchar,
     unit_of_measure varchar,
-    package_quantity integer
+    package_quantity integer,
+    updated_at timestamp without time zone,
+    is_deleted boolean
 )
  as $$
        begin
@@ -484,7 +486,9 @@ returns table (
                    ELSE df.name
                    END as dosageFormName,
             m.unit_of_measure,
-            m.package_quantity
+            m.package_quantity,
+            m.updated_at,
+            m.is_deleted
         from medicine m
                  join brand b on b.id = m.brand_id
                  join country c on c.id = m.country_id
@@ -762,8 +766,7 @@ $$ LANGUAGE plpgsql;
 create or replace procedure medicine_pkg.delete_medicine(id_medicine numeric(38,2))
     as $$
        begin
-       delete from medicine where id = id_medicine;
-       delete from photos where photos.entity_id = id_medicine;
+UPDATE medicine SET is_deleted = true, updated_at = NOW() WHERE id = id_medicine;
 end;
 $$ language plpgsql;
 

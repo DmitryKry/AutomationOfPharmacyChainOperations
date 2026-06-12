@@ -133,4 +133,14 @@ public class OrderService {
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(OrderMedicine.class), orderID);
     }
 
-}
+    public List<Order> getAllOrdersUser(BigDecimal userID) {
+        String sql = "select * from order_pkg.get_all_orders_user(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class), userID);
+    }
+
+    public Order getOrderId(BigDecimal orderID) {
+        String sql = "select * from order_pkg.get_order_id(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class), orderID).get(0);
+    }
+
+ }

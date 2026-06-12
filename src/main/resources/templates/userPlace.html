@@ -154,7 +154,7 @@
     </div>
     <div th:class="content">
         <ul>
-            <li th:each="ph : ${pharmacies}">
+            <li th:each="ph : ${pharmacies}" th:if="${ph.getClosing_date() == null}">
                 <a th:if="${orderID == null}" th:href="@{/api/pharmacy/pharmacyView(idPharmacy=${ph.getId()}, userID=${user.getId()})}">
                     <div class="for-photo">
                         <ul th:if="${!photos.isEmpty()}">

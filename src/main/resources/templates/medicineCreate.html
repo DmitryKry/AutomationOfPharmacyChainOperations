@@ -671,7 +671,7 @@
         </ul>
     </div>
     <div>
-        <a th:href="@{/api/pharmacy/brandCreate(userID=${user.getId()})}" th:text="#{add}"></a>
+        <a th:href="@{/api/pharmacy/medicineCreate/brandCreate(userID=${user.getId()})}" th:text="#{add}"></a>
         <a th:href="@{/api/pharmacy/medicineCreate(addBrand=${false}, userID=${user.getId()},
                             brand_id=${brand_id},
                             selectBrand=${selectBrand},
@@ -1425,7 +1425,7 @@
 </div>
 <!-- Бренд -->
 <div th:class="findPerconal" th:id="createPrescriptionForm" th:if="${brandCreate == true}">
-    <form th:action="@{/api/pharmacy/brandCreate(userID=${user.getId()})}" method="post">
+    <form th:action="@{/api/pharmacy/medicineCreate/brandCreate(userID=${user.getId()})}" method="post">
         <label for="BrandName" th:text="#{name}"></label>
         <input th:name="name" id="BrandName" th:type="text" th:placeholder="#{medicine.brand}">
         <button th:text="#{create}"></button>
