@@ -35,15 +35,22 @@ create or replace procedure pharmacy_pkg.create_new_pharmacy(p_name character va
                                                                     p_inn character varying(12), p_kpp character varying(9),
                                                                     p_ogrn character varying(13), p_address character varying(255),
                                                                     p_ID_CITY numeric, p_region character varying(100),
-                                                                    p_postal_code character varying(10), id_of_worker NUMERIC,
-       p_error out varchar,  id_pharmacy out numeric)
+                                                                    p_postal_code character varying(10), p_id_of_worker NUMERIC,
+       p_error out varchar,  p_id_pharmacy out numeric)
 as $$
+       declare
+p_manage numeric;
 begin
-insert into pharmacy (name, legal_name, inn, kpp, ogrn, address, ID_CITY, region, postal_code)
-values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_ID_CITY, p_region, p_postal_code)
-    RETURNING ID INTO id_pharmacy;
-insert into pharmacy_manage(id_of_pharmacy, id_of_worker)
-values (id_pharmacy, id_of_worker);
+select 1 into p_manage from pharmacy_manage where id_of_worker = p_id_of_worker;
+if p_manage is null then
+    insert into pharmacy (name, legal_name, inn, kpp, ogrn, address, ID_CITY, region, postal_code)
+    values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_ID_CITY, p_region, p_postal_code)
+    RETURNING ID INTO p_id_pharmacy;
+    insert into pharmacy_manage(id_of_pharmacy, id_of_worker)
+    values (p_id_pharmacy, p_id_of_worker);
+else
+    p_error := 'Такой менеджер уже присутствует в другой аптеке';
+end if;
 EXCEPTION
     WHEN unique_violation THEN
         IF EXISTS (SELECT 1 FROM pharmacy WHERE name = p_name) THEN
@@ -341,15 +348,16 @@ create or replace procedure pharmacy_pkg.delete_pharmacy(idPharmacy numeric(38, 
        as $$
        begin
        update pharmacy set closing_date = now(), status = 'closed' where id = idPharmacy;
+       delete from pharmacy_manage where id_of_pharmacy = idPharmacy;
 end;
 $$ language plpgsql;
 
 create or replace function pharmacy_pkg.sort_pharmacy(p_name varchar default null, p_city_name varchar default null,
        p_address varchar default null, p_region varchar default null)
-       returns table(id numeric(38,2), name varchar, cityName varchar, address varchar, region varchar) as $$
+       returns table(id numeric(38,2), name varchar, cityName varchar, address varchar, region varchar, closing_date date) as $$
        begin
        return query
-        SELECT p.id, p.name, c.name AS cityName, p.address, p.region
+        SELECT p.id, p.name, c.name AS cityName, p.address, p.region, p.closing_date
         FROM pharmacy p
                  JOIN city c ON c.id = p.id_city
         WHERE (p_name IS NULL OR p.name ILIKE '%' || p_name || '%')
@@ -358,3 +366,25 @@ create or replace function pharmacy_pkg.sort_pharmacy(p_name varchar default nul
           AND (p_region IS NULL OR p.region ILIKE '%' || p_region || '%');
 end;
 $$ language plpgsql;
+
+create or replace function pharmacy_pkg.get_pharmacy_manage_pharmacy(pharmacyID numeric)
+       returns setof pharmacy_manage as $$
+       begin
+       return query
+       select * from pharmacy_manage where id_of_pharmacy = pharmacyID;
+end;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION pharmacy_pkg.create_pharmacy_manage(pharmacyID NUMERIC, workerID NUMERIC, error varchar)
+RETURNS VOID AS
+$$
+BEGIN
+INSERT INTO pharmacy_manage (id_of_pharmacy, id_of_worker)
+VALUES (pharmacyID, workerID);
+EXCEPTION
+    WHEN unique_violation THEN
+        error := 'Запись с такой аптекой и работником уже существует';
+WHEN OTHERS THEN
+        error := SQLERRM;
+END;
+$$ LANGUAGE plpgsql;

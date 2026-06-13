@@ -6,7 +6,7 @@
     <link rel="stylesheet" th:href="@{/style.css}">
     <script th:inline="javascript">
         const FORM_STORAGE_KEY = 'pharmacyFormData';
-
+/*
         function saveFormData() {
             const formData = {
                 name: document.getElementById('name_pharmacy')?.value || '',
@@ -56,7 +56,7 @@
                 }
             });
         }
-
+*/
         function attachLinkHandlers() {
             const links = document.querySelectorAll('a');
             links.forEach(link => {
@@ -105,7 +105,8 @@
         <a th:if="${user == null}" class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
         <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
         <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
-        <a th:if="${user != null}" class="authorization"  th:text="#{basket}"></a>
+        <a th:if="${user != null}" class="authorization" th:href="@{/api/pharmacy/orders(userID=${user.getId()})}" th:text="#{basket}"></a>
+        <a th:if="${user != null}" class="orders" th:href="@{/api/pharmacy/ordersList(userID=${user.getId()})}" th:text="#{orders}"></a>
         <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
         <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
     </div>
@@ -113,7 +114,7 @@
         <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
         <input type="hidden" id="pharmacyID" th:value="${pharmacy != null ? pharmacy.getId() : ''}">
         <input type="hidden" id="userID" th:value="${user != null ? user.getId() : ''}">
-        <input type="hidden" id="source" th:value="${'pharmacyEdit'}">
+        <input type="hidden" id="source" th:value="'pharmacyEdit'">
         <img id="preview" th:src="${photos != null && photos.getPhotoPath() != null ? photos.getPhotoPath() : ''}">
     </div>
 
@@ -224,7 +225,6 @@
             </ul>
         </div>
         <div>
-            <a th:href="@{/api/pharmacy/workerCreate(userID=${user.getId()})}"th:text="#{add}"></a>
             <a th:href="@{/api/pharmacy/pharmacyEdit(addAdministrator=${false}, idAdmin=${idAdmin}, userID=${user.getId()},
                         selectAdmin=${selectAdmin}, idCity=${idCity}, selectCity=${selectCity},
                         selectCityRegion=${selectCityRegion}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
@@ -257,28 +257,10 @@
             </ul>
         </div>
         <div>
-            <a th:href="@{/api/pharmacy/pharmacyEdit(createCity = ${true}, userID=${user.getId()})}"th:text="#{add}"></a>
             <a th:href="@{/api/pharmacy/pharmacyEdit(addAdministrator=${false},
             selectCity=${selectCity}, selectCityRegion=${selectCityRegion}, idCity=${idCity},
                         selectAdmin=${selectAdmin}, idAdmin=${idAdmin}, pharmacyID=${pharmacy != null ? pharmacy.getId() : ''},
             photoID=${photos != null ? photos.getId() : ''}, userID=${user.getId()})}" th:text="#{cancel}"></a>
-        </div>
-    </div>
-    <div th:class="findPerconal" th:id="createCity" th:if="${createCity == true}">
-        <form th:action="@{/api/pharmacy/createCity(source='pharmacyEdit', selectAdmin=${selectAdmin}, userID=${user.getId()}, idAdmin=${idAdmin})}" method="post">
-            <label for="createC" th:text="#{CITY}"></label>
-            <br>
-            <input id="createC"  th:name="name" th:type="text">
-            <br>
-            <label for="createR" th:text="#{REGION}"></label>
-            <br>
-            <input id="createR" th:name="region" th:type="text">
-            <br>
-            <button th:text="#{create}"></button>
-
-        </form>
-        <div>
-            <a th:href="@{/api/pharmacy/pharmacyEdit(createRole=false, addRole=true, userID=${user.getId()})}" th:text="#{cancel}"></a>
         </div>
     </div>
 </div>

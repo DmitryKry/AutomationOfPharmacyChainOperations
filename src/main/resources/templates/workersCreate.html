@@ -10,11 +10,12 @@
     <a th:if="${user == null}" class="authorization" th:href="@{/api/pharmacy/login}" th:text="#{authorization}"></a>
     <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
     <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
-    <a class="about_of_pharmacy" th:text="#{basket}"></a>
+    <a th:if="${user != null}" class="authorization" th:href="@{/api/pharmacy/orders(userID=${user.getId()})}" th:text="#{basket}"></a>
+    <a th:if="${user != null}" class="orders" th:href="@{/api/pharmacy/ordersList(userID=${user.getId()})}" th:text="#{orders}"></a>
     <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
     <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
 </div>
-    <form th:action="@{/api/pharmacy/workerCreate}" method="post">
+    <form th:action="@{/api/pharmacy/workerCreate(userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}" method="post">
 
         <div th:class="createObject" th:id="worker">
             <h3 th:text="#{workerInfo}"></h3>
@@ -26,7 +27,7 @@
 
             </div>
             <a th:href="@{/api/pharmacy/workerCreate(addUser=${addUser == false ? true : false}, idRole=${idRole},
-            selectRole=${selectRole}, idUser=${idUser}, selectUser=${selectUser}, userID=${user.getId()})}"
+            selectRole=${selectRole}, idUser=${idUser}, selectUser=${selectUser}, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="salary" th:text="#{salary}"></label>
@@ -45,7 +46,7 @@
                 <input type="text" id="id_of_role" th:value="${selectRole}" readonly>
             </div>
             <a th:href="@{/api/pharmacy/workerCreate(addRole=${addRole == false ? true : false}, idRole=${idRole},
-            selectRole=${selectRole}, idUser=${idUser}, selectUser=${selectUser})}"
+            selectRole=${selectRole}, idUser=${idUser}, selectUser=${selectUser}, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}"
                th:text="#{find}"></a>
             <div class="form-group">
                 <label for="education" th:text="#{education}"></label>
@@ -62,7 +63,7 @@
     </form>
     <div th:class="findPerconal" th:if="${addUser == true}">
         <div>
-            <form th:action="@{/api/pharmacy/workerCreate/searchUsers}" method="post">
+            <form th:action="@{/api/pharmacy/workerCreate/searchUsers(userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}" method="post">
                 <input th:name="searchUser" th:type="text">
                 <button th:text="#{find}">
                 </button>
@@ -73,7 +74,7 @@
                 <li th:each="u : ${users}">
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/workerCreate(idUser=${u.getId()}, selectUser=${u.getFio()},
-                        idRole=${idRole}, selectRole=${selectRole})}">
+                        idRole=${idRole}, selectRole=${selectRole}, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}">
                             <span th:text="${u.getFio()} + ' id: ' + ${u.getId()}"></span>
                         </a>
                     </div>
@@ -81,7 +82,7 @@
             </ul>
         </div>
         <div>
-            <a th:href="@{/api/pharmacy/workerCreate(addUser=false)}" th:text="#{cancel}"></a>
+            <a th:href="@{/api/pharmacy/workerCreate(addUser=false, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}" th:text="#{cancel}"></a>
         </div>
     </div>
     <div th:class="findPerconal" th:if="${addRole == true}">
@@ -90,7 +91,7 @@
                 <li th:each="r : ${roles}">
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/workerCreate(idRole=${r.getId()}, selectRole=${r.getName()},
-                        idUser=${idUser}, selectUser=${selectUser})}">
+                        idUser=${idUser}, selectUser=${selectUser}, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}">
                             <span th:text="${r.getName()}"></span>
                         </a>
                     </div>
@@ -98,26 +99,26 @@
             </ul>
         </div>
         <div>
-            <a th:href="@{/api/pharmacy/workerCreate(addRole=false, createRole=true)}"th:text="#{add}"></a>
-            <a th:href="@{/api/pharmacy/workerCreate(addRole=false)}" th:text="#{cancel}"></a>
+            <a th:if="${user.getRole() == 1}" th:href="@{/api/pharmacy/workerCreate(addRole=false, createRole=true, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}"th:text="#{add}"></a>
+            <a th:href="@{/api/pharmacy/workerCreate(addRole=false, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}" th:text="#{cancel}"></a>
         </div>
     </div>
 
     <div th:class="findPerconal" th:id="createRole" th:if="${createRole == true}">
-        <form th:action="@{/api/pharmacy/workerCreate/createRole}" method="post">
+        <form th:action="@{/api/pharmacy/workerCreate/createRole(userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}" method="post">
             <input th:name="roleName" th:type="text">
             <button th:text="#{create}"></button>
 
         </form>
         <div>
-            <a th:href="@{/api/pharmacy/workerCreate(createRole=false, addRole=true)}" th:text="#{cancel}"></a>
+            <a th:href="@{/api/pharmacy/workerCreate(createRole=false, addRole=true, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}" th:text="#{cancel}"></a>
         </div>
     </div>
 
     <div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
         <H3 th:text="${InfoError}"></H3>
         <div>
-            <a th:href="@{/api/pharmacy/medicineCreate(InfoErrorShow = false)}" th:text="#{Ok}"></a>
+            <a th:href="@{/api/pharmacy/workerCreate(InfoErrorShow = false, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}" th:text="#{Ok}"></a>
         </div>
     </div>
 </body>

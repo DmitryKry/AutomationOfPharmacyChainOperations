@@ -120,13 +120,17 @@ CREATE OR REPLACE PROCEDURE user_pkg.set_worker(
     p_id_of_role NUMERIC,
     p_inn CHARACTER VARYING(12),
     p_snils CHARACTER VARYING(11),
-    INOUT p_error VARCHAR
+    INOUT p_error VARCHAR,
+    OUT workerID NUMERIC
 ) AS $$
 DECLARE
 v_constraint_name TEXT;
 BEGIN
+update userofpharmacy
+set role = p_id_of_role where id = p_id_of_user;
 INSERT INTO workers (id_of_user, salary, education, id_of_role, inn, snils)
-VALUES (p_id_of_user, p_salary, p_education, p_id_of_role, p_inn, p_snils);
+VALUES (p_id_of_user, p_salary, p_education, p_id_of_role, p_inn, p_snils)
+returning id into workerID;
 
 EXCEPTION
     WHEN unique_violation THEN
@@ -232,7 +236,13 @@ create or replace procedure user_pkg.update_user(p_user_id numeric,
 end;
 $$ language plpgsql;
 
-
+create or replace function user_pkg.get_worker_id(userID numeric)
+       returns setof workers as $$
+       begin
+       return query
+       select * from workers where id_of_user = userID;
+end;
+$$ language plpgsql;
 
 
 

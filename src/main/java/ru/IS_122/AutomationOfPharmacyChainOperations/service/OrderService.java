@@ -1,4 +1,5 @@
 package ru.IS_122.AutomationOfPharmacyChainOperations.service;
+import org.aspectj.weaver.ast.Or;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -141,6 +142,21 @@ public class OrderService {
     public Order getOrderId(BigDecimal orderID) {
         String sql = "select * from order_pkg.get_order_id(?)";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class), orderID).get(0);
+    }
+
+    public List<Order> getOrderAdmin(BigDecimal adminID) {
+        String sql = "select * from order_pkg.get_order_admin(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class), adminID);
+    }
+
+    public void updateOrderPay(BigDecimal orderID) {
+        String sql = "call order_pkg.update_order_pay(?)";
+        jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            int index = 1;
+            cs.setBigDecimal(index, orderID);
+            cs.execute();
+            return null;
+        });
     }
 
  }

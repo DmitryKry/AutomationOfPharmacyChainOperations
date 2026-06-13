@@ -77,11 +77,11 @@ public class UserService {
         return jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(Role.class));
     }
 
-    public String workerCreate(Workers worker) {
+    public Workers workerCreate(Workers worker) {
 
         String sql = "CALL user_pkg.set_worker(?, ?, ?, ?, ?, ?, ?)";
 
-        String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             cs.setBigDecimal(1, worker.getId_of_user());
             cs.setBigDecimal(2, worker.getSalary());
             cs.setString(3, worker.getEducation());
@@ -89,15 +89,12 @@ public class UserService {
             cs.setString(5, worker.getInn());
             cs.setString(6, worker.getSnils());
             cs.registerOutParameter(7, Types.VARCHAR);
+            cs.registerOutParameter(8, Types.NUMERIC);
             cs.execute();
-            return cs.getString(7);
+            Workers workers = new Workers();
+            workers.setWorkerResult(cs.getString(7), cs.getBigDecimal(8));
+            return workers;
         });
-
-        if (errorMessage != null && !errorMessage.isEmpty()) {
-            return errorMessage;
-        }
-
-        return null;
     }
 
     public void roleCreate(Role role) {
@@ -149,5 +146,10 @@ public class UserService {
             return null;
         });
 
+    }
+
+    public Workers getWorkerId(BigDecimal userID){
+        String sql = "SELECT * FROM user_pkg.get_worker_id(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Workers.class), userID).get(0);
     }
 }

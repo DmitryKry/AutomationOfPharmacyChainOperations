@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.City;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.Pharmacy;
+import ru.IS_122.AutomationOfPharmacyChainOperations.model.PharmacyManage;
 import ru.IS_122.AutomationOfPharmacyChainOperations.model.Photos;
 
 
@@ -176,5 +177,27 @@ public class PharmacyService {
     public List<Pharmacy> sortPharmacies(String name,String region, String city, String adress){
         String sql = "select * from pharmacy_pkg.sort_pharmacy(?, ?, ?, ?)";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pharmacy.class), name, city, adress, region);
+    }
+
+    public List<PharmacyManage> getPharmacyManageAll(BigDecimal pharmacyID){
+        String sql = "select * from pharmacy_pkg.get_pharmacy_manage_pharmacy(?)";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PharmacyManage.class), pharmacyID);
+    }
+
+    public String createNewManage(BigDecimal pharmacyID, BigDecimal workerID){
+        String sql = "select * from pharmacy_pkg.create_pharmacy_manage(?, ?, ?)";
+        return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
+            cs.setBigDecimal(1, pharmacyID);
+            cs.setBigDecimal(2, workerID);
+            cs.registerOutParameter(3, Types.VARCHAR);
+
+            cs.execute();
+
+            String error = cs.getString(3);
+
+            cs.execute();
+
+            return error;
+        });
     }
 }

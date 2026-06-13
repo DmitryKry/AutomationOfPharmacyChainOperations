@@ -20,7 +20,7 @@
         <img th:if="${photos != null && photos.getPhotoPath() != null}"
              th:src="${photos.getPhotoPath()}">
     </div>
-    <a th:if="${idPharmacy == null}" th:class="edit" th:id="order" th:text="#{specifyAPharmacy}" th:href="@{/api/pharmacy/pharmacy(
+    <a th:if="${idPharmacy == null && !medicines.isEmpty()}" th:class="edit" th:id="order" th:text="#{specifyAPharmacy}" th:href="@{/api/pharmacy/pharmacy(
     userID=${user.getId()},
     orderID=${orderMedicines != null and orderMedicines.size() > 0 ? orderMedicines[0].orderId : null})}"></a>
     <a th:if="${idPharmacy != null}" th:class="edit" th:id="order" th:text="#{final}" th:href="@{/api/pharmacy/orders(
@@ -86,18 +86,74 @@
             </tr>
             </tfoot>
         </table>
-        <button >Печать чека</button>
+        <input type="hidden" th:id="orderID" th:value="${order.getId()}">
+        <input type="hidden" th:id="idPharmacy" th:value="${idPharmacy}">
+        <input type="hidden" id="userId" th:value="${user.getId()}">
+        <button th:class="AcceptTheOrder" th:if="${user.getRole() != 2}" th:text="#{AcceptTheOrder}">Печать чека</button>
+        <button th:class="PrintingTheReceip" th:if="${user.getRole() == 2}" th:text="#{PrintingTheReceip}">Печать чека</button>
     </div>
     <div>
         <a th:href="@{/api/pharmacy/orders(userID=${user.getId()}, orderID=${orderID})}"
            th:text="#{Ok}"></a>
     </div>
 </div>
+<div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
+    <H3 th:text="${InfoError}"></H3>
+    <div>
+        <a th:href="@{/api/pharmacy/orders(InfoErrorShow = false,
+        userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}" th:text="#{Ok}"></a>
+    </div>
+</div>
 <script>
-    document.querySelectorAll('.medicine-info').forEach(item => {
-        item.addEventListener('click', function() {
-            const medicineId = this.getAttribute('data-medicine-id');
+    let hoverTimer = null;
+    let currentOrderId = null;
+
+    document.querySelectorAll('.AcceptTheOrder').forEach(item => {
+        item.addEventListener('click', function (e) {
+            const userId = document.getElementById('userId').value;
+            const orderID = document.getElementById('orderID').value;
+            const idPharmacy = document.getElementById('idPharmacy').value;
+
+            if (hoverTimer) {
+                clearTimeout(hoverTimer);
+                hoverTimer = null;
+            }
+
+            window.location.href = `/api/pharmacy/orders?userID=${userId}&idPharmacy=${idPharmacy}&orderID=${orderID}&pay=${true}`;
+        });
+    });
+
+    document.querySelectorAll('.medicine-item').forEach(item => {
+        item.addEventListener('mouseenter', function (e) {
             const userId = this.getAttribute('data-user-id');
+            const medicineId = this.getAttribute('data-medicine-id');
+
+            if (currentOrderId !== medicineId) {
+                if (hoverTimer) clearTimeout(hoverTimer);
+                currentOrderId = medicineId;
+            }
+
+            hoverTimer = setTimeout(() => {
+                window.location.href = `/api/pharmacy/orders?userID=${userId}&medicineID=${medicineId}`;
+            }, 300);
+        });
+
+        item.addEventListener('mouseleave', function(e) {
+            if (hoverTimer) {
+                clearTimeout(hoverTimer);
+                hoverTimer = null;
+                currentOrderId = null;
+            }
+        });
+
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (hoverTimer) {
+                clearTimeout(hoverTimer);
+                hoverTimer = null;
+            }
+            const userId = this.getAttribute('data-user-id');
+            const medicineId = this.getAttribute('data-medicine-id');
             updatePhoto(userId, medicineId);
         });
     });

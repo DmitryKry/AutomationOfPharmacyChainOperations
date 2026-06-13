@@ -148,7 +148,7 @@ $$ language plpgsql;
 
 create or replace function order_pkg.get_all_orders_user(userID numeric)
        returns table (id bigint, id_of_pharmacy bigint, id_of_user bigint, id_user_role bigint,
-       order_date timestamp, cost numeric, pharmacyName varchar, pharmacyAddress varchar, pharmacyCity varchar, userFio varchar) as $$
+       order_date timestamp, cost numeric, status_pay boolean, pharmacyName varchar, pharmacyAddress varchar, pharmacyCity varchar, userFio varchar) as $$
 begin
 return query
 select o.*, p.name pharmacyName, p.address pharmacyAddress, c.name pharmacyCity, u.fio userFio from orders o
@@ -272,3 +272,31 @@ create or replace procedure order_pkg.update_count(user_id numeric,med_id numeri
 end;
 $$ language plpgsql;
 
+create or replace function order_pkg.get_order_admin(adminID numeric)
+       returns table (id bigint, id_of_pharmacy bigint, id_of_user bigint, id_user_role bigint,
+       order_date timestamp, cost numeric, status_pay boolean, pharmacyName varchar, pharmacyAddress varchar, pharmacyCity varchar, userFio varchar) as $$
+declare
+       pharmacyID numeric;
+       begin
+       select p.id into pharmacyID from pharmacy p
+           join pharmacy_manage pm on pm.id_of_pharmacy = p.id
+           join workers w on w.id = pm.id_of_worker
+           where w.id_of_user = adminID and p.closing_date is null
+               limit 1;
+return query
+select o.*, p.name pharmacyName, p.address pharmacyAddress, c.name pharmacyCity, u.fio userFio from orders o
+join pharmacy p on p.id = o.id_of_pharmacy
+join userofpharmacy u on u.id = o.id_of_user
+join city c on c.id = p.id_city
+where p.id = pharmacyID;
+end;
+$$ language plpgsql;
+
+create or replace procedure order_pkg.update_order_pay(orderID numeric)
+       as $$
+begin
+update orders
+set status_pay = true
+where id = orderID;
+end;
+$$ language plpgsql;

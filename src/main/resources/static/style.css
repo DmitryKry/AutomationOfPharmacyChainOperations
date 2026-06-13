@@ -443,7 +443,9 @@ input:focus, select:focus {
 .findPerconal {
     position: fixed;
     width: 40%;
-    height: 40%;
+    /*height: 40%;*/
+    height: auto;
+    min-height: 300px;
     left: 30%;
     top: 25%;
     background-color: white;
@@ -481,6 +483,10 @@ input:focus, select:focus {
     padding: 20px;
     border-bottom: 1px solid red; /* Отделяем верх */
     text-align: center;
+}
+
+.findPerconal div:last-child{
+    margin-top: auto;
 }
 
 .findPerconal h3{

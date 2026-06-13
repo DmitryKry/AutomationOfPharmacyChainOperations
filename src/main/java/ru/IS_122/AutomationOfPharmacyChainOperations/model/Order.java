@@ -41,6 +41,9 @@ public class Order {
     @Column(name = "cost")
     private BigDecimal cost;
 
+    @Column(name = "status_pay")
+    private boolean statusPay;
+
     @Transient
     private String pharmacyName;
 

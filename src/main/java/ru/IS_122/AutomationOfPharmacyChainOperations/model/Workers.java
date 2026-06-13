@@ -74,4 +74,10 @@ public class Workers {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_of_role", insertable = false, updatable = false)
     private Role role;
+    private String errorMessage;
+
+    public void setWorkerResult(String errorMessage, BigDecimal id) {
+        this.errorMessage = errorMessage;
+        this.id = id;
+    }
 }

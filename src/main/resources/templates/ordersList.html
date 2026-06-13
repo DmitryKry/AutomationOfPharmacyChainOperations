@@ -12,6 +12,7 @@
         <a th:if="${user == null}" class="registration" th:href="@{/api/pharmacy/registration}" th:text="#{registration}"></a>
         <a th:if="${user != null}" class="registration" th:href="@{/api/pharmacy/userView(userID=${user.getId()})}" th:text="#{user}"></a>
         <a th:if="${user != null}" class="authorization" th:href="@{/api/pharmacy/orders(userID=${user.getId()})}" th:text="#{basket}"></a>
+        <a th:if="${user != null}" class="orders" th:href="@{/api/pharmacy/ordersList(userID=${user.getId()})}" th:text="#{orders}"></a>
         <a class="pharmacies" th:text="#{pharmacies}" th:href="@{/api/pharmacy/pharmacy(userID=${user.getId()})}"></a>
         <a class="medicines" th:text="#{medicines}" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()})}"></a>
     </div>
@@ -19,7 +20,7 @@
         <img th:if="${photos != null && photos.getPhotoPath() != null}"
              th:src="${photos.getPhotoPath()}">
     </div>
-    <div id="ordersContent">
+    <div id="ordersContent" th:style="'width: 45%; left: 28%'">
         <div id="infoOrder"><H1 th:text="#{orders}"></H1></div>
         <ul>
             <li th:each="ord : ${ordersList}" th:data-pharmacy-id="${ord.getIdOfPharmacy()}"
@@ -27,7 +28,7 @@
                 class="medicine-item">
                 <div class="medicine-info" th:text="${'№' + ord.getId()} + ' ' + ${ord.getPharmacyName()} + ' ' +
                 ${ord.getPharmacyCity()} + ' ' + ${ord.getPharmacyAddress()} + ' ' + ${ord.getUserFio()}
-                + ' '"></div>
+                + ' ' + ${!ord.isStatusPay() ? '' : 'Оплачено'}"></div>
                 <span th:text="${ord.getCost()}"></span>
             </li>
         </ul>
@@ -55,7 +56,7 @@
 
             hoverTimer = setTimeout(() => {
                 window.location.href = `/api/pharmacy/ordersList?orderID=${orderId}&userID=${userId}&idPharmacy=${pharmacyId}`;
-            }, 1000);
+            }, 100);
         });
 
         item.addEventListener('mouseleave', function(e) {
