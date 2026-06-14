@@ -29,7 +29,7 @@
                 <div class="medicine-info" th:text="${'№' + ord.getId()} + ' ' + ${ord.getPharmacyName()} + ' ' +
                 ${ord.getPharmacyCity()} + ' ' + ${ord.getPharmacyAddress()} + ' ' + ${ord.getUserFio()}
                 + ' ' + ${!ord.isStatusPay() ? '' : 'Оплачено'}"></div>
-                <span th:text="${ord.getCost()}"></span>
+                <span th:text="${ord.getCost()} + '₽'"></span>
             </li>
         </ul>
     </div>

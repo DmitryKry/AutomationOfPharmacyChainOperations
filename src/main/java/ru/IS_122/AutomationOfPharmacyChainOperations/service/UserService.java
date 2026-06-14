@@ -79,7 +79,7 @@ public class UserService {
 
     public Workers workerCreate(Workers worker) {
 
-        String sql = "CALL user_pkg.set_worker(?, ?, ?, ?, ?, ?, ?)";
+        String sql = "CALL user_pkg.set_worker(?, ?, ?, ?, ?, ?, ?, ?)";
 
         return jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             cs.setBigDecimal(1, worker.getId_of_user());

@@ -71,7 +71,7 @@
         </div>
         <div th:id="contentForFindPerconal">
             <ul>
-                <li th:each="u : ${users}">
+                <li th:each="u : ${users}" th:if="${u.getId() != user.getId()}">
                     <div th:id="Transfer">
                         <a th:class="personnelLists" th:href="@{/api/pharmacy/workerCreate(idUser=${u.getId()}, selectUser=${u.getFio()},
                         idRole=${idRole}, selectRole=${selectRole}, userID=${user.getId()}, idPharmacy=${pharmacy != null ? pharmacy.getId() : ''})}">

@@ -73,7 +73,7 @@
             formData.append('source', document.getElementById('source').value);
             document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
 
-            fetch('/api/pharmacy/uploadPhoto', {
+            fetch('/api/pharmacy/uploadPhotoMedicine', {
                 method: 'POST',
                 body: formData
             })
@@ -104,7 +104,7 @@
     <form th:action="@{/api/pharmacy/medicineEdit(userID=${user.getId()})}" method="post">
         <div class="form-left">
             <div id="forPhoto1">
-                <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
+                <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this); return false;">
                 <input type="hidden" id="medicineId" th:value="${medicine != null ? medicine.getId() : ''}">
                 <input type="hidden" id="userID" th:value="${user != null ? user.getId() : ''}">
                 <input type="hidden" id="source" th:value="${'medicineEdit'}">

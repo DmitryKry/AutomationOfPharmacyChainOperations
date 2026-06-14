@@ -91,7 +91,7 @@ RETURN QUERY
 SELECT w.id, u.fio user_fio
 FROM workers w
          JOIN userofpharmacy u ON w.id_of_user = u.id
-WHERE w.id_of_role = 1;
+WHERE w.id_of_role = 1 or w.id_of_role = 3;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -125,9 +125,15 @@ CREATE OR REPLACE PROCEDURE user_pkg.set_worker(
 ) AS $$
 DECLARE
 v_constraint_name TEXT;
+v_id_again numeric;
 BEGIN
 update userofpharmacy
 set role = p_id_of_role where id = p_id_of_user;
+select 1 into v_id_again from workers where id_of_user = p_id_of_user;
+if v_id_again = 1 then
+   delete from workers
+       where id_of_user = p_id_of_user;
+end if;
 INSERT INTO workers (id_of_user, salary, education, id_of_role, inn, snils)
 VALUES (p_id_of_user, p_salary, p_education, p_id_of_role, p_inn, p_snils)
 returning id into workerID;

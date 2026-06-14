@@ -526,8 +526,18 @@ public class MainControl {
     @GetMapping("/pharmacyView")
     public String pharmacyView(@RequestParam BigDecimal idPharmacy, @RequestParam(required = false) BigDecimal userID,
                                Model model) {
+        Pharmacy pharmacy = new Pharmacy();
+        if (idPharmacy != null && idPharmacy.compareTo(BigDecimal.ZERO) > 0){
+            Photos photos = pharmacyService.getPhotoPharmacy(idPharmacy);
+            //Photos photos = userService.getPhoto(photoID);
+            pharmacy = pharmacyService.getPharmacyById(idPharmacy).get(0);
+            model.addAttribute("pharmacy", pharmacy);
+        }
         model.addAttribute("pharmacy", pharmacyService.getPharmacyById(idPharmacy).get(0));
         Photos photos = pharmacyService.getPhotoPharmacy(idPharmacy);
+        UserOfPharmacy admin = userService.getAdminPharmacy(pharmacy.getId()).get(0);
+        model.addAttribute("idAdmin", admin.getId());
+        model.addAttribute("selectAdmin", admin.getFio());
         model.addAttribute("photos", pharmacyService.getPhotoPharmacy(idPharmacy));
         model.addAttribute("admin", userService.getAdminPharmacy(idPharmacy).get(0));
         Workers workers = userService.getWorkerId(userID);
@@ -576,7 +586,7 @@ public class MainControl {
                                        @RequestParam(defaultValue = "") String fio, Model model) {
         model.addAttribute("users", userService.searchUsers(searchUser));
         if (idPharmacy != null && idPharmacy.compareTo(BigDecimal.ZERO) > 0){
-            model.addAttribute("pharmacy", pharmacyService.getPharmacyById(idPharmacy));
+            model.addAttribute("pharmacy", pharmacyService.getPharmacyById(idPharmacy).get(0));
         }
         model.addAttribute("addRole", addRole);
         model.addAttribute("addUser", addUser);
@@ -608,7 +618,7 @@ public class MainControl {
             workers.setErrorMessage(pharmacyService.createNewManage(idPharmacy, workers.getId()));
         }
         if (idPharmacy != null && idPharmacy.compareTo(BigDecimal.ZERO) > 0){
-            model.addAttribute("pharmacy", pharmacyService.getPharmacyById(idPharmacy));
+            model.addAttribute("pharmacy", pharmacyService.getPharmacyById(idPharmacy).get(0));
         }
         model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("addRole", addRole);
@@ -2007,7 +2017,8 @@ public class MainControl {
 
     @PostMapping("/uploadPhotoMedicine")
     public String uploadPhotoMedicine(@RequestParam("photo") MultipartFile file, @RequestParam(required = false) BigDecimal userID,
-                              @RequestParam(required = false) BigDecimal medicineId, Model model,
+                              @RequestParam(required = false) BigDecimal medicineId, @RequestParam(required = false) String source,
+                                      Model model,
                               HttpSession session) {
         String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
         String fileName = file.getOriginalFilename();
@@ -2028,7 +2039,7 @@ public class MainControl {
         if (medicineId != null)
             medicine = medicineService.getMedicineByID(medicineId).get(0);
 
-        String redirectUrl = UriComponentsBuilder.fromPath("/api/pharmacy/medicineCreate")
+        String redirectUrl = UriComponentsBuilder.fromPath("/api/pharmacy/" + source)
                 .queryParam("edit", true)
                 .queryParam("idMedicine", medicine.getId())
                 .queryParam("brand_id", medicine.getBrandId())
@@ -2163,7 +2174,7 @@ public class MainControl {
                 model.addAttribute("orderID", orderID);
                 model.addAttribute("InfoError", "Заказ принят!");
                 model.addAttribute("InfoErrorShow", true);
-                model.addAttribute("order", orderID);
+                model.addAttribute("order", orderService.getOrderId(orderID));
             }
             model.addAttribute("orderID", orderID);
         if (finalTrue){

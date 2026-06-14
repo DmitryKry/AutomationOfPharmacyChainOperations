@@ -80,7 +80,7 @@
             <tr>
                 <td colspan="3"><strong>Итого:</strong></td>
                 <td>
-                    <strong th:text="${order.getCost()}">₽
+                    <strong th:text="${order.getCost()} + '₽'">
                     </strong>
                 </td>
             </tr>
