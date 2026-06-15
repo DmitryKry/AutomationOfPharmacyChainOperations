@@ -15,8 +15,9 @@ CREATE TABLE IF NOT EXISTS public.pharmacy
     postal_code character varying(10) COLLATE pg_catalog."default",
     opening_date date DEFAULT CURRENT_DATE,
     closing_date date,
-    status character varying(20) COLLATE pg_catalog."default" DEFAULT 'active'::character varying,
-    id_city numeric,
+    status character varying(255) COLLATE pg_catalog."default" DEFAULT 'active'::character varying,
+    id_city numeric(38,2),
+    error_message character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT pharmacy_pkey PRIMARY KEY (id),
     CONSTRAINT pharmacy_address_unique UNIQUE (address),
     CONSTRAINT pharmacy_inn_unique UNIQUE (inn),
@@ -26,8 +27,8 @@ CREATE TABLE IF NOT EXISTS public.pharmacy
     REFERENCES public.city (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION,
-    CONSTRAINT pharmacy_status_check CHECK (status::text = ANY (ARRAY['active'::character varying, 'closed'::character varying, 'renovation'::character varying, 'temporary_closed'::character varying]::text[])),
-    CONSTRAINT pharmacy_dates_check CHECK (closing_date IS NULL OR closing_date >= opening_date)
+    CONSTRAINT pharmacy_dates_check CHECK (closing_date IS NULL OR closing_date >= opening_date),
+    CONSTRAINT pharmacy_status_check CHECK (status::text = ANY (ARRAY['active'::character varying::text, 'closed'::character varying::text, 'renovation'::character varying::text, 'temporary_closed'::character varying::text]))
     )
 
     TABLESPACE pg_default;

@@ -201,7 +201,7 @@ public class MainControl {
         }
         List<Pharmacy> pharmacies = new ArrayList<>();
         model.addAttribute("orderID", orderID);
-        if (grade == null && coverage.isEmpty()) {
+        if (grade == null) {
             pharmacies = pharmacyService.sortPharmacies(name, REGION, CITY, adress)
                     .stream()
                     .limit(15 + pagin)

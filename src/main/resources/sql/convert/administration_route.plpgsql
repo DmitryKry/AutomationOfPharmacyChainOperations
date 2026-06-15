@@ -1,0 +1,29 @@
+-- Table: public.administration_route
+
+-- DROP TABLE IF EXISTS public.administration_route;
+
+CREATE TABLE IF NOT EXISTS public.administration_route
+(
+    id bigint NOT NULL DEFAULT nextval('administration_route_id_seq'::regclass),
+    name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    description character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT administration_route_pkey PRIMARY KEY (id),
+    CONSTRAINT administration_route_name_key UNIQUE (name)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.administration_route
+    OWNER to postgres;
+
+COMMENT ON TABLE public.administration_route
+    IS 'Справочник способов применения (путей введения) лекарственных средств';
+
+COMMENT ON COLUMN public.administration_route.id
+    IS 'Уникальный идентификатор';
+
+COMMENT ON COLUMN public.administration_route.name
+    IS 'Название способа применения (например, "перорально", "наружно", "инъекционно")';
+
+COMMENT ON COLUMN public.administration_route.description
+    IS 'Дополнительное описание способа применения';

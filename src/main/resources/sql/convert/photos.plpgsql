@@ -1,21 +1,44 @@
-CREATE TABLE photos (
-                        id NUMERIC PRIMARY KEY default nextval('AllObjects'),
-                        entity_id NUMERIC NOT NULL,           -- ID записи (лекарства/аптеки/пользователя)
-                        entity_type CHAR(1) NOT NULL,        -- 'U', 'M', 'P'
-                        photo_path VARCHAR(500) NOT NULL,    -- путь к файлу или URL
-                        file_name VARCHAR(255),              -- оригинальное имя файла
-                        file_size BIGINT,                    -- размер в байтах
-                        content_type VARCHAR(100),           -- mime type (image/jpeg, image/png)
-                        is_main BOOLEAN DEFAULT FALSE,       -- основное фото (если несколько)
-                        sort_order INTEGER DEFAULT 0,        -- порядок сортировки
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+-- Table: public.photos
 
-    -- Индексы для быстрого поиска
-                        CONSTRAINT idx_photos_entity UNIQUE (entity_id, entity_type, sort_order),
-                        CHECK (entity_type IN ('U', 'M', 'P'))
-);
+-- DROP TABLE IF EXISTS public.photos;
 
--- Индексы для производительности
-CREATE INDEX idx_photos_entity_lookup ON photos(entity_id, entity_type);
-CREATE INDEX idx_photos_main ON photos(entity_id, entity_type, is_main) WHERE is_main = TRUE;
+CREATE TABLE IF NOT EXISTS public.photos
+(
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    entity_id numeric(38,2),
+    entity_type character(1) COLLATE pg_catalog."default" NOT NULL,
+    photo_path character varying(500) COLLATE pg_catalog."default" NOT NULL,
+    file_name character varying(255) COLLATE pg_catalog."default",
+    file_size bigint,
+    content_type character varying(100) COLLATE pg_catalog."default",
+    is_main boolean DEFAULT false,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    sort_order integer,
+    error_message character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT photos_pkey PRIMARY KEY (id),
+    CONSTRAINT idx_photos_entity UNIQUE (entity_id, entity_type),
+    CONSTRAINT photos_entity_type_check CHECK (entity_type = ANY (ARRAY['U'::bpchar, 'M'::bpchar, 'P'::bpchar]))
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.photos
+    OWNER to postgres;
+-- Index: idx_photos_entity_lookup
+
+-- DROP INDEX IF EXISTS public.idx_photos_entity_lookup;
+
+CREATE INDEX IF NOT EXISTS idx_photos_entity_lookup
+    ON public.photos USING btree
+    (entity_id ASC NULLS LAST, entity_type COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_photos_main
+
+-- DROP INDEX IF EXISTS public.idx_photos_main;
+
+CREATE INDEX IF NOT EXISTS idx_photos_main
+    ON public.photos USING btree
+    (entity_id ASC NULLS LAST, entity_type COLLATE pg_catalog."default" ASC NULLS LAST, is_main ASC NULLS LAST)
+    TABLESPACE pg_default
+    WHERE is_main = true;

@@ -1,0 +1,37 @@
+-- Table: public.prescription_form
+
+-- DROP TABLE IF EXISTS public.prescription_form;
+
+CREATE TABLE IF NOT EXISTS public.prescription_form
+(
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    name character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    description character varying(255) COLLATE pg_catalog."default",
+    requires_special_blank boolean,
+    storage_restriction character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT prescription_form_pkey PRIMARY KEY (id),
+    CONSTRAINT prescription_form_name_key UNIQUE (name)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.prescription_form
+    OWNER to postgres;
+
+COMMENT ON TABLE public.prescription_form
+    IS 'Справочник форм рецептурных бланков';
+
+COMMENT ON COLUMN public.prescription_form.id
+    IS 'Уникальный идентификатор формы рецепта';
+
+COMMENT ON COLUMN public.prescription_form.name
+    IS 'Наименование формы рецепта (например, "107-1/у", "148-1/у-88")';
+
+COMMENT ON COLUMN public.prescription_form.description
+    IS 'Описание: для каких лекарств предназначена данная форма рецепта';
+
+COMMENT ON COLUMN public.prescription_form.requires_special_blank
+    IS 'Признак: true - требуется специальный защищённый бланк, false - обычный бланк';
+
+COMMENT ON COLUMN public.prescription_form.storage_restriction
+    IS 'Условия и срок хранения рецепта в аптеке';

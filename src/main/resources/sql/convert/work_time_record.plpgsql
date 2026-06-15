@@ -1,0 +1,49 @@
+-- Table: public.work_time_record
+
+-- DROP TABLE IF EXISTS public.work_time_record;
+
+CREATE TABLE IF NOT EXISTS public.work_time_record
+(
+    id numeric NOT NULL DEFAULT nextval('allobjects'::regclass),
+    worker_id numeric NOT NULL,
+    pharmacy_id numeric NOT NULL,
+    work_date date NOT NULL DEFAULT CURRENT_DATE,
+    start_time time without time zone NOT NULL,
+    end_time time without time zone NOT NULL,
+    hours_worked numeric(4,2),
+    is_overtime boolean DEFAULT false,
+    overtime_hours numeric(4,2) DEFAULT 0,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT work_time_record_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_wtr_pharmacy FOREIGN KEY (pharmacy_id)
+    REFERENCES public.pharmacy (id) MATCH SIMPLE
+                    ON UPDATE NO ACTION
+                    ON DELETE NO ACTION,
+    CONSTRAINT fk_wtr_worker FOREIGN KEY (worker_id)
+    REFERENCES public.workers (id) MATCH SIMPLE
+                    ON UPDATE NO ACTION
+                    ON DELETE NO ACTION,
+    CONSTRAINT chk_work_hours CHECK (start_time < end_time)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.work_time_record
+    OWNER to postgres;
+-- Index: idx_wtr_pharmacy_date
+
+-- DROP INDEX IF EXISTS public.idx_wtr_pharmacy_date;
+
+CREATE INDEX IF NOT EXISTS idx_wtr_pharmacy_date
+    ON public.work_time_record USING btree
+    (pharmacy_id ASC NULLS LAST, work_date ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: idx_wtr_worker_date
+
+-- DROP INDEX IF EXISTS public.idx_wtr_worker_date;
+
+CREATE INDEX IF NOT EXISTS idx_wtr_worker_date
+    ON public.work_time_record USING btree
+    (worker_id ASC NULLS LAST, work_date ASC NULLS LAST)
+    TABLESPACE pg_default;

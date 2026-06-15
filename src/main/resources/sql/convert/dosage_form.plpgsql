@@ -1,0 +1,41 @@
+-- Table: public.dosage_form
+
+-- DROP TABLE IF EXISTS public.dosage_form;
+
+CREATE TABLE IF NOT EXISTS public.dosage_form
+(
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    is_solid boolean,
+    is_liquid boolean,
+    administration_route_id bigint,
+    CONSTRAINT dosage_form_pkey PRIMARY KEY (id),
+    CONSTRAINT dosage_form_name_key UNIQUE (name),
+    CONSTRAINT fk_dosage_form_administration_route FOREIGN KEY (administration_route_id)
+    REFERENCES public.administration_route (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.dosage_form
+    OWNER to postgres;
+
+COMMENT ON TABLE public.dosage_form
+    IS 'Справочник лекарственных форм';
+
+COMMENT ON COLUMN public.dosage_form.id
+    IS 'Уникальный идентификатор';
+
+COMMENT ON COLUMN public.dosage_form.name
+    IS 'Название лекарственной формы';
+
+COMMENT ON COLUMN public.dosage_form.is_solid
+    IS 'Флаг: является ли форма твёрдой';
+
+COMMENT ON COLUMN public.dosage_form.is_liquid
+    IS 'Флаг: является ли форма жидкой';
+
+COMMENT ON COLUMN public.dosage_form.administration_route_id
+    IS 'Способ введения/применения препарата';

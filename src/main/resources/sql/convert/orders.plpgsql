@@ -1,0 +1,32 @@
+-- Table: public.orders
+
+-- DROP TABLE IF EXISTS public.orders;
+
+CREATE TABLE IF NOT EXISTS public.orders
+(
+    id bigint NOT NULL DEFAULT nextval('allobjects'::regclass),
+    id_of_pharmacy bigint,
+    id_of_user bigint,
+    id_user_role bigint,
+    order_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    cost numeric(38,2),
+    status_pay boolean DEFAULT false,
+    CONSTRAINT order_medicine_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_his_role FOREIGN KEY (id_user_role)
+    REFERENCES public.role (id) MATCH SIMPLE
+                         ON UPDATE NO ACTION
+                         ON DELETE NO ACTION,
+    CONSTRAINT fk_order_pharmacy FOREIGN KEY (id_of_pharmacy)
+    REFERENCES public.pharmacy (id) MATCH SIMPLE
+                         ON UPDATE NO ACTION
+                         ON DELETE NO ACTION,
+    CONSTRAINT fk_user_orders FOREIGN KEY (id_of_user)
+    REFERENCES public.userofpharmacy (id) MATCH SIMPLE
+                         ON UPDATE NO ACTION
+                         ON DELETE NO ACTION
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.orders
+    OWNER to postgres;

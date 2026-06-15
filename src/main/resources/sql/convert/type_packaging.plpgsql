@@ -1,0 +1,17 @@
+-- Table: public.type_packaging
+
+-- DROP TABLE IF EXISTS public.type_packaging;
+
+CREATE TABLE IF NOT EXISTS public.type_packaging
+(
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    description character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT pk_type_packaging PRIMARY KEY (id),
+    CONSTRAINT uq_name_tp UNIQUE (name)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.type_packaging
+    OWNER to postgres;

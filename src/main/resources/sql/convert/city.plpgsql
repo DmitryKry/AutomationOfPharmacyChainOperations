@@ -1,7 +1,17 @@
-create table city(
-                     id numeric primary key not null default nextval('allobjects'),
-                     name VARCHAR(100) NOT NULL,
-                     region VARCHAR(100) NOT NULL, -- Регион хранится здесь
-                     CONSTRAINT uq_city_ UNIQUE (name),
-                     CONSTRAINT uq_region UNIQUE (region)
-)
+-- Table: public.city
+
+-- DROP TABLE IF EXISTS public.city;
+
+CREATE TABLE IF NOT EXISTS public.city
+(
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    region character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT city_pkey PRIMARY KEY (id),
+    CONSTRAINT uq_city_ UNIQUE (name)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.city
+    OWNER to postgres;

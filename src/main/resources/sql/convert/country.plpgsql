@@ -1,0 +1,18 @@
+-- Table: public.country
+
+-- DROP TABLE IF EXISTS public.country;
+
+CREATE TABLE IF NOT EXISTS public.country
+(
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    iso_code_2 character(2) COLLATE pg_catalog."default",
+    iso_code_3 character(3) COLLATE pg_catalog."default",
+    CONSTRAINT country_pkey PRIMARY KEY (id),
+    CONSTRAINT country_name_key UNIQUE (name)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.country
+    OWNER to postgres;

@@ -4,9 +4,9 @@
 
 CREATE TABLE IF NOT EXISTS public.pharmacy_manage
 (
-    id numeric NOT NULL DEFAULT nextval('allobjects'::regclass),
-    id_of_pharmacy numeric NOT NULL,
-    id_of_worker numeric NOT NULL,
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    id_of_pharmacy numeric(38,2) NOT NULL,
+    id_of_worker numeric(38,2) NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pharmacy_manage_pkey PRIMARY KEY (id),

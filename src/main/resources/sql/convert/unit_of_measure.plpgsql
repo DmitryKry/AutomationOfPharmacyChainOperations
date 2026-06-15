@@ -1,0 +1,18 @@
+-- Table: public.unit_of_measure
+
+-- DROP TABLE IF EXISTS public.unit_of_measure;
+
+CREATE TABLE IF NOT EXISTS public.unit_of_measure
+(
+    id numeric NOT NULL,
+    name character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    short_name character varying(10) COLLATE pg_catalog."default",
+    dimension_type character varying(20) COLLATE pg_catalog."default",
+    CONSTRAINT unit_of_measure_pkey PRIMARY KEY (id),
+    CONSTRAINT unit_of_measure_name_key UNIQUE (name)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.unit_of_measure
+    OWNER to postgres;

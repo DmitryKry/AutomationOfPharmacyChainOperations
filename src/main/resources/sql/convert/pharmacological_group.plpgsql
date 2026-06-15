@@ -1,0 +1,18 @@
+-- Table: public.pharmacological_group
+
+-- DROP TABLE IF EXISTS public.pharmacological_group;
+
+CREATE TABLE IF NOT EXISTS public.pharmacological_group
+(
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    name character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    description character varying(255) COLLATE pg_catalog."default",
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pharmacological_group_pkey PRIMARY KEY (id),
+    CONSTRAINT pharmacological_group_name_key UNIQUE (name)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.pharmacological_group
+    OWNER to postgres;

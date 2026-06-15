@@ -1,0 +1,16 @@
+-- Table: public.brand
+
+-- DROP TABLE IF EXISTS public.brand;
+
+CREATE TABLE IF NOT EXISTS public.brand
+(
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    name character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT brand_pkey PRIMARY KEY (id),
+    CONSTRAINT uq_name UNIQUE (name)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.brand
+    OWNER to postgres;

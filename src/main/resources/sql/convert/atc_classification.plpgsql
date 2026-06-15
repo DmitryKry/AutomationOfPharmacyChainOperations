@@ -1,0 +1,17 @@
+-- Table: public.atc_classification
+
+-- DROP TABLE IF EXISTS public.atc_classification;
+
+CREATE TABLE IF NOT EXISTS public.atc_classification
+(
+    id numeric(38,2) NOT NULL DEFAULT nextval('allobjects'::regclass),
+    code character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    description character varying(500) COLLATE pg_catalog."default",
+    CONSTRAINT atc_classification_pkey PRIMARY KEY (id),
+    CONSTRAINT uq_code UNIQUE (code)
+    )
+
+    TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.atc_classification
+    OWNER to postgres;
