@@ -19,7 +19,6 @@ public class VigenereCipherService {
         return result.toString();
     }
 
-    // Расшифровка (все символы)
     public String decrypt(String input) {
         if (input == null || input.isEmpty()) return input;
 

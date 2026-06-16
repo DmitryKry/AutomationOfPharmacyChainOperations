@@ -179,13 +179,16 @@
         }
 
         function uploadPhoto(input) {
+        alert('Функция вызвана!');
             saveMedicineFormData();
             let formData = new FormData();
             formData.append('photo', input.files[0]);
             formData.append('medicineId', document.getElementById('medicineId').value);
+            formData.append('userID', document.getElementById('userID').value);
+            formData.append('source', document.getElementById('source').value);
             document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
 
-            fetch('/api/pharmacy/medicineCreate/uploadPhoto', {
+            fetch('/api/pharmacy/uploadPhotoMedicine', {
                 method: 'POST',
                 body: formData
             })
@@ -264,8 +267,10 @@
     <form th:action="@{/api/pharmacy/medicineCreate(userID=${user.getId()})}" method="post">
     <div class="form-left">
         <div id="forPhoto1">
-            <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this);">
+            <input type="file" id="fileInput" accept="image/*" onchange="uploadPhoto(this); return false;">
             <input type="hidden" id="medicineId" th:value="${medicine != null ? medicine.getId() : ''}">
+            <input type="hidden" id="userID" th:value="${user != null ? user.getId() : ''}">
+            <input type="hidden" id="source" th:value="${'medicineCreate'}">
             <img id="preview" th:src="${photos != null && photos.getPhotoPath() != null ? photos.getPhotoPath() : ''}">
         </div>
     </div>
@@ -725,28 +730,31 @@
     <div th:id="contentForFindPerconal">
         <ul>
             <li th:each="df : ${dosageForms}">
-                <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate(userID=${user.getId()},
+                <div id="Transfer">
+                    <a th:title="${df.getArname()} + ': ' + ${df.getArdescription()}"
+                       th:class="personnelLists"
+                       th:href="@{/api/pharmacy/medicineCreate(userID=${user.getId()},
                     atc_id=${atc_id},
-                            selectAtc=${selectAtc},
-                            manufacturer_id=${manufacturer_id},
-                            selectManufacturer=${selectManufacturer},
-                            country_id=${country_id},
-                            selectCountry=${selectCountry},
-                            pharmacological_group_id=${pharmacological_group_id},
-                            selectPharmacologicalGroup=${selectPharmacologicalGroup},
-                            therapeutic_group_id=${therapeutic_group_id},
-                            selectTherapeuticGroup=${selectTherapeuticGroup},
-                            prescription_form_id=${prescription_form_id},
-                            selectPrescriptionForm=${selectPrescriptionForm},
-                            package_type_id=${package_type_id},
-                            selectPackageType=${selectPackageType},
-                            brand_id=${brand_id},
-                            selectBrand=${selectBrand},
-                            dosage_form_id=${df.getId()},
-                            selectDosageForm=${df.getName()},
-                            addDosageForm=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
-                        <span th:text="${df.getName()}"></span>
+                    selectAtc=${selectAtc},
+                    manufacturer_id=${manufacturer_id},
+                    selectManufacturer=${selectManufacturer},
+                    country_id=${country_id},
+                    selectCountry=${selectCountry},
+                    pharmacological_group_id=${pharmacological_group_id},
+                    selectPharmacologicalGroup=${selectPharmacologicalGroup},
+                    therapeutic_group_id=${therapeutic_group_id},
+                    selectTherapeuticGroup=${selectTherapeuticGroup},
+                    prescription_form_id=${prescription_form_id},
+                    selectPrescriptionForm=${selectPrescriptionForm},
+                    package_type_id=${package_type_id},
+                    selectPackageType=${selectPackageType},
+                    brand_id=${brand_id},
+                    selectBrand=${selectBrand},
+                    dosage_form_id=${df.id},
+                    selectDosageForm=${df.name},
+                    addDosageForm=${false},
+                    idMedicine=${medicine != null ? medicine.id : ''})}">
+                        <span th:text="${df.name}"></span>
                     </a>
                 </div>
             </li>
@@ -1382,7 +1390,7 @@
         <ul>
             <li th:each="inm : ${InjectionMethods}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate/dosageFormCreate(userID=${user.getId()},
+                    <a th:title="${inm.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicineCreate/dosageFormCreate(userID=${user.getId()},
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -1403,7 +1411,7 @@
                             selectBrand=${selectBrand},
                             InjectionMethods_id=${inm.getId()},
                             selectInjectionMethods=${inm.getName()}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
-                        <span th:text="${inm.getName()} + ': ' + ${inm.getDescription()}"></span>
+                        <span th:text="${inm.getName()}"></span>
                     </a>
                 </div>
             </li>

@@ -65,15 +65,23 @@ public class MainControl {
     }
 
     @GetMapping("/login")
-    public String showLoginPage(Model model) {
+    public String showLoginPage(@RequestParam(required = false) Boolean InfoErrorShow,
+                                Model model,
+                                HttpSession session) {
+        if (InfoErrorShow != null && InfoErrorShow == true){
+            model.addAttribute("InfoError", "Пользователь зарегистрирован успешно!");
+            model.addAttribute("InfoErrorShow", true);
+        }
         return "entrace";
     }
 
     @PostMapping("/login")
     public String processLogin(@RequestParam String login,
                                @RequestParam String password,
+                               @RequestParam(required = false) String InfoError,
                                Model model,
                                HttpSession session) {
+
         UserOfPharmacy user = userService.findOfUser(login, password);
         if (user != null) {
             model.addAttribute("pagin", 0);
@@ -87,7 +95,8 @@ public class MainControl {
             model.addAttribute("user", user);
             return "userPlace";
         } else {
-            model.addAttribute("error", ErrorCode.AUTHORIZATION_FAILED.getCode());
+            model.addAttribute("InfoError", ErrorCode.AUTHORIZATION_FAILED.getCode() == 1 ? "Неверный логин или пароль" : 1);
+            model.addAttribute("InfoErrorShow", true);
             return "entrace";
         }
     }
@@ -117,11 +126,12 @@ public class MainControl {
                 .email(email).build();
         String error = userService.UserCreate(user);
         if (error != null) {
-            model.addAttribute("error", error);
+            model.addAttribute("InfoError", error);
+            model.addAttribute("InfoErrorShow", true);
             return "registration";
         } else {
             model.addAttribute("error", ErrorCode.REGISTRATION_SUCCESS.getCode());
-            return "entrace";
+            return "redirect:/api/pharmacy/login?InfoErrorShow=" + true;
         }
     }
 
@@ -561,7 +571,8 @@ public class MainControl {
                                        @RequestParam(defaultValue = "") String selectRole,
                                        @RequestParam(required = false) BigDecimal userID,
                                        @RequestParam(defaultValue = "") String selectUser, Model model) {
-        model.addAttribute("users", userService.searchUsers(fio));
+        List<UserOfPharmacy> user = userService.searchUsers(fio);
+        model.addAttribute("users", user);
         model.addAttribute("roles", userService.getRoles());
         model.addAttribute("addRole", addRole);
         model.addAttribute("addUser", addUser);
@@ -951,7 +962,7 @@ public class MainControl {
                                          @RequestParam(defaultValue = "") String selectPackageType,
                                          @RequestParam(required = false) BigDecimal dosage_form_id,
                                          @RequestParam(defaultValue = "") String selectDosageForm,
-                                       @RequestParam(required = false) BigDecimal userID,
+                                         @RequestParam(required = false) BigDecimal userID,
                                          @RequestParam(defaultValue = "false") boolean edit,
                                          @RequestParam(required = false) BigDecimal idMedicine,
                                          @RequestParam(required = false) BigDecimal photoID,
@@ -1109,7 +1120,7 @@ public class MainControl {
                                     @RequestParam(required = false) BigDecimal photoID,
                                     @RequestParam(required = false) boolean delete,
                                     @RequestParam(required = false) boolean deleteMedicine,
-                                    Model model) {
+                                    Model model, HttpSession session) {
         model.addAttribute("addBrand", addBrand);
         Brand brand = Brand.builder().name(brandName).build();
         model.addAttribute("brands", medicineService.findBrands(brand.getName()));
@@ -1118,10 +1129,31 @@ public class MainControl {
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
-        List<Photos> photos = medicineService.getPhotosMed();
+        if (source.equals("medicinePlace")) {
+            List<Photos> photos = medicineService.getPhotosMed();
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            model.addAttribute("photos", photos);
+        }
+        else {
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                    .findFirst().orElse(null) != null) {
+                photoID = null;
+            } else {
+                photoID = p_ID == null ? photoID : p_ID;
+            }
+            if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = medicineService.getPhotoMed(idMedicine);
+                if (photoID == null)
+                    model.addAttribute("photos", photos);
+            }
+            if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+                model.addAttribute("photos", photos);
+            }
+        }
         model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("medicines", medicines);
-        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);
@@ -1209,7 +1241,7 @@ public class MainControl {
                                       @RequestParam(required = false) BigDecimal photoID,
                                       @RequestParam(required = false) boolean delete,
                                       @RequestParam(required = false) boolean deleteMedicine,
-                                      Model model) {
+                                      Model model, HttpSession session) {
         model.addAttribute("addAtc", addAtc);
         AtcClassification atcClassification = AtcClassification.builder().code(atcCode).build();
         model.addAttribute("atcList", medicineService.findAtcCode(atcClassification.getCode()));
@@ -1219,9 +1251,30 @@ public class MainControl {
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
-        List<Photos> photos = medicineService.getPhotosMed();
+        if (source.equals("medicinePlace")) {
+            List<Photos> photos = medicineService.getPhotosMed();
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            model.addAttribute("photos", photos);
+        }
+        else {
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                    .findFirst().orElse(null) != null) {
+                photoID = null;
+            } else {
+                photoID = p_ID == null ? photoID : p_ID;
+            }
+            if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = medicineService.getPhotoMed(idMedicine);
+                if (photoID == null)
+                    model.addAttribute("photos", photos);
+            }
+            if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+                model.addAttribute("photos", photos);
+            }
+        }
         model.addAttribute("medicines", medicines);
-        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);
@@ -1291,7 +1344,7 @@ public class MainControl {
                                             @RequestParam(required = false) BigDecimal photoID,
                                             @RequestParam(required = false) boolean delete,
                                             @RequestParam(required = false) boolean deleteMedicine,
-                                                 Model model) {
+                                                 Model model, HttpSession session) {
         model.addAttribute("addPrescriptionForm", addPrescriptionForm);
         model.addAttribute("prescriptionForms", medicineService.findPrescriptionForm(formName));
         model.addAttribute("pagin", 0);
@@ -1299,10 +1352,31 @@ public class MainControl {
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
-        List<Photos> photos = medicineService.getPhotosMed();
+        if (source.equals("medicinePlace")) {
+            List<Photos> photos = medicineService.getPhotosMed();
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            model.addAttribute("photos", photos);
+        }
+        else {
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                    .findFirst().orElse(null) != null) {
+                photoID = null;
+            } else {
+                photoID = p_ID == null ? photoID : p_ID;
+            }
+            if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = medicineService.getPhotoMed(idMedicine);
+                if (photoID == null)
+                    model.addAttribute("photos", photos);
+            }
+            if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+                model.addAttribute("photos", photos);
+            }
+        }
         model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("medicines", medicines);
-        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);
@@ -1389,7 +1463,7 @@ public class MainControl {
                                       @RequestParam(required = false) BigDecimal photoID,
                                       @RequestParam(required = false) boolean delete,
                                       @RequestParam(required = false) boolean deleteMedicine,
-                                      Model model) {
+                                      Model model, HttpSession session) {
         model.addAttribute("addPackageType", addPackageType);
         model.addAttribute("packageTypes", medicineService.findTypePackaging(packageTypeName));
         model.addAttribute("pagin", 0);
@@ -1398,9 +1472,30 @@ public class MainControl {
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
-        List<Photos> photos = medicineService.getPhotosMed();
+        if (source.equals("medicinePlace")) {
+            List<Photos> photos = medicineService.getPhotosMed();
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            model.addAttribute("photos", photos);
+        }
+        else {
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                    .findFirst().orElse(null) != null) {
+                photoID = null;
+            } else {
+                photoID = p_ID == null ? photoID : p_ID;
+            }
+            if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = medicineService.getPhotoMed(idMedicine);
+                if (photoID == null)
+                    model.addAttribute("photos", photos);
+            }
+            if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+                model.addAttribute("photos", photos);
+            }
+        }
         model.addAttribute("medicines", medicines);
-        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);
@@ -1478,7 +1573,7 @@ public class MainControl {
                                                      @RequestParam(required = false) BigDecimal photoID,
                                                      @RequestParam(required = false) boolean delete,
                                                      @RequestParam(required = false) boolean deleteMedicine,
-                                            Model model) {
+                                            Model model, HttpSession session) {
         model.addAttribute("addPharmacologicalGroup", addPharmacologicalGroup);
         model.addAttribute("pharmacologicalGroups", medicineService.findPharmacologicalGroup(groupName));
         model.addAttribute("pagin", 0);
@@ -1486,10 +1581,31 @@ public class MainControl {
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
-        List<Photos> photos = medicineService.getPhotosMed();
+        if (source.equals("medicinePlace")) {
+            List<Photos> photos = medicineService.getPhotosMed();
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            model.addAttribute("photos", photos);
+        }
+        else {
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                    .findFirst().orElse(null) != null) {
+                photoID = null;
+            } else {
+                photoID = p_ID == null ? photoID : p_ID;
+            }
+            if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = medicineService.getPhotoMed(idMedicine);
+                if (photoID == null)
+                    model.addAttribute("photos", photos);
+            }
+            if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+                model.addAttribute("photos", photos);
+            }
+        }
         model.addAttribute("medicines", medicines);
         model.addAttribute("user", userService.get_id_user(userID));
-        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);
@@ -1585,7 +1701,7 @@ public class MainControl {
                                              @RequestParam(required = false) BigDecimal photoID,
                                              @RequestParam(required = false) boolean delete,
                                              @RequestParam(required = false) boolean deleteMedicine,
-                                             Model model) {
+                                             Model model, HttpSession session) {
         model.addAttribute("addTherapeuticGroup", addTherapeuticGroup);
         model.addAttribute("therapeuticGroups", medicineService.findTherapeuticGroup(groupName));
         model.addAttribute("pagin", 0);
@@ -1594,9 +1710,30 @@ public class MainControl {
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
-        List<Photos> photos = medicineService.getPhotosMed();
+        if (source.equals("medicinePlace")) {
+            List<Photos> photos = medicineService.getPhotosMed();
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            model.addAttribute("photos", photos);
+        }
+        else {
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                    .findFirst().orElse(null) != null) {
+                photoID = null;
+            } else {
+                photoID = p_ID == null ? photoID : p_ID;
+            }
+            if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = medicineService.getPhotoMed(idMedicine);
+                if (photoID == null)
+                    model.addAttribute("photos", photos);
+            }
+            if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+                model.addAttribute("photos", photos);
+            }
+        }
         model.addAttribute("medicines", medicines);
-        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);
@@ -1675,7 +1812,7 @@ public class MainControl {
                                           @RequestParam(required = false) BigDecimal photoID,
                                           @RequestParam(required = false) boolean delete,
                                           @RequestParam(required = false) boolean deleteMedicine,
-                                             Model model) {
+                                             Model model, HttpSession session) {
         model.addAttribute("addManufacturer", addManufacturer);
         model.addAttribute("manufacturers", medicineService.findManufucture(manufacturerName));
         model.addAttribute("pagin", 0);
@@ -1684,9 +1821,30 @@ public class MainControl {
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
-        List<Photos> photos = medicineService.getPhotosMed();
+        if (source.equals("medicinePlace")) {
+            List<Photos> photos = medicineService.getPhotosMed();
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            model.addAttribute("photos", photos);
+        }
+        else {
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                    .findFirst().orElse(null) != null) {
+                photoID = null;
+            } else {
+                photoID = p_ID == null ? photoID : p_ID;
+            }
+            if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = medicineService.getPhotoMed(idMedicine);
+                if (photoID == null)
+                    model.addAttribute("photos", photos);
+            }
+            if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+                model.addAttribute("photos", photos);
+            }
+        }
         model.addAttribute("medicines", medicines);
-        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);
@@ -1800,7 +1958,7 @@ public class MainControl {
                                      @RequestParam(required = false) BigDecimal photoID,
                                      @RequestParam(required = false) boolean delete,
                                      @RequestParam(required = false) boolean deleteMedicine,
-                                    Model model) {
+                                    Model model, HttpSession session) {
         model.addAttribute("dosageForms", medicineService.findDosageForm(dosageFormName));
         model.addAttribute("addDosageForm", addDosageForm);
         model.addAttribute("pagin", 0);
@@ -1809,9 +1967,30 @@ public class MainControl {
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
-        List<Photos> photos = medicineService.getPhotosMed();
+        if (source.equals("medicinePlace")) {
+            List<Photos> photos = medicineService.getPhotosMed();
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            model.addAttribute("photos", photos);
+        }
+        else {
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                    .findFirst().orElse(null) != null) {
+                photoID = null;
+            } else {
+                photoID = p_ID == null ? photoID : p_ID;
+            }
+            if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = medicineService.getPhotoMed(idMedicine);
+                if (photoID == null)
+                    model.addAttribute("photos", photos);
+            }
+            if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+                model.addAttribute("photos", photos);
+            }
+        }
         model.addAttribute("medicines", medicines);
-        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);
@@ -1962,7 +2141,7 @@ public class MainControl {
                                     @RequestParam(required = false) BigDecimal photoID,
                                     @RequestParam(required = false) boolean delete,
                                     @RequestParam(required = false) boolean deleteMedicine,
-                                    Model model) {
+                                    Model model, HttpSession session) {
         model.addAttribute("countries", medicineService.findCountry(countryName));
         model.addAttribute("addCountry", addCountry);
         model.addAttribute("pagin", 0);
@@ -1970,10 +2149,31 @@ public class MainControl {
         List<Medicine> medicines = medicineService.getAllMedicine().stream()
                 .limit(15)
                 .collect(Collectors.toList());
-        List<Photos> photos = medicineService.getPhotosMed();
+        if (source.equals("medicinePlace")) {
+            List<Photos> photos = medicineService.getPhotosMed();
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            model.addAttribute("photos", photos);
+        }
+        else {
+            BigDecimal p_ID = (BigDecimal) session.getAttribute("photoID");
+            if (pharmacyService.getPhotosPharmacy().stream().filter(photos -> photos.getId().equals(p_ID) && photos.getEntityId() != null)
+                    .findFirst().orElse(null) != null) {
+                photoID = null;
+            } else {
+                photoID = p_ID == null ? photoID : p_ID;
+            }
+            if (idMedicine != null && idMedicine.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = medicineService.getPhotoMed(idMedicine);
+                if (photoID == null)
+                    model.addAttribute("photos", photos);
+            }
+            if (photoID != null && photoID.compareTo(BigDecimal.ZERO) > 0) {
+                Photos photos = userService.getPhoto(photoID) == null ? new Photos() : userService.getPhoto(photoID);
+                model.addAttribute("photos", photos);
+            }
+        }
         model.addAttribute("user", userService.get_id_user(userID));
         model.addAttribute("medicines", medicines);
-        model.addAttribute("photos", photos);
         model.addAttribute("selectBrand", selectBrand);
         model.addAttribute("brand_id", brand_id);
         model.addAttribute("selectAtc", selectAtc);

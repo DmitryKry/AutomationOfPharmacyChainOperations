@@ -56,7 +56,7 @@
 
             hoverTimer = setTimeout(() => {
                 window.location.href = `/api/pharmacy/ordersList?orderID=${orderId}&userID=${userId}&idPharmacy=${pharmacyId}`;
-            }, 100);
+            }, 500);
         });
 
         item.addEventListener('mouseleave', function(e) {

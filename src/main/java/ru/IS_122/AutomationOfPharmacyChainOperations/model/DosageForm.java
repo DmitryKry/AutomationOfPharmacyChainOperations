@@ -36,4 +36,9 @@ public class DosageForm {
     @Column(nullable = false)
     private Long administration_route_id;
 
+    @Transient
+    public String arname;
+
+    @Transient
+    public String ardescription;
 }

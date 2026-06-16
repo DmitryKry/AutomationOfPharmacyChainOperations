@@ -89,9 +89,13 @@
         <input type="hidden" th:id="orderID" th:value="${order.getId()}">
         <input type="hidden" th:id="idPharmacy" th:value="${idPharmacy}">
         <input type="hidden" id="userId" th:value="${user.getId()}">
-        <button th:class="AcceptTheOrder" th:if="${user.getRole() != 2}" th:text="#{AcceptTheOrder}">Печать чека</button>
-        <button th:class="PrintingTheReceip" th:if="${user.getRole() == 2}" th:text="#{PrintingTheReceip}">Печать чека</button>
+        <button th:class="AcceptTheOrder" th:if="${user.getRole() != 2}" th:text="#{AcceptTheOrder}"></button>
     </div>
+    <script th:if="${finalTrue == true && order.getCost() == null}">
+        setTimeout(function() {
+            location.reload();
+        }, 100);
+    </script>
     <div>
         <a th:href="@{/api/pharmacy/orders(userID=${user.getId()}, orderID=${orderID})}"
            th:text="#{Ok}"></a>
@@ -135,7 +139,7 @@
 
             hoverTimer = setTimeout(() => {
                 window.location.href = `/api/pharmacy/orders?userID=${userId}&medicineID=${medicineId}`;
-            }, 300);
+            }, 500);
         });
 
         item.addEventListener('mouseleave', function(e) {

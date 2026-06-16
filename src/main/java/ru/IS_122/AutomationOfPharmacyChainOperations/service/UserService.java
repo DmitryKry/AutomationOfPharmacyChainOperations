@@ -53,6 +53,32 @@ public class UserService {
     }
 
     public String UserCreate(UserOfPharmacy user) {
+        String phoneError = validatePhone(user.getPhone());
+        if (phoneError != null) return phoneError;
+
+        String loginError = validateLogin(user.getLogin());
+        if (loginError != null) return loginError;
+
+        String fioError = validateFio(user.getFio());
+        if (fioError != null) return fioError;
+
+        String emailError = validateEmail(user.getEmail());
+        if (emailError != null) return emailError;
+
+        String passwordError = validatePassword(user.getPassword());
+        if (passwordError != null) return passwordError;
+
+        String passportError = validatePassport(user.getPassport());
+        if (passportError != null) return passportError;
+
+        String birthDateError = validateBirthDate(user.getDataOfBirt());
+        if (birthDateError != null) return birthDateError;
+
+        String normalizedPhone = user.getPhone().replaceAll("\\D", "");
+        if (normalizedPhone.startsWith("8")) {
+            normalizedPhone = "7" + normalizedPhone.substring(1);
+        }
+        user.setPhone(normalizedPhone);
 
         String sql = "CALL user_pkg.set_of_user(?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -65,6 +91,7 @@ public class UserService {
                 .email(cipherService.encrypt(user.getEmail()))
                 .password(cipherService.encrypt(user.getPassword()))
                 .build();
+
         String errorMessage = jdbcTemplate.execute(sql, (CallableStatement cs) -> {
             cs.setString(1, encodedUser.getLogin());
             cs.setDate(2, Date.valueOf(encodedUser.getDataOfBirt()));
@@ -82,6 +109,60 @@ public class UserService {
             return errorMessage;
         }
 
+        return null;
+    }
+
+    private String validatePhone(String phone) {
+        if (phone == null || phone.isEmpty()) return "Номер телефона не может быть пустым";
+        String cleanPhone = phone.replaceAll("\\D", "");
+        if (cleanPhone.length() != 11) return "Номер телефона должен содержать 11 цифр";
+        if (!cleanPhone.startsWith("7") && !cleanPhone.startsWith("8")) return "Номер телефона должен начинаться с 7 или 8";
+        return null;
+    }
+
+    private String validateLogin(String login) {
+        if (login == null || login.isEmpty()) return "Логин не может быть пустым";
+        if (login.length() < 3) return "Логин должен содержать минимум 3 символа";
+        if (login.length() > 50) return "Логин не может быть длиннее 50 символов";
+        if (!login.matches("^[a-zA-Z0-9_]+$")) return "Логин может содержать только буквы, цифры и знак подчеркивания";
+        return null;
+    }
+
+    private String validateFio(String fio) {
+        if (fio == null || fio.isEmpty()) return "ФИО не может быть пустым";
+        if (fio.length() > 200) return "ФИО не может быть длиннее 200 символов";
+        if (!fio.matches("^[а-яА-Яa-zA-Z\\s-]+$")) return "ФИО может содержать только буквы, пробелы и дефисы";
+        return null;
+    }
+
+    private String validateEmail(String email) {
+        if (email == null || email.isEmpty()) return "Email не может быть пустым";
+        if (email.length() > 100) return "Email не может быть длиннее 100 символов";
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) return "Введите корректный email";
+        return null;
+    }
+
+    private String validatePassword(String password) {
+        if (password == null || password.isEmpty()) return "Пароль не может быть пустым";
+        if (password.length() < 6) return "Пароль должен содержать минимум 6 символов";
+        if (password.length() > 255) return "Пароль не может быть длиннее 255 символов";
+        return null;
+    }
+
+    private String validatePassport(String passport) {
+        if (passport != null && !passport.isEmpty()) {
+            String cleanPassport = passport.replaceAll("\\s", "");
+            if (cleanPassport.length() != 10 && cleanPassport.length() != 11) {
+                return "Паспорт должен содержать 10 или 11 цифр (серия+номер)";
+            }
+        }
+        return null;
+    }
+
+    private String validateBirthDate(LocalDate birthDate) {
+        if (birthDate == null) return "Дата рождения не может быть пустой";
+        if (birthDate.isAfter(LocalDate.now())) return "Дата рождения не может быть в будущем";
+        if (birthDate.isBefore(LocalDate.now().minusYears(150))) return "Некорректная дата рождения";
         return null;
     }
 

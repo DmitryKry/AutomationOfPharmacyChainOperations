@@ -5,98 +5,30 @@
     <title>Вход</title>
     <link rel="stylesheet" th:href="@{/style.css}">
     <script th:inline="javascript">
-        const FORM_STORAGE_KEY = 'pharmacyFormData';
-/*
-        function saveFormData() {
-            const formData = {
-                name: document.getElementById('name_pharmacy')?.value || '',
-                legal_name: document.getElementById('legal_name_pharmacy')?.value || '',
-                inn: document.getElementById('INN')?.value || '',
-                kpp: document.getElementById('KPP')?.value || '',
-                ogrn: document.getElementById('OGRN')?.value || '',
-                address: document.getElementById('adress_pharmacy')?.value || '',
-                postal_code: document.getElementById('POSTAL_CODE')?.value || ''
-            };
-            sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
-        }
-
-        function restoreFormData() {
-            const savedData = sessionStorage.getItem(FORM_STORAGE_KEY);
-            if (savedData) {
-                const formData = JSON.parse(savedData);
-
-                if (document.getElementById('name_pharmacy'))
-                    document.getElementById('name_pharmacy').value = formData.name || '';
-                if (document.getElementById('legal_name_pharmacy'))
-                    document.getElementById('legal_name_pharmacy').value = formData.legal_name || '';
-                if (document.getElementById('INN'))
-                    document.getElementById('INN').value = formData.inn || '';
-                if (document.getElementById('KPP'))
-                    document.getElementById('KPP').value = formData.kpp || '';
-                if (document.getElementById('OGRN'))
-                    document.getElementById('OGRN').value = formData.ogrn || '';
-                if (document.getElementById('adress_pharmacy'))
-                    document.getElementById('adress_pharmacy').value = formData.address || '';
-                if (document.getElementById('POSTAL_CODE'))
-                    document.getElementById('POSTAL_CODE').value = formData.postal_code || '';
-            }
-        }
-
-        function clearFormData() {
-            sessionStorage.removeItem(FORM_STORAGE_KEY);
-        }
-
-        function attachAutoSave() {
-            const inputs = ['name_pharmacy', 'legal_name_pharmacy', 'INN', 'KPP', 'OGRN', 'adress_pharmacy', 'POSTAL_CODE'];
-            inputs.forEach(id => {
-                const input = document.getElementById(id);
-                if (input) {
-                    input.addEventListener('input', () => saveFormData());
-                    input.addEventListener('change', () => saveFormData());
-                }
-            });
-        }
-*/
-        function attachLinkHandlers() {
-            const links = document.querySelectorAll('a');
-            links.forEach(link => {
-                link.addEventListener('click', () => saveFormData());
-            });
-        }
-
         function uploadPhoto(input) {
             let formData = new FormData();
             formData.append('photo', input.files[0]);
             formData.append('pharmacyID', document.getElementById('pharmacyID').value);
             formData.append('userID', document.getElementById('userID').value);
             formData.append('source', document.getElementById('source').value);
-            document.getElementById('preview').src = URL.createObjectURL(input.files[0]);
+
+            let preview = document.getElementById('preview');
+            if (preview) {
+                preview.src = URL.createObjectURL(input.files[0]);
+            }
 
             fetch('/api/pharmacy/uploadPhotoPharmacy', {
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('preview').src = data.photoUrl + '?t=' + new Date().getTime();
-                        document.getElementById('status').innerHTML = '✓ Загружено';
-                        setTimeout(() => document.getElementById('status').innerHTML = '', 2000);
-                    }
-                })
-                .catch(() => document.getElementById('status').innerHTML = '✗ Ошибка');
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && preview) {
+                    preview.src = data.photoUrl + '?t=' + new Date().getTime();
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            restoreFormData();
-            attachAutoSave();
-            attachLinkHandlers();
-
-            const form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', () => clearFormData());
-            }
-        });
     </script>
 </HEAD>
 <body>

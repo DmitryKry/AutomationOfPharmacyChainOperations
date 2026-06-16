@@ -42,7 +42,7 @@ public class Order {
     private BigDecimal cost;
 
     @Column(name = "status_pay")
-    private boolean statusPay;
+    private Boolean statusPay;
 
     @Transient
     private String pharmacyName;
@@ -55,4 +55,8 @@ public class Order {
 
     @Transient
     private String userFio;
+
+    public boolean isStatusPay() {
+        return statusPay != null && statusPay;
+    }
 }

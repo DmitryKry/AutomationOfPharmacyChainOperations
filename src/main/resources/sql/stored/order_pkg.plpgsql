@@ -146,18 +146,37 @@ select * from orders where id_user_role = 3;
 end;
 $$ language plpgsql;
 
-create or replace function order_pkg.get_all_orders_user(userID numeric)
-       returns table (id bigint, id_of_pharmacy bigint, id_of_user bigint, id_user_role bigint,
-       order_date timestamp, cost numeric, status_pay boolean, pharmacyName varchar, pharmacyAddress varchar, pharmacyCity varchar, userFio varchar) as $$
-begin
-return query
-select o.*, p.name pharmacyName, p.address pharmacyAddress, c.name pharmacyCity, u.fio userFio from orders o
-         join pharmacy p on p.id = o.id_of_pharmacy
-         join userofpharmacy u on u.id = o.id_of_user
-         join city c on c.id = p.id_city
-         where o.id_of_user = userID;
-end;
-$$ language plpgsql;
+CREATE OR REPLACE FUNCTION order_pkg.get_all_orders_user(
+	p_user_id numeric)
+    RETURNS TABLE(id numeric, id_of_pharmacy numeric, id_of_user numeric, id_user_role numeric, order_date timestamp without time zone, cost numeric, status_pay boolean, pharmacyname character varying, pharmacyaddress character varying, pharmacycity character varying, userfio character varying)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o.id::numeric,
+        o.id_of_pharmacy::numeric,
+        o.id_of_user::numeric,
+        o.id_user_role::numeric,
+        o.order_date,
+        o.cost,
+        o.status_pay,
+        p.name::varchar,
+        p.address::varchar,
+        c.name::varchar,
+        u.fio::varchar
+    FROM orders o
+    JOIN pharmacy p ON p.id = o.id_of_pharmacy
+    JOIN userofpharmacy u ON u.id = o.id_of_user
+    JOIN city c ON c.id = p.id_city
+    WHERE o.id_of_user = p_user_id;
+END;
+$BODY$;
+
 
 create or replace function order_pkg.get_med_orders(user_id numeric)
        returns table(
@@ -273,8 +292,10 @@ end;
 $$ language plpgsql;
 
 create or replace function order_pkg.get_order_admin(adminID numeric)
-       returns table (id bigint, id_of_pharmacy bigint, id_of_user bigint, id_user_role bigint,
-       order_date timestamp, cost numeric, status_pay boolean, pharmacyName varchar, pharmacyAddress varchar, pharmacyCity varchar, userFio varchar) as $$
+       returns table (id bigint, cost numeric, id_of_pharmacy bigint,
+                                      id_of_user bigint,
+                                      id_user_role bigint,
+       order_date timestamp, status_pay boolean, pharmacyName varchar, pharmacyAddress varchar, pharmacyCity varchar, userFio varchar) as $$
 declare
        pharmacyID numeric;
        begin

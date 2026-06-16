@@ -812,10 +812,11 @@ end;
 $$ language plpgsql;
 
 create or replace function medicine_pkg.get_all_dosageForms()
-       returns setof dosage_form as $$
+       returns table (name varchar, is_solid boolean, is_liquid boolean, administration_route_id bigint, arname varchar, ardescription varchar) as $$
 begin
 return query
-select * from dosage_form;
+select df.name, df.is_solid, df.is_liquid, df.administration_route_id, ar.name arname, ar.description ardescription from dosage_form df
+join administration_route ar on ar.id = df.administration_route_id;
 end;
 $$ language plpgsql;
 

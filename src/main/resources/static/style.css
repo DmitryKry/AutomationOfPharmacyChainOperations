@@ -144,7 +144,7 @@ input:focus, select:focus {
 
 .orders{
     position: absolute;
-    right: 16%;
+    right: 20%;
 }
 
 .registration {
@@ -154,7 +154,7 @@ input:focus, select:focus {
 
 .authorization {
     position: absolute;
-    right: 10%;
+    right: 12%;
 }
 
 .about_of_pharmacy{
@@ -169,7 +169,7 @@ input:focus, select:focus {
 
 .pharmacies{
     position: absolute;
-    left: 9%;
+    left: 12%;
 }
 
 .createObject{
@@ -214,6 +214,7 @@ input:focus, select:focus {
     background: white;
     border-radius: 2.5% 2.5% 2.5% 2.5%;
     border: 1px solid red;
+    height: auto;
 
     display: flex;
     flex-direction: column;
@@ -232,18 +233,16 @@ input:focus, select:focus {
     text-align: center;
 }
 #more_active > a{
-    margin-top: 0.5%;
     padding-right: 3%;
     padding-left: 3%;
     padding-top: 1.5%;
     padding-bottom: 1.5%;
     margin-left: 0.5%;
-    margin-top: 10%;
+    margin-top: 5%;
 
 }
 #more_active > a:first-child{
     position: relative;
-    left: -2%;
 }
 
 .form-group {

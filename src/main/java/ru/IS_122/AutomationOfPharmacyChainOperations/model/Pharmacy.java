@@ -18,31 +18,22 @@ public class Pharmacy {
     @Column(name = "id", nullable = false)
     private BigDecimal id;
     @Column(name = "name", nullable = false, length = 200)
-    @NonNull
     private String name;
     @Column(name = "legal_name", nullable = false, length = 200)
-    @NonNull
     private String legal_name;
     @Column(name = "inn", nullable = false, length = 12)
-    @NonNull
     private String inn;
     @Column(name = "kpp", nullable = false, length = 9)
-    @NonNull
     private String kpp;
     @Column(name = "ogrn", nullable = false, length = 13)
-    @NonNull
     private String ogrn;
     @Column(name = "address", nullable = false, length = 255)
-    @NonNull
     private String address;
     @Column(name = "ID_CITY", nullable = false)
-    @NonNull
     private BigDecimal ID_CITY;
     @Column(name = "region", nullable = false, length = 100)
-    @NonNull
     private String region;
     @Column(name = "postal_code", nullable = false, length = 10)
-    @NonNull
     private String postal_code;
 
     @Column(name = "opening_date", nullable = false)

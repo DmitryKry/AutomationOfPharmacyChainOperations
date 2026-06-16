@@ -41,9 +41,33 @@ as $$
        declare
 p_manage numeric;
 begin
+if p_name is null then
+    p_error := 'ERROR: Поле name не может быть NULL';
+    return;
+end if;
+
+if p_address is null then
+    p_error := 'ERROR: Поле address не может быть NULL';
+    return;
+end if;
+
+if p_ID_CITY is null then
+    p_error := 'ERROR: Поле city не может быть NULL';
+    return;
+end if;
+
+if p_ID_CITY is null then
+    p_error := 'ERROR: Поле id_city не может быть NULL';
+    return;
+end if;
+
+if p_id_of_worker is null then
+    p_error := 'ERROR: Поле p_id_of_worker не может быть NULL';
+    return;
+end if;
 select 1 into p_manage from pharmacy_manage where id_of_worker = p_id_of_worker;
 if p_manage is null then
-    insert into pharmacy (name, legal_name, inn, kpp, ogrn, address, ID_CITY, region, postal_code)
+    insert into pharmacy (name, legal_name, inn, kpp, ogrn, address,  id_city, region, postal_code)
     values (p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_ID_CITY, p_region, p_postal_code)
     RETURNING ID INTO p_id_pharmacy;
     insert into pharmacy_manage(id_of_pharmacy, id_of_worker)
@@ -66,7 +90,7 @@ ELSE
 END IF;
 
 WHEN not_null_violation THEN
-        p_error := 'ERROR: Обязательное поле не может быть NULL';
+        p_error := concat('ERROR: Обязательное поле не может быть NULL', p_name, p_legal_name, p_inn, p_kpp, p_ogrn, p_address, p_ID_CITY, p_region, p_postal_code, p_id_pharmacy, p_id_of_worker);
 
 WHEN foreign_key_violation THEN
         p_error := 'ERROR: Нарушение внешнего ключа';

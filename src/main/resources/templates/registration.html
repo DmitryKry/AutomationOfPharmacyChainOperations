@@ -12,10 +12,7 @@
 </div>
 <form th:action="@{/api/pharmacy/registration}" method="post" th:if="${user == null}">
     <div class="Entrace">
-        <h2 th:if="${error == null}" th:text="#{view.registration}"></h2>
-        <div th:id="errorCheak" th:if="${error != null}">
-            <h2 th:if="${error != null}" th:text="${error}"></h2>
-        </div>
+        <h2 th:text="#{view.registration}"></h2>
         <div class="form-group">
             <label for="login" th:text="#{login}"></label>
             <br>
@@ -51,6 +48,12 @@
             <br>
             <input type="password" id="password" name="password" required>
             <button type="submit" th:class="ButtonPost" th:text="#{regisres}"></button>
+        </div>
+    </div>
+    <div th:class="findPerconal" th:id="okForm" th:if="${InfoErrorShow == true}">
+        <H3 th:text="${InfoError}"></H3>
+        <div>
+            <a th:href="@{/api/pharmacy/registration}" th:text="#{Ok}"></a>
         </div>
     </div>
 </form>

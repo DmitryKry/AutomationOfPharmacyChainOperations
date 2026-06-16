@@ -20,6 +20,14 @@ public class OrderService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private final VigenereCipherService cipherService;
+
+    public OrderService(JdbcTemplate jdbcTemplate, VigenereCipherService cipherService) {
+
+        this.jdbcTemplate = jdbcTemplate;
+        this.cipherService = cipherService;
+    }
 
     public void createOrder(BigDecimal userID) {
         String sql = "call order_pkg.create_order(?)";
@@ -136,7 +144,13 @@ public class OrderService {
 
     public List<Order> getAllOrdersUser(BigDecimal userID) {
         String sql = "select * from order_pkg.get_all_orders_user(?)";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class), userID);
+        List<Order> orders = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class), userID);
+
+        for (Order order : orders){
+            order.setUserFio(cipherService.decrypt(order.getUserFio()));
+        }
+
+        return orders;
     }
 
     public Order getOrderId(BigDecimal orderID) {
@@ -146,7 +160,12 @@ public class OrderService {
 
     public List<Order> getOrderAdmin(BigDecimal adminID) {
         String sql = "select * from order_pkg.get_order_admin(?)";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class), adminID);
+        List<Order> orders = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Order.class), adminID);
+        for (Order order : orders){
+            order.setUserFio(cipherService.decrypt(order.getUserFio()));
+        }
+
+        return orders;
     }
 
     public void updateOrderPay(BigDecimal orderID) {

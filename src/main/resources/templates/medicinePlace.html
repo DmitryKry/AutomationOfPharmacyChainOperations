@@ -988,7 +988,7 @@
         <ul>
             <li th:each="pt : ${packageTypes}">
                 <div th:id="Transfer">
-                    <a th:class="personnelLists" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()},
+                    <a th:title="${pt.getDescription()}" th:class="personnelLists" th:href="@{/api/pharmacy/medicinePlace(userID=${user.getId()},
                     atc_id=${atc_id},
                             selectAtc=${selectAtc},
                             manufacturer_id=${manufacturer_id},
@@ -1008,7 +1008,7 @@
                             package_type_id=${pt.getId()},
                             selectPackageType=${pt.getName()},
                             addPackageType=${false}, idMedicine=${medicine != null ? medicine.getId() : ''})}">
-                        <span th:text="${pt.getName()} + ': ' + ${pt.getDescription()}"></span>
+                        <span th:text="${pt.getName()}"></span>
                     </a>
                 </div>
             </li>
